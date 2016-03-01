@@ -9,8 +9,10 @@ import PureLayout
 public enum StackViewDistribution {
     case Fill
     case FillEqually
+    // FIXME: Implement
     case FillProportionally
     case EqualSpacing
+    // FIXME: Implement
     case EqualCentering
 }
 
@@ -30,14 +32,26 @@ public enum StackViewAlignment {
 }
 
 public class StackView : UIView {
-    public var axis: UILayoutConstraintAxis = .Horizontal
-    public var distribution: StackViewDistribution = .Fill
-    public var alignment: StackViewAlignment = .Fill
-    public var spacing: CGFloat = 0.0
-    
-    // FIXME:
-    public var baselineRelativeArrangement = false
-    public var layoutMarginsRelativeArrangement = false
+    public var axis: UILayoutConstraintAxis = .Horizontal {
+        didSet { if axis != oldValue { self.invalidateLayout() } }
+    }
+    public var distribution: StackViewDistribution = .Fill {
+        didSet { if distribution != oldValue { self.invalidateLayout() } }
+    }
+    public var alignment: StackViewAlignment = .Fill {
+        didSet { if alignment != oldValue { self.invalidateLayout() } }
+    }
+    public var spacing: CGFloat = 0.0 {
+        didSet { if spacing != oldValue { self.invalidateLayout() } }
+    }
+    // FIXME: Implement
+    public var baselineRelativeArrangement = false {
+        didSet { if baselineRelativeArrangement != oldValue { self.invalidateLayout() } }
+    }
+    // FIXME: Implement
+    public var layoutMarginsRelativeArrangement = false {
+        didSet { if layoutMarginsRelativeArrangement != oldValue { self.invalidateLayout() } }
+    }
     
     private var stackConstraints = [NSLayoutConstraint]()
     private var invalidated = false
@@ -104,7 +118,7 @@ public class StackView : UIView {
     }
     
     private func addSpacingConstraints() -> [NSLayoutConstraint] {
-        // TEMP:
+        // FIXME: Don't create spacers when not necessary
         /*
         var constraints2 = [NSLayoutConstraint]()
         let _ = self.arrangedSubviews.reduce(nil as UIView?) { previous, current in

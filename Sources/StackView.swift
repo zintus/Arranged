@@ -53,25 +53,35 @@ public class StackView : UIView {
         didSet { if layoutMarginsRelativeArrangement != oldValue { self.invalidateLayout() } }
     }
     
-    private var stackConstraints = [NSLayoutConstraint]()
+    private var alignmentArrangement: _LayoutArrangement? = nil
+    private var distrubitonArrangement: _LayoutArrangement? = nil
+    
     private var invalidated = false
+    
+//    private
     
     public private(set) var arrangedSubviews: [UIView]
     
     public init(arrangedSubviews views: [UIView]) {
         self.arrangedSubviews = views
         super.init(frame: CGRectZero)
+        self.commonInit()
     }
     
     public required init?(coder aDecoder: NSCoder) {
         self.arrangedSubviews = []
         super.init(coder: aDecoder)
-        
+        self.commonInit()
         // FIXME: KVO warning
         
         // FIXME:
         self.arrangedSubviews.appendContentsOf(self.subviews)
         self.invalidateLayout()
+    }
+    
+    private func commonInit() {
+        self.alignmentArrangement = _AlignedLayoutArrangement(canvas: self)
+        self.distrubitonArrangement = _DistributionLayoutArrangement(canvas: self)
     }
     
     public func addArrangedSubview(view: UIView) {
@@ -102,44 +112,77 @@ public class StackView : UIView {
     public override func updateConstraints() {
         if self.invalidated {
             self.invalidated = false
-            self.refreshConstraints()
+            // FIXME: Refresh only invalidated constraints (at least in most and perforamce-intensive common cases)
+            self.alignmentArrangement?.updateConstraints()
+            self.distrubitonArrangement?.updateConstraints()
         }
         super.updateConstraints()
     }
-    
-    private func refreshConstraints() {
-        self.removeConstraints(self.stackConstraints)
-        self.stackConstraints.removeAll()
-        // FIXME: Maybe we could avoid collection constraints?
-        self.stackConstraints.appendContentsOf(self.addSpacingConstraints())
-        self.stackConstraints.appendContentsOf(self.addPinningSidesCostraints())
-        self.stackConstraints.appendContentsOf(self.addDistributionConstraints())
-        self.stackConstraints.appendContentsOf(self.addAlignmentConstraints())
+}
+
+private class _LayoutArrangement {
+    private weak var canvas: StackView!
+    private var constraints = [NSLayoutConstraint]()
+
+    private init(canvas: StackView) {
+        self.canvas = canvas
+    }
+    private func updateConstraints() {
+        canvas.removeConstraints(self.constraints)
+        constraints.removeAll()
+    }
+}
+
+private class _AlignedLayoutArrangement: _LayoutArrangement {
+    private override func updateConstraints() {
+        super.updateConstraints()
+        let hor = canvas.axis == .Horizontal
+        let align = canvas.alignment
+        let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
+            constraints.append(current.autoPinEdgeToSuperviewMargin((hor ? .Top : .Leading), relation: (align == .Fill || align == .Leading ? .Equal : .GreaterThanOrEqual)))
+            constraints.append(current.autoPinEdgeToSuperviewMargin((hor ? .Bottom : .Trailing), relation: (align == .Fill || align == .Trailing ? .Equal : .GreaterThanOrEqual)))
+            if align == .Center {
+                constraints.append(current.autoAlignAxisToSuperviewMarginAxis(hor ? .Horizontal : .Vertical))
+            }
+            if let previous = previous where align == .FirstBaseline || align == .LastBaseline {
+                constraints.append(current.autoAlignAxis((align == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: previous))
+            }
+            return current
+        }
+    }
+}
+
+private class _DistributionLayoutArrangement: _LayoutArrangement {
+    private override func updateConstraints() {
+        super.updateConstraints()
+        
+        self.addSpacingConstraints()
+        self.addPinningSidesCostraints()
+        self.addDistributionConstraints()
     }
     
-    private func addSpacingConstraints() -> [NSLayoutConstraint] {
+    private func addSpacingConstraints() {
         // FIXME: Don't create spacers when not necessary
         /*
         var constraints2 = [NSLayoutConstraint]()
         let _ = self.arrangedSubviews.reduce(nil as UIView?) { previous, current in
-            if let previous = previous {
-                let hor = self.axis == .Horizontal
-                constraints2.append(current.autoPinEdge((hor ? .Leading : .Bottom), toEdge: (hor ? .Trailing : .Top), ofView: previous, withOffset: self.spacing))
-            }
-            return current
+        if let previous = previous {
+        let hor = self.axis == .Horizontal
+        constraints2.append(current.autoPinEdge((hor ? .Leading : .Bottom), toEdge: (hor ? .Trailing : .Top), ofView: previous, withOffset: self.spacing))
+        }
+        return current
         }
         return constraints2
-*/
+        */
         
-        self.subviews.filter{ $0 is Spacer }.forEach{ $0.removeFromSuperview() }
-        let hor = self.axis == .Horizontal
-        var constraints = [NSLayoutConstraint]()
+        canvas.subviews.filter{ $0 is Spacer }.forEach{ $0.removeFromSuperview() }
+        let hor = canvas.axis == .Horizontal
         // Join views using spacers
         var spacers = [Spacer]()
-        let _ = self.arrangedSubviews.reduce(nil as UIView?) { previous, current in
+        let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
             if let previous = previous {
                 let spacer = Spacer()
-                self.addSubview(spacer)
+                canvas.addSubview(spacer)
                 spacers.append(spacer)
                 constraints.append(spacer.autoPinEdge((hor ? .Leading : .Bottom), toEdge: (hor ? .Trailing : .Top), ofView: previous))
                 constraints.append(current.autoPinEdge((hor ? .Leading : .Bottom), toEdge: (hor ? .Trailing : .Top), ofView: spacer))
@@ -151,60 +194,39 @@ public class StackView : UIView {
             constraints.append(current.autoSetDimension((hor ? .Height : .Width), toSize: 0))
             // FIXME: Support other distributions
             let dimension: ALDimension = hor ? .Width : .Height
-            constraints.append(current.autoSetDimension(dimension, toSize: self.spacing, relation: (self.distribution == .EqualSpacing ? .Equal : .GreaterThanOrEqual)))
+            constraints.append(current.autoSetDimension(dimension, toSize: canvas.spacing, relation: (canvas.distribution == .EqualSpacing ? .Equal : .GreaterThanOrEqual)))
             if let previous = previous {
                 constraints.append(current.autoMatchDimension(dimension, toDimension: dimension, ofView: previous))
             }
             return current
         }
-        return constraints
     }
     
-    private func addPinningSidesCostraints() -> [NSLayoutConstraint] {
+    private func addPinningSidesCostraints() {
         var constraints = [NSLayoutConstraint]()
-        let hor = self.axis == .Horizontal
-        if let constraint = self.arrangedSubviews.first?.autoPinEdgeToSuperviewMargin(hor ? .Leading : .Top) {
+        let hor = canvas.axis == .Horizontal
+        if let constraint = canvas.arrangedSubviews.first?.autoPinEdgeToSuperviewMargin(hor ? .Leading : .Top) {
             constraints.append(constraint)
         }
         // FIXME: Make sure that matches UIStackView
-        if let constraint = self.arrangedSubviews.last?.autoPinEdgeToSuperviewMargin(hor ? .Trailing : .Bottom) {
+        if let constraint = canvas.arrangedSubviews.last?.autoPinEdgeToSuperviewMargin(hor ? .Trailing : .Bottom) {
             constraints.append(constraint)
         }
-        return constraints
     }
     
-    private func addDistributionConstraints() -> [NSLayoutConstraint] {
+    private func addDistributionConstraints() {
         // FIXME: Add support for other distributions
-        guard self.distribution == .FillEqually else {
-            return []
+        guard canvas.distribution == .FillEqually else {
+            return
         }
         var constraints = [NSLayoutConstraint]()
-        let _ = self.arrangedSubviews.reduce(nil as UIView?) { previous, current in
-            let dimension: ALDimension = (self.axis == .Horizontal ? .Width : .Height)
+        let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
+            let dimension: ALDimension = (canvas.axis == .Horizontal ? .Width : .Height)
             if let previous = previous {
                 constraints.append(previous.autoMatchDimension(dimension, toDimension: dimension, ofView: current))
             }
             return current
         }
-        return constraints
-    }
-    
-    private func addAlignmentConstraints() -> [NSLayoutConstraint] {
-        var constraints = [NSLayoutConstraint]()
-        let hor = self.axis == .Horizontal
-        let align = self.alignment
-        let _ = self.arrangedSubviews.reduce(nil as UIView?) { previous, current in
-            constraints.append(current.autoPinEdgeToSuperviewMargin((hor ? .Top : .Leading), relation: (align == .Fill || align == .Leading ? .Equal : .GreaterThanOrEqual)))
-            constraints.append(current.autoPinEdgeToSuperviewMargin((hor ? .Bottom : .Trailing), relation: (align == .Fill || align == .Trailing ? .Equal : .GreaterThanOrEqual)))
-            if align == .Center {
-                constraints.append(current.autoAlignAxisToSuperviewMarginAxis(hor ? .Horizontal : .Vertical))
-            }
-            if let previous = previous where align == .FirstBaseline || align == .LastBaseline {
-                constraints.append(current.autoAlignAxis((align == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: previous))
-            }
-            return current
-        }
-        return constraints
     }
 }
 

@@ -1,13 +1,13 @@
 Pod::Spec.new do |s|
-    s.name             = "Stack"
+    s.name             = "Arranged"
     s.version          = "0.1"
     s.summary          = "UIStackView port for iOS 8+"
 
-    s.homepage         = "https://github.com/kean/Stack"
+    s.homepage         = "https://github.com/kean/Arranged"
     s.license          = "MIT"
     s.author           = "Alexander Grebenyuk"
     s.social_media_url = "https://twitter.com/a_grebenyuk"
-    s.source           = { :git => "https://github.com/kean/Stack.git", :tag => s.version.to_s }
+    s.source           = { :git => "https://github.com/kean/Arranged.git", :tag => s.version.to_s }
 
     s.dependency 'PureLayout', '~> 3.0'
 

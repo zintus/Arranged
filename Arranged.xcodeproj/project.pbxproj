@@ -7,14 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0CC6B8301C860A5D0022B224 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC6B82F1C860A5D0022B224 /* ViewExtensions.swift */; };
 		0CE361251C8607BB00EA70CF /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0CE361241C8607BB00EA70CF /* Info.plist */; };
 		0CE361281C8607DE00EA70CF /* StackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE361271C8607DE00EA70CF /* StackView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0CC6B82F1C860A5D0022B224 /* ViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
-		0CE361181C86077B00EA70CF /* Stack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Stack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CE361181C86077B00EA70CF /* Arranged.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Arranged.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CE361241C8607BB00EA70CF /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Supporting/Info.plist; sourceTree = "<group>"; };
 		0CE361271C8607DE00EA70CF /* StackView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -42,7 +40,7 @@
 		0CE361191C86077B00EA70CF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0CE361181C86077B00EA70CF /* Stack.framework */,
+				0CE361181C86077B00EA70CF /* Arranged.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -59,7 +57,6 @@
 			isa = PBXGroup;
 			children = (
 				0CE361271C8607DE00EA70CF /* StackView.swift */,
-				0CC6B82F1C860A5D0022B224 /* ViewExtensions.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -77,9 +74,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		0CE361171C86077B00EA70CF /* Stack */ = {
+		0CE361171C86077B00EA70CF /* Arranged */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0CE361201C86077B00EA70CF /* Build configuration list for PBXNativeTarget "Stack" */;
+			buildConfigurationList = 0CE361201C86077B00EA70CF /* Build configuration list for PBXNativeTarget "Arranged" */;
 			buildPhases = (
 				0CE361131C86077B00EA70CF /* Sources */,
 				0CE361141C86077B00EA70CF /* Frameworks */,
@@ -90,9 +87,9 @@
 			);
 			dependencies = (
 			);
-			name = Stack;
+			name = Arranged;
 			productName = Stack;
-			productReference = 0CE361181C86077B00EA70CF /* Stack.framework */;
+			productReference = 0CE361181C86077B00EA70CF /* Arranged.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -109,7 +106,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 0CE361121C86077B00EA70CF /* Build configuration list for PBXProject "Stack" */;
+			buildConfigurationList = 0CE361121C86077B00EA70CF /* Build configuration list for PBXProject "Arranged" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -121,7 +118,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0CE361171C86077B00EA70CF /* Stack */,
+				0CE361171C86077B00EA70CF /* Arranged */,
 			);
 		};
 /* End PBXProject section */
@@ -142,7 +139,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0CC6B8301C860A5D0022B224 /* ViewExtensions.swift in Sources */,
 				0CE361281C8607DE00EA70CF /* StackView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -251,7 +247,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.Stack;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.Arranged;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -270,7 +266,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.Stack;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.Arranged;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -279,7 +275,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0CE361121C86077B00EA70CF /* Build configuration list for PBXProject "Stack" */ = {
+		0CE361121C86077B00EA70CF /* Build configuration list for PBXProject "Arranged" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0CE3611E1C86077B00EA70CF /* Debug */,
@@ -288,7 +284,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0CE361201C86077B00EA70CF /* Build configuration list for PBXNativeTarget "Stack" */ = {
+		0CE361201C86077B00EA70CF /* Build configuration list for PBXNativeTarget "Arranged" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0CE361211C86077B00EA70CF /* Debug */,

@@ -57,9 +57,7 @@ public class StackView : UIView {
     private var distrubitonArrangement: _LayoutArrangement? = nil
     
     private var invalidated = false
-    
-//    private
-    
+        
     public private(set) var arrangedSubviews: [UIView]
     
     public init(arrangedSubviews views: [UIView]) {
@@ -72,7 +70,6 @@ public class StackView : UIView {
         self.arrangedSubviews = []
         super.init(coder: aDecoder)
         self.commonInit()
-        // FIXME: KVO warning
         
         // FIXME:
         self.arrangedSubviews.appendContentsOf(self.subviews)

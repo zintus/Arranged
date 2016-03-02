@@ -124,48 +124,80 @@ public class StackView : UIView {
     }
 }
 
-private class LayoutArrangement {
-    private weak var canvas: StackView!
-    private var constraints = [NSLayoutConstraint]()
-
-    private init(canvas: StackView) {
+class LayoutArrangement {
+    weak var canvas: StackView!
+    var constraints = [NSLayoutConstraint]()
+    
+    // Convenience accessors
+    var hor: Bool { return canvas.axis == .Horizontal }
+    var align: StackViewAlignment { return canvas.alignment }
+    var marginsEnabled: Bool { return canvas.layoutMarginsRelativeArrangement }
+    
+    
+    init(canvas: StackView) {
         self.canvas = canvas
     }
-    private func updateConstraints() {
+    
+    func updateConstraints() {
         canvas.removeConstraints(self.constraints)
         constraints.removeAll()
     }
 }
 
-private class AlignedLayoutArrangement: LayoutArrangement {
-    private override func updateConstraints() {
+class AlignedLayoutArrangement: LayoutArrangement {
+    override func updateConstraints() {
         super.updateConstraints()
-        let hor = canvas.axis == .Horizontal
-        let align = canvas.alignment
         let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
-            constraints.append(current.autoPinEdgeToSuperviewMargin((hor ? .Top : .Leading), relation: (align == .Fill || align == .Leading ? .Equal : .GreaterThanOrEqual)))
-            constraints.append(current.autoPinEdgeToSuperviewMargin((hor ? .Bottom : .Trailing), relation: (align == .Fill || align == .Trailing ? .Equal : .GreaterThanOrEqual)))
+            // Pin edges leading and trailing edges (either with .Equal : .GreaterThanOrEqual relation)
+            if marginsEnabled {
+                constraints.append(current.autoPinEdgeToSuperviewMargin(leadingEdge, relation: leadingRelation))
+                constraints.append(current.autoPinEdgeToSuperviewMargin(trailingEdge, relation: trailingRelation))
+            } else {
+                constraints.append(current.autoPinEdgeToSuperviewEdge(leadingEdge, withInset: 0, relation: leadingRelation))
+                constraints.append(current.autoPinEdgeToSuperviewEdge(trailingEdge, withInset: 0, relation: trailingRelation))
+            }
             if align == .Center {
-                constraints.append(current.autoAlignAxisToSuperviewMarginAxis(hor ? .Horizontal : .Vertical))
+                constraints.append(current.autoConstrainAttribute(centeringAttribute, toAttribute: centeringAttribute, ofView: canvas))
             }
             if let previous = previous where align == .FirstBaseline || align == .LastBaseline {
+                assert(!hor, "baseline alignment not supported for vertical layout axis")
                 constraints.append(current.autoAlignAxis((align == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: previous))
             }
             return current
         }
     }
-}
-
-private class DistributionLayoutArrangement: LayoutArrangement {
-    private override func updateConstraints() {
-        super.updateConstraints()
-
-        self.addSpacingConstraints()
-        self.addPinningSidesCostraints()
-        self.addDistributionConstraints()
+    
+    var leadingEdge: ALEdge {
+        return hor ? .Top : .Leading
     }
     
-    private func addSpacingConstraints() {
+    var trailingEdge: ALEdge {
+        return hor ? .Bottom : .Trailing
+    }
+    
+    var leadingRelation: NSLayoutRelation {
+        return (align == .Fill || align == .Leading ? .Equal : .GreaterThanOrEqual)
+    }
+    
+    var trailingRelation: NSLayoutRelation {
+        return (align == .Fill || align == .Trailing ? .Equal : .GreaterThanOrEqual)
+    }
+    
+    var centeringAttribute: ALAttribute {
+        return marginsEnabled ? (hor ? .MarginAxisHorizontal : .MarginAxisVertical) : (hor ? .Horizontal : .Vertical)
+    }
+}
+
+class DistributionLayoutArrangement: LayoutArrangement {
+    override func updateConstraints() {
+        super.updateConstraints()
+
+        updateSpacingConstraints()
+        updatePinningSidesCostraints()
+        updateDistributionConstraints()
+    }
+    
+    func updateSpacingConstraints() {
         // FIXME: Don't create spacers when not necessary
         /*
         var constraints2 = [NSLayoutConstraint]()
@@ -205,24 +237,26 @@ private class DistributionLayoutArrangement: LayoutArrangement {
         }
     }
     
-    private func addPinningSidesCostraints() {
-        var constraints = [NSLayoutConstraint]()
-        let hor = canvas.axis == .Horizontal
-        if let constraint = canvas.arrangedSubviews.first?.autoPinEdgeToSuperviewMargin(hor ? .Leading : .Top) {
-            constraints.append(constraint)
+    func updatePinningSidesCostraints() {
+        guard let first = canvas.arrangedSubviews.first, last = canvas.arrangedSubviews.last else {
+            return
         }
-        // FIXME: Make sure that matches UIStackView
-        if let constraint = canvas.arrangedSubviews.last?.autoPinEdgeToSuperviewMargin(hor ? .Trailing : .Bottom) {
-            constraints.append(constraint)
+        let leadingEdge: ALEdge = hor ? .Leading : .Top
+        let trailingEdge: ALEdge = hor ? .Trailing : .Bottom
+        if marginsEnabled {
+            constraints.append(first.autoPinEdgeToSuperviewMargin(leadingEdge))
+            constraints.append(last.autoPinEdgeToSuperviewMargin(trailingEdge))
+        } else {
+            constraints.append(first.autoPinEdgeToSuperviewEdge(leadingEdge))
+            constraints.append(last.autoPinEdgeToSuperviewEdge(trailingEdge))
         }
     }
-    
-    private func addDistributionConstraints() {
+
+    func updateDistributionConstraints() {
         // FIXME: Add support for other distributions
         guard canvas.distribution == .FillEqually else {
             return
         }
-        var constraints = [NSLayoutConstraint]()
         let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
             let dimension: ALDimension = (canvas.axis == .Horizontal ? .Width : .Height)
             if let previous = previous {

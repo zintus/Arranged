@@ -131,6 +131,8 @@ class LayoutArrangement {
     // Convenience accessors
     var hor: Bool { return canvas.axis == .Horizontal }
     var align: StackViewAlignment { return canvas.alignment }
+    var distr: StackViewDistribution { return canvas.distribution }
+    var spacing: CGFloat { return canvas.spacing }
     var marginsEnabled: Bool { return canvas.layoutMarginsRelativeArrangement }
     
     
@@ -193,25 +195,29 @@ class DistributionLayoutArrangement: LayoutArrangement {
         super.updateConstraints()
 
         updateSpacingConstraints()
-        updatePinningSidesCostraints()
+        updateCanvasConnectingCostraints()
         updateDistributionConstraints()
     }
     
     func updateSpacingConstraints() {
-        // FIXME: Don't create spacers when not necessary
-        /*
-        var constraints2 = [NSLayoutConstraint]()
-        let _ = self.arrangedSubviews.reduce(nil as UIView?) { previous, current in
-        if let previous = previous {
-        let hor = self.axis == .Horizontal
-        constraints2.append(current.autoPinEdge((hor ? .Leading : .Bottom), toEdge: (hor ? .Trailing : .Top), ofView: previous, withOffset: self.spacing))
-        }
-        return current
-        }
-        return constraints2
-        */
         canvas.subviews.filter{ $0 is Spacer }.forEach{ $0.removeFromSuperview() }
-        let hor = canvas.axis == .Horizontal
+        
+        let fromEdge: ALEdge = hor ? .Leading : .Top
+        let toEdge: ALEdge = hor ? .Trailing : .Bottom
+        
+        guard spacersEnabled else {
+            // Set spacing without creating spacers
+            let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
+                if let previous = previous {
+                    let constraint = current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous, withOffset: spacing)
+                    constraint.identifier = "ASV-spacing"
+                    constraints.append(constraint)
+                }
+                return current
+            }
+            return
+        }
+        
         // Join views using spacers
         var spacers = [Spacer]()
         let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
@@ -219,17 +225,15 @@ class DistributionLayoutArrangement: LayoutArrangement {
                 let spacer = Spacer()
                 canvas.addSubview(spacer)
                 spacers.append(spacer)
-                constraints.append(spacer.autoPinEdge((hor ? .Leading : .Bottom), toEdge: (hor ? .Trailing : .Top), ofView: previous))
-                constraints.append(current.autoPinEdge((hor ? .Leading : .Bottom), toEdge: (hor ? .Trailing : .Top), ofView: spacer))
+                constraints.append(spacer.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous))
+                constraints.append(current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: spacer))
             }
             return current
         }
         // Configure spacers
         let _ = spacers.reduce(nil as Spacer?) { previous, current in
-            constraints.append(current.autoSetDimension((hor ? .Height : .Width), toSize: 0))
-            // FIXME: Support other distributions
             let dimension: ALDimension = hor ? .Width : .Height
-            constraints.append(current.autoSetDimension(dimension, toSize: canvas.spacing, relation: (canvas.distribution == .EqualSpacing ? .Equal : .GreaterThanOrEqual)))
+            constraints.append(current.autoSetDimension(dimension, toSize: spacing, relation: (distr == .EqualSpacing ? .Equal : .GreaterThanOrEqual)))
             if let previous = previous {
                 constraints.append(current.autoMatchDimension(dimension, toDimension: dimension, ofView: previous))
             }
@@ -237,7 +241,11 @@ class DistributionLayoutArrangement: LayoutArrangement {
         }
     }
     
-    func updatePinningSidesCostraints() {
+    var spacersEnabled: Bool {
+        return distr == .EqualSpacing
+    }
+    
+    func updateCanvasConnectingCostraints() {
         guard let first = canvas.arrangedSubviews.first, last = canvas.arrangedSubviews.last else {
             return
         }
@@ -267,4 +275,8 @@ class DistributionLayoutArrangement: LayoutArrangement {
     }
 }
 
-private class Spacer: UIView {}
+class Spacer: UIView {
+    override func intrinsicContentSize() -> CGSize {
+        return CGSize(width: 0, height: 0)
+    }
+}

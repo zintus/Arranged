@@ -8,6 +8,8 @@
 
 import UIKit
 
+let loggingEnabled = true
+
 class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewController {
     var stackView: T!
     var views = [UIView]()
@@ -33,9 +35,9 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
 
         self.stackView = self.createStackView()
         
-        views.append(ContentView(contentSize: CGSize(width: 44, height: 44), color: UIColor.redColor()))
-        views.append(ContentView(contentSize: CGSize(width: 30, height: 100), color: UIColor.blueColor()))
-        views.append(ContentView(contentSize: CGSize(width: 80, height: 40), color: UIColor.greenColor()))
+        views.append(ContentView(contentSize: CGSize(width: 44, height: 44), color: UIColor.redColor(), title: "content-view-1"))
+        views.append(ContentView(contentSize: CGSize(width: 30, height: 100), color: UIColor.blueColor(), title: "content-view-2"))
+        views.append(ContentView(contentSize: CGSize(width: 80, height: 40), color: UIColor.greenColor(), title: "content-view-3"))
 
         for view in views {
             self.stackView.addArrangedSubview(view)
@@ -142,6 +144,31 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         controls.autoPinEdge(.Top, toEdge: .Bottom, ofView: self.stackView, withOffset: 16, relation: .GreaterThanOrEqual)
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if loggingEnabled {
+            print("")
+            print("horizontal")
+            print("==========")
+            print("\naffecting stack view:")
+            printConstraints(stackView.constraintsAffectingLayoutForAxis(.Horizontal))
+            for view in views {
+                print("\naffecting view \(view.accessibilityIdentifier):")
+                printConstraints(view.constraintsAffectingLayoutForAxis(.Horizontal))
+            }
+            print("")
+            print("vertical")
+            print("==========")
+            print("\naffecting stack view:")
+            printConstraints(stackView.constraintsAffectingLayoutForAxis(.Vertical))
+            for view in views {
+                print("\naffecting view \(view.accessibilityIdentifier):")
+                printConstraints(view.constraintsAffectingLayoutForAxis(.Vertical))
+            }
+        }
+    }
+    
     @objc func buttonShowAllTapped(sender: UIButton) {
         self.perform {
             self.stackView.subviews.forEach{ $0.hidden = false }
@@ -172,16 +199,23 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
             closure()
         }
     }
+    
+    func printConstraints(constraints: [NSLayoutConstraint]) {
+        for constraint in constraints {
+            print(constraint)
+        }
+    }
 }
 
 
 class ContentView: UIView {
     var contentSize = CGSize(width: 44, height: 44)
 
-    convenience init(contentSize: CGSize, color: UIColor) {
+    convenience init(contentSize: CGSize, color: UIColor, title: String) {
         self.init(frame: CGRectZero)
         self.contentSize = contentSize
         self.backgroundColor = color
+        self.accessibilityIdentifier = title
     }
 
     override init(frame: CGRect) {

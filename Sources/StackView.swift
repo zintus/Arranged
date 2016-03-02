@@ -81,6 +81,7 @@ public class StackView : UIView {
     }
     
     private func commonInit() {
+        self.layoutMargins = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         self.alignmentArrangement = AlignedLayoutArrangement(canvas: self)
         self.distrubitonArrangement = DistributionLayoutArrangement(canvas: self)
     }

@@ -31,7 +31,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         // Creat stack view
 
         self.stackView = self.createStackView()
-
+        
         views.append(ContentView(contentSize: CGSize(width: 44, height: 44), color: UIColor.redColor()))
         views.append(ContentView(contentSize: CGSize(width: 30, height: 100), color: UIColor.blueColor()))
         views.append(ContentView(contentSize: CGSize(width: 80, height: 40), color: UIColor.greenColor()))
@@ -42,7 +42,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
             self.stackView.addArrangedSubview(view)
         }
 
-        self.stackView.layoutMargins = UIEdgeInsetsZero
+        self.stackView.layoutMargins = UIEdgeInsetsMake(8, 8, 8, 8)
 
         self.view.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         self.view.addSubview(self.stackView)

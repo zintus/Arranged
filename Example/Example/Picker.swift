@@ -141,8 +141,8 @@ class AlignmentPicker : ValuePicker<UIStackViewAlignment> {
 }
 
 class MarginsPicker : ValuePicker<UIEdgeInsets> {
-    let values: [UIEdgeInsets] = [UIEdgeInsetsZero, UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0), UIEdgeInsetsMake(10, 20, 30, 40)]
-    let items = ["(0, 0, 0, 0)", "(10, 0, 10, 0)", "(10, 20, 30, 40)"]
+    let values: [UIEdgeInsets] = [UIEdgeInsetsMake(8, 8, 8, 8) , UIEdgeInsetsMake(10, 20, 30, 40), UIEdgeInsetsZero]
+    let items = ["(8, 8, 8, 8)", "(10, 20, 30, 40)", "(0, 0, 0, 0)"]
 
     override init(value: UIEdgeInsets, presenter: UIViewController, observer: (value: UIEdgeInsets) -> Void) {
         super.init(value: value, presenter: presenter, observer: observer)

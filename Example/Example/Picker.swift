@@ -187,6 +187,20 @@ class LayoutMarginsRelativeArrangementPicker : ValuePicker<Bool> {
     }
 }
 
+class AnimatedPicker : ValuePicker<Bool> {
+    override init(value: Bool, presenter: UIViewController, observer: (value: Bool) -> Void) {
+        super.init(value: value, presenter: presenter, observer: observer)
+    }
+    
+    override func update() {
+        button.setTitle("animated:", value: "\(value)")
+    }
+    
+    override func tapped() {
+        value = !value
+    }
+}
+
 extension UIButton {
     func setTitle(title: String, value: String) {
         let string = NSMutableAttributedString()

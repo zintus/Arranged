@@ -73,7 +73,7 @@ class AxisPicker : ValuePicker<UILayoutConstraintAxis> {
     }
 
     override func update() {
-        button.setTitle("axis:  \(items[values.indexOf(value)!])", forState: .Normal)
+        button.setTitle("axis:", value: "\(items[values.indexOf(value)!])")
     }
 
     override func tapped() {
@@ -92,7 +92,7 @@ class SpacingPicker : ValuePicker<CGFloat> {
     }
 
     override func update() {
-        button.setTitle("spacing: \(values[values.indexOf(value)!])", forState: .Normal)
+        button.setTitle("spacing:", value: "\(values[values.indexOf(value)!])")
     }
 
     override func tapped() {
@@ -111,7 +111,7 @@ class DistrubituonPicker : ValuePicker<UIStackViewDistribution> {
     }
 
     override func update() {
-        button.setTitle("distribution: \(items[values.indexOf(value)!])", forState: .Normal)
+        button.setTitle("distribution:", value: "\(items[values.indexOf(value)!])")
     }
 
     override func tapped() {
@@ -130,7 +130,7 @@ class AlignmentPicker : ValuePicker<UIStackViewAlignment> {
     }
 
     override func update() {
-        button.setTitle("alignment: \(items[values.indexOf(value)!])", forState: .Normal)
+        button.setTitle("alignment:", value: "\(items[values.indexOf(value)!])")
     }
 
     override func tapped() {
@@ -149,7 +149,7 @@ class MarginsPicker : ValuePicker<UIEdgeInsets> {
     }
 
     override func update() {
-        button.setTitle("margins: \(items[values.indexOf(value)!])", forState: .Normal)
+        button.setTitle("margins:", value: "\(items[values.indexOf(value)!])")
     }
 
     override func tapped() {
@@ -165,7 +165,7 @@ class BaselineRelativeArrangementPicker : ValuePicker<Bool> {
     }
 
     override func update() {
-        button.setTitle("baselineRelativeArrangement: \(value)", forState: .Normal)
+        button.setTitle("baselineRelativeArrangement:", value: "\(value)")
     }
 
     override func tapped() {
@@ -179,10 +179,19 @@ class LayoutMarginsRelativeArrangementPicker : ValuePicker<Bool> {
     }
 
     override func update() {
-        button.setTitle("layoutMarginsRelativeArrangement: \(value)", forState: .Normal)
+        button.setTitle("layoutMarginsRelativeArrangement:", value: "\(value)")
     }
 
     override func tapped() {
         value = !value
+    }
+}
+
+extension UIButton {
+    func setTitle(title: String, value: String) {
+        let string = NSMutableAttributedString()
+        string.appendAttributedString(NSAttributedString(string: title.stringByAppendingString(" "), attributes: [ NSFontAttributeName: UIFont.systemFontOfSize(14) ]))
+        string.appendAttributedString(NSAttributedString(string: value, attributes: [ NSFontAttributeName: UIFont.boldSystemFontOfSize(14) ]))
+        self.setAttributedTitle(string, forState: .Normal)
     }
 }

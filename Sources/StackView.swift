@@ -53,8 +53,8 @@ public class StackView : UIView {
         didSet { if layoutMarginsRelativeArrangement != oldValue { self.invalidateLayout() } }
     }
     
-    private var alignmentArrangement: _LayoutArrangement? = nil
-    private var distrubitonArrangement: _LayoutArrangement? = nil
+    private var alignmentArrangement: LayoutArrangement? = nil
+    private var distrubitonArrangement: LayoutArrangement? = nil
     
     private var invalidated = false
         
@@ -81,9 +81,11 @@ public class StackView : UIView {
     }
     
     private func commonInit() {
-        self.alignmentArrangement = _AlignedLayoutArrangement(canvas: self)
-        self.distrubitonArrangement = _DistributionLayoutArrangement(canvas: self)
+        self.alignmentArrangement = AlignedLayoutArrangement(canvas: self)
+        self.distrubitonArrangement = DistributionLayoutArrangement(canvas: self)
     }
+
+    // MARK: Managing Arranged Views
     
     public func addArrangedSubview(view: UIView) {
         if view.superview != view && !self.arrangedSubviews.contains(view) {
@@ -92,7 +94,7 @@ public class StackView : UIView {
             self.invalidateLayout()
         }
     }
-    
+
     public func removeArrangedSubview(view: UIView) {
         // FIXME:
     }
@@ -121,7 +123,7 @@ public class StackView : UIView {
     }
 }
 
-private class _LayoutArrangement {
+private class LayoutArrangement {
     private weak var canvas: StackView!
     private var constraints = [NSLayoutConstraint]()
 
@@ -134,7 +136,7 @@ private class _LayoutArrangement {
     }
 }
 
-private class _AlignedLayoutArrangement: _LayoutArrangement {
+private class AlignedLayoutArrangement: LayoutArrangement {
     private override func updateConstraints() {
         super.updateConstraints()
         let hor = canvas.axis == .Horizontal
@@ -153,10 +155,10 @@ private class _AlignedLayoutArrangement: _LayoutArrangement {
     }
 }
 
-private class _DistributionLayoutArrangement: _LayoutArrangement {
+private class DistributionLayoutArrangement: LayoutArrangement {
     private override func updateConstraints() {
         super.updateConstraints()
-        
+
         self.addSpacingConstraints()
         self.addPinningSidesCostraints()
         self.addDistributionConstraints()

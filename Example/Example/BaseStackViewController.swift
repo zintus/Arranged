@@ -11,6 +11,7 @@ import UIKit
 class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewController {
     var stackView: T!
     var views = [UIView]()
+    var pinStackViewConstraint: NSLayoutConstraint!
 
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -48,6 +49,8 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.stackView.autoPinToTopLayoutGuideOfViewController(self, withInset: 16)
         self.stackView.autoPinEdgeToSuperviewMargin(.Leading)
         self.stackView.autoPinEdgeToSuperviewMargin(.Trailing, relation: .GreaterThanOrEqual)
+        self.pinStackViewConstraint = self.stackView.autoPinEdgeToSuperviewMargin(.Trailing)
+        self.pinStackViewConstraint.active = false
 
 
         // Create background for stack view
@@ -71,42 +74,63 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
 
         controls.addArrangedSubview(AxisPicker(value: self.stackView.axis, presenter: self) {
             self.stackView.axis = $0
-            }.button)
+        }.button)
         controls.addArrangedSubview(SpacingPicker(value: self.stackView.spacing, presenter: self) {
             self.stackView.spacing = $0
-            }.button)
+        }.button)
         controls.addArrangedSubview(DistrubituonPicker(value: self.stackView.ar_distribution, presenter: self) {
             self.stackView.ar_distribution = $0
-            }.button)
+        }.button)
         controls.addArrangedSubview(AlignmentPicker(value: self.stackView.ar_alignment, presenter: self) {
             self.stackView.ar_alignment = $0
-            }.button)
+        }.button)
         controls.addArrangedSubview(MarginsPicker(value: self.stackView.layoutMargins, presenter: self) {
             self.stackView.layoutMargins = $0
-            }.button)
+        }.button)
         controls.addArrangedSubview(BaselineRelativeArrangementPicker(value: self.stackView.baselineRelativeArrangement
             , presenter: self) {
                 self.stackView.baselineRelativeArrangement = $0
-            }.button)
+        }.button)
         controls.addArrangedSubview(LayoutMarginsRelativeArrangementPicker(value: self.stackView.layoutMarginsRelativeArrangement
             , presenter: self) {
-                self.stackView.layoutMarginsRelativeArrangement = $0
-            }.button)
-        controls.addArrangedSubview({
+            self.stackView.layoutMarginsRelativeArrangement = $0
+        }.button)
+
+        let controls2 = UIStackView()
+        controls2.spacing = 0
+        controls2.axis = .Vertical
+        controls2.layoutMarginsRelativeArrangement = true
+        controls2.alignment = .Trailing
+        controls2.addArrangedSubview({
             let button = UIButton(type: .System)
             button.setTitle("show all subviews", forState: .Normal)
             button.addTarget(self, action: "buttonShowAllTapped:", forControlEvents: .TouchUpInside)
             return button
-            }())
+        }())
+        controls2.addArrangedSubview({
+            let button = UIButton(type: .System)
+            button.setTitle("pin stack view", forState: .Normal)
+            button.setTitle("unpin stack view", forState: .Selected)
+            button.addTarget(self, action: "buttonPinTapped:", forControlEvents: .TouchUpInside)
+            return button
+        }())
 
         self.view.addSubview(controls)
+        self.view.addSubview(controls2)
         controls.autoPinToBottomLayoutGuideOfViewController(self, withInset: 16)
+        controls2.autoPinEdge(.Top, toEdge: .Top, ofView: controls)
         controls.autoPinEdgeToSuperviewMargin(.Leading)
+        controls2.autoPinEdgeToSuperviewMargin(.Trailing)
         controls.autoPinEdge(.Top, toEdge: .Bottom, ofView: self.stackView, withOffset: 16, relation: .GreaterThanOrEqual)
     }
 
     @objc func buttonShowAllTapped(sender: UIButton) {
         self.stackView.subviews.forEach{ $0.hidden = false }
+    }
+
+    @objc func buttonPinTapped(sender: UIButton ) {
+        sender.selected = !sender.selected
+        self.pinStackViewConstraint.active = sender.selected
     }
 
     @objc func viewTapped(sender: UIView) {

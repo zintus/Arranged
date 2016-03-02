@@ -65,6 +65,10 @@ public class StackView : UIView {
         super.init(frame: CGRectZero)
         self.commonInit()
     }
+
+    public convenience init() {
+        self.init(arrangedSubviews: [])
+    }
     
     public required init?(coder aDecoder: NSCoder) {
         self.arrangedSubviews = []
@@ -82,7 +86,7 @@ public class StackView : UIView {
     }
     
     public func addArrangedSubview(view: UIView) {
-        if view.superview != view {
+        if view.superview != view && !self.arrangedSubviews.contains(view) {
             self.arrangedSubviews.append(view)
             self.addSubview(view)
             self.invalidateLayout()
@@ -171,7 +175,6 @@ private class _DistributionLayoutArrangement: _LayoutArrangement {
         }
         return constraints2
         */
-        
         canvas.subviews.filter{ $0 is Spacer }.forEach{ $0.removeFromSuperview() }
         let hor = canvas.axis == .Horizontal
         // Join views using spacers

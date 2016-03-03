@@ -201,6 +201,25 @@ class AnimatedPicker : ValuePicker<Bool> {
     }
 }
 
+class ContentTypePicker : ValuePicker<ContentType> {
+    let values: [ContentType] = [.View, .Label]
+    let items = [".View", ".Label"]
+
+    override init(value: ContentType, presenter: UIViewController, observer: (value: ContentType) -> Void) {
+        super.init(value: value, presenter: presenter, observer: observer)
+    }
+
+    override func update() {
+        button.setTitle("content type:", value: "\(items[values.indexOf(value)!])")
+    }
+
+    override func tapped() {
+        presenter.showPicker("Content Type", items: items, selected: values.indexOf(self.value)) { index in
+            self.value = self.values[index]
+        }
+    }
+}
+
 extension UIButton {
     func setTitle(title: String, value: String) {
         let string = NSMutableAttributedString()

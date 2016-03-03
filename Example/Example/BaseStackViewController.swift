@@ -10,11 +10,26 @@ import UIKit
 
 let loggingEnabled = true
 
+
+// MARK: BaseStackViewController
+
+enum ContentType {
+    case View
+    case Label
+}
+
 class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewController {
     var stackView: T!
     var views = [UIView]()
     var pinStackViewConstraint: NSLayoutConstraint!
+
+    // Options
     var animated = true
+    var contentType: ContentType = .View {
+        didSet {
+            refreshContent()
+        }
+    }
 
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -34,16 +49,9 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         // Creat stack view
 
         self.stackView = self.createStackView()
-        
-        views.append(ContentView(contentSize: CGSize(width: 44, height: 44), color: UIColor.redColor(), title: "content-view-1"))
-        views.append(ContentView(contentSize: CGSize(width: 30, height: 100), color: UIColor.blueColor(), title: "content-view-2"))
-        views.append(ContentView(contentSize: CGSize(width: 80, height: 40), color: UIColor.greenColor(), title: "content-view-3"))
 
-        for view in views {
-            self.stackView.addArrangedSubview(view)
-            view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "viewTapped:"))
-            self.stackView.addArrangedSubview(view)
-        }
+
+        self.refreshContent()
 
         self.stackView.layoutMargins = UIEdgeInsetsMake(8, 8, 8, 8)
 
@@ -118,21 +126,20 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         controls2.axis = .Vertical
         controls2.layoutMarginsRelativeArrangement = true
         controls2.alignment = .Trailing
-        controls2.addArrangedSubview({
-            let button = UIButton(type: .System)
-            button.setTitle("show all subviews", forState: .Normal)
-            button.addTarget(self, action: "buttonShowAllTapped:", forControlEvents: .TouchUpInside)
-            return button
-        }())
-        controls2.addArrangedSubview({
-            let button = UIButton(type: .System)
-            button.setTitle("pin stack view", forState: .Normal)
-            button.setTitle("unpin stack view", forState: .Selected)
-            button.addTarget(self, action: "buttonPinTapped:", forControlEvents: .TouchUpInside)
-            return button
-        }())
-        controls2.addArrangedSubview(AnimatedPicker(value: animated, presenter: self) {
+        controls2.addArrangedSubview(UIButton(type: .System).then {
+            $0.setTitle("show all subviews", forState: .Normal)
+            $0.addTarget(self, action: "buttonShowAllTapped:", forControlEvents: .TouchUpInside)
+        })
+        controls2.addArrangedSubview(UIButton(type: .System).then {
+            $0.setTitle("pin stack view", forState: .Normal)
+            $0.setTitle("unpin stack view", forState: .Selected)
+            $0.addTarget(self, action: "buttonPinTapped:", forControlEvents: .TouchUpInside)
+        })
+        controls2.addArrangedSubview(AnimatedPicker(value: self.animated, presenter: self) {
             self.animated = $0
+        }.button)
+        controls2.addArrangedSubview(ContentTypePicker(value: self.contentType, presenter: self) {
+            self.contentType = $0
         }.button)
 
         self.view.addSubview(controls)
@@ -142,6 +149,58 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         controls.autoPinEdgeToSuperviewMargin(.Leading)
         controls2.autoPinEdgeToSuperviewMargin(.Trailing)
         controls.autoPinEdge(.Top, toEdge: .Bottom, ofView: self.stackView, withOffset: 16, relation: .GreaterThanOrEqual)
+    }
+
+    func refreshContent() {
+
+        self.views.forEach {
+            self.stackView.removeArrangedSubview($0)
+        }
+        self.views.removeAll()
+
+        switch self.contentType {
+        case .View:
+            self.views.append(ContentView().then {
+                $0.contentSize = CGSize(width: 44, height: 44)
+                $0.backgroundColor = UIColor.redColor()
+            })
+
+            self.views.append(ContentView().then {
+                $0.contentSize = CGSize(width: 30, height: 100)
+                $0.backgroundColor = UIColor.blueColor()
+            })
+
+            self.views.append(ContentView().then {
+                $0.contentSize = CGSize(width: 80, height: 40)
+                $0.backgroundColor = UIColor.greenColor()
+            })
+
+        case .Label:
+            self.views.append(UILabel().then {
+                $0.text = "Sed ut perspiciatis unde omnis iste natus"
+                $0.numberOfLines = 0
+                $0.backgroundColor = UIColor.redColor()
+            })
+
+            self.views.append(UILabel().then {
+                $0.text = "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
+                $0.numberOfLines = 0
+                $0.backgroundColor = UIColor.blueColor()
+            })
+
+            self.views.append(UILabel().then {
+                $0.text = "Neque porro quisquam est, qui dolorem ipsum"
+                $0.numberOfLines = 0
+                $0.backgroundColor = UIColor.greenColor()
+            })
+        }
+
+        for (index, view) in views.enumerate() {
+            view.accessibilityIdentifier = "content-view-\(index)"
+            self.stackView.addArrangedSubview(view)
+            view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "viewTapped:"))
+            self.stackView.addArrangedSubview(view)
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -208,14 +267,13 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
 }
 
 
+// MARK: ContentView
+
 class ContentView: UIView {
     var contentSize = CGSize(width: 44, height: 44)
 
-    convenience init(contentSize: CGSize, color: UIColor, title: String) {
+    convenience init() {
         self.init(frame: CGRectZero)
-        self.contentSize = contentSize
-        self.backgroundColor = color
-        self.accessibilityIdentifier = title
     }
 
     override init(frame: CGRect) {
@@ -230,3 +288,25 @@ class ContentView: UIView {
         return self.contentSize
     }
 }
+
+
+// MARK: Then
+
+protocol Then {}
+
+extension Then where Self: Any {
+    func then(@noescape block: inout Self -> Void) -> Self {
+        var copy = self
+        block(&copy)
+        return copy
+    }
+}
+
+extension Then where Self: AnyObject {
+    func then(@noescape block: Self -> Void) -> Self {
+        block(self)
+        return self
+    }
+}
+
+extension NSObject: Then {}

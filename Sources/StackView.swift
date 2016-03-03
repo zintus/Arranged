@@ -89,6 +89,7 @@ public class StackView : UIView {
     // MARK: Managing Arranged Views
     
     public func addArrangedSubview(view: UIView) {
+        // FIXME: Make sure that behavior matches UIStackView
         if view.superview != view && !arrangedSubviews.contains(view) {
             arrangedSubviews.append(view)
             addSubview(view)
@@ -97,7 +98,12 @@ public class StackView : UIView {
     }
 
     public func removeArrangedSubview(view: UIView) {
-        // FIXME:
+        // FIXME: Make sure that behavior matches UIStackView
+        if let index = arrangedSubviews.indexOf(view) {
+            arrangedSubviews.removeAtIndex(index)
+            view.removeFromSuperview()
+            invalidateLayout()
+        }
     }
     
     public func insertArrangedSubview(view: UIView, atIndex stackIndex: Int) {
@@ -176,7 +182,7 @@ private class AlignedLayoutArrangement: LayoutArrangement {
                 constraints.append(item.autoConstrainAttribute(centeringAttribute, toAttribute: centeringAttribute, ofView: canvas))
             }
         }
-        items.forEachPair { previous, current in
+        items.forPair { previous, current in
             if type == .FirstBaseline || type == .LastBaseline {
                 assert(!horizontal, "baseline alignment not supported for vertical layout axis")
                 constraints.append(previous.autoAlignAxis((type == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: current))
@@ -226,9 +232,9 @@ private class DistributionLayoutArrangement: LayoutArrangement {
         
         guard spacersEnabled else {
             // Set spacing without creating spacers
-            items.forEachPair {  previous, current in
+            items.forPair {  previous, current in
                 let constraint = current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous, withOffset: spacing)
-                constraint.identifier = "ASV-spacing"
+                constraint.identifier = "A.SV-spacing"
                 constraints.append(constraint)
             }
             return
@@ -236,7 +242,7 @@ private class DistributionLayoutArrangement: LayoutArrangement {
         
         // Join views using spacer
         var spacers = [Spacer]()
-        items.forEachPair { previous, current in
+        items.forPair { previous, current in
             let spacer = Spacer()
             canvas.addSubview(spacer)
             spacers.append(spacer)
@@ -249,7 +255,7 @@ private class DistributionLayoutArrangement: LayoutArrangement {
         }
         
         // Match spacers size
-        spacers.forEachPair { previous, current in
+        spacers.forPair { previous, current in
             let dimension: ALDimension = horizontal ? .Width : .Height
             constraints.append(current.autoMatchDimension(dimension, toDimension: dimension, ofView: previous))
         }
@@ -279,7 +285,7 @@ private class DistributionLayoutArrangement: LayoutArrangement {
         guard type == .FillEqually else {
             return
         }
-        items.forEachPair { previous, current in
+        items.forPair { previous, current in
             let dimension: ALDimension = horizontal ? .Width : .Height
             constraints.append(previous.autoMatchDimension(dimension, toDimension: dimension, ofView: current))
         }
@@ -293,7 +299,8 @@ private class Spacer: UIView {
 }
 
 private extension SequenceType {
-    func forEachPair(@noescape closure: (first: Self.Generator.Element, second: Self.Generator.Element) -> Void) {
+    // FIXME: Name might be misleading, it doesn't enumerate over all combinations
+    func forPair(@noescape closure: (first: Self.Generator.Element, second: Self.Generator.Element) -> Void) {
         let _ = reduce(nil as Self.Generator.Element?) { previous, current in
             if let previous = previous {
                 closure(first: previous, second: current)

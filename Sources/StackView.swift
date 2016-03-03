@@ -161,6 +161,10 @@ private class LayoutArrangement {
         canvas.removeConstraints(constraints)
         constraints.removeAll()
     }
+
+    func save(constraint: NSLayoutConstraint) {
+        constraints.append(constraint)
+    }
 }
 
 private class AlignedLayoutArrangement: LayoutArrangement {
@@ -171,34 +175,34 @@ private class AlignedLayoutArrangement: LayoutArrangement {
         items.forEach { item in
             switch type {
             case .Fill:
-                constraints.append(pinItemToLeadingEdge(item, relation: .Equal))
-                constraints.append(pinItemToTrailingEdge(item, relation: .Equal))
+                save(pinToLeadingEdge(item, relation: .Equal))
+                save(pinToTrailingEdge(item, relation: .Equal))
             case .Leading, .Trailing:
-                constraints.append(pinItemToLeadingEdge(item, relation: (type == .Leading ? .Equal : .GreaterThanOrEqual)))
-                constraints.append(pinItemToTrailingEdge(item, relation: (type == .Leading ? .GreaterThanOrEqual : .Equal)))
+                save(pinToLeadingEdge(item, relation: (type == .Leading ? .Equal : .GreaterThanOrEqual)))
+                save(pinToTrailingEdge(item, relation: (type == .Leading ? .GreaterThanOrEqual : .Equal)))
             case .Center:
-                constraints.append(pinItemToLeadingEdge(item, relation: .GreaterThanOrEqual))
+                save(pinToLeadingEdge(item, relation: .GreaterThanOrEqual))
                 let attribute: ALAttribute = marginsEnabled ? (horizontal ? .MarginAxisHorizontal : .MarginAxisVertical) : (horizontal ? .Horizontal : .Vertical)
-                constraints.append(item.autoConstrainAttribute(attribute, toAttribute: attribute, ofView: canvas))
+                save(item.autoConstrainAttribute(attribute, toAttribute: attribute, ofView: canvas))
             case .FirstBaseline, .LastBaseline: break
             }
         }
         if type == .FirstBaseline || type == .LastBaseline {
             items.forPair { previous, current in
                 assert(!horizontal, "baseline alignment not supported for vertical layout axis")
-                constraints.append(previous.autoAlignAxis((type == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: current))
+                save(previous.autoAlignAxis((type == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: current))
             }
         }
     }
 
-    func pinItemToLeadingEdge(item: UIView, relation: NSLayoutRelation) -> NSLayoutConstraint {
+    func pinToLeadingEdge(item: UIView, relation: NSLayoutRelation) -> NSLayoutConstraint {
         let edge: ALEdge = horizontal ? .Top : .Leading
         let constraint = marginsEnabled ? item.autoPinEdgeToSuperviewMargin(edge, relation: relation) : item.autoPinEdgeToSuperviewEdge(edge, withInset: 0, relation: relation)
         constraint.identifier = "ASV-canvas-connection"
         return constraint
     }
 
-    func pinItemToTrailingEdge(item: UIView, relation: NSLayoutRelation) -> NSLayoutConstraint {
+    func pinToTrailingEdge(item: UIView, relation: NSLayoutRelation) -> NSLayoutConstraint {
         let edge: ALEdge = horizontal ? .Bottom : .Trailing
         let constraint = marginsEnabled ? item.autoPinEdgeToSuperviewMargin(edge, relation: relation) : item.autoPinEdgeToSuperviewEdge(edge, withInset: 0, relation: relation)
         constraint.identifier = "ASV-canvas-connection"
@@ -221,45 +225,50 @@ private class DistributionLayoutArrangement: LayoutArrangement {
     func updateSpacingConstraints() {
         // FIXME: Don't remove all spacers
         canvas.subviews.filter{ $0 is Spacer }.forEach{ $0.removeFromSuperview() }
-        
-        let fromEdge: ALEdge = horizontal ? .Leading : .Top
-        let toEdge: ALEdge = horizontal ? .Trailing : .Bottom
-        
-        guard spacersEnabled else {
-            // Set spacing without creating spacers
-            items.forPair {  previous, current in
-                let constraint = current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous, withOffset: spacing)
-                constraint.identifier = "ASV-spacing"
-                constraints.append(constraint)
-            }
+
+        guard type != .EqualSpacing else {
+            self.updateFillEquallyConstraints()
             return
         }
-        
+
+        // Set spacing without creating spacers
+        let fromEdge: ALEdge = horizontal ? .Leading : .Top
+        let toEdge: ALEdge = horizontal ? .Trailing : .Bottom
+        items.forPair {  previous, current in
+            let constraint = current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous, withOffset: spacing)
+            constraint.identifier = "ASV-spacing"
+            save(constraint)
+        }
+        return
+    }
+
+    func updateFillEquallyConstraints() {
+        let fromEdge: ALEdge = horizontal ? .Leading : .Top
+        let toEdge: ALEdge = horizontal ? .Trailing : .Bottom
+
         // Join views using spacer
         var spacers = [Spacer]()
         items.forPair { previous, current in
             let spacer = Spacer()
             canvas.addSubview(spacer)
             spacers.append(spacer)
-            
-            let dimension: ALDimension = horizontal ? .Width : .Height
-            constraints.append(current.autoSetDimension(dimension, toSize: spacing, relation: (type == .EqualSpacing ? .Equal : .GreaterThanOrEqual)))
-            
-            constraints.append(spacer.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous))
-            constraints.append(current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: spacer))
+
+            save(current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous, withOffset: spacing, relation: .GreaterThanOrEqual))
+
+            // Join views using spacer
+            save(spacer.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous))
+            save(current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: spacer))
         }
-        
+
         // Match spacers size
         spacers.forPair { previous, current in
             let dimension: ALDimension = horizontal ? .Width : .Height
-            constraints.append(current.autoMatchDimension(dimension, toDimension: dimension, ofView: previous))
+            let constraint = current.autoMatchDimension(dimension, toDimension: dimension, ofView: previous)
+            constraint.identifier = "ASV-fill-equally"
+            save(constraint)
         }
     }
-    
-    var spacersEnabled: Bool {
-        return type == .EqualSpacing
-    }
-    
+
     func updateCanvasConnectingCostraints() {
         guard let first = items.first, last = items.last else {
             return
@@ -267,22 +276,22 @@ private class DistributionLayoutArrangement: LayoutArrangement {
         let leadingEdge: ALEdge = horizontal ? .Leading : .Top
         let trailingEdge: ALEdge = horizontal ? .Trailing : .Bottom
         if marginsEnabled {
-            constraints.append(first.autoPinEdgeToSuperviewMargin(leadingEdge))
-            constraints.append(last.autoPinEdgeToSuperviewMargin(trailingEdge))
+            save(first.autoPinEdgeToSuperviewMargin(leadingEdge))
+            save(last.autoPinEdgeToSuperviewMargin(trailingEdge))
         } else {
-            constraints.append(first.autoPinEdgeToSuperviewEdge(leadingEdge))
-            constraints.append(last.autoPinEdgeToSuperviewEdge(trailingEdge))
+            save(first.autoPinEdgeToSuperviewEdge(leadingEdge))
+            save(last.autoPinEdgeToSuperviewEdge(trailingEdge))
         }
     }
 
     func updateDistributionConstraints() {
-        // FIXME: Add support for other distributions
+        // FIXME: Cleanup
         guard type == .FillEqually else {
             return
         }
         items.forPair { previous, current in
             let dimension: ALDimension = horizontal ? .Width : .Height
-            constraints.append(previous.autoMatchDimension(dimension, toDimension: dimension, ofView: current))
+            save(previous.autoMatchDimension(dimension, toDimension: dimension, ofView: current))
         }
     }
 }

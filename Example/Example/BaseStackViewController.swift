@@ -163,17 +163,17 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         switch self.contentType {
         case .View:
             self.views.append(ContentView().then {
-                $0.contentSize = CGSize(width: 44, height: 44)
+                $0.contentSize = CGSize(width: 40, height: 40)
                 $0.backgroundColor = UIColor.redColor()
             })
 
             self.views.append(ContentView().then {
-                $0.contentSize = CGSize(width: 30, height: 100)
+                $0.contentSize = CGSize(width: 20, height: 100)
                 $0.backgroundColor = UIColor.blueColor()
             })
 
             self.views.append(ContentView().then {
-                $0.contentSize = CGSize(width: 80, height: 40)
+                $0.contentSize = CGSize(width: 80, height: 60)
                 $0.backgroundColor = UIColor.greenColor()
             })
 
@@ -198,7 +198,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         }
 
         for (index, view) in self.views.enumerate() {
-            view.accessibilityIdentifier = "content-view-\(index)"
+            view.accessibilityIdentifier = "content-view-\(index + 1)"
             view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "viewTapped:"))
             self.stackView.addArrangedSubview(view)
         }
@@ -208,6 +208,11 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         super.viewDidLayoutSubviews()
 
         if loggingEnabled {
+            print("\n\n")
+            print("===========================")
+            print("all stack view constraints:")
+            printConstraints(stackView.constraints)
+
             print("")
             print("horizontal")
             print("==========")

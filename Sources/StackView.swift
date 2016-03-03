@@ -33,37 +33,37 @@ public enum StackViewAlignment {
 
 public class StackView : UIView {
     public var axis: UILayoutConstraintAxis = .Horizontal {
-        didSet { if axis != oldValue { self.invalidateLayout() } }
+        didSet { if axis != oldValue { invalidateLayout() } }
     }
     public var distribution: StackViewDistribution = .Fill {
-        didSet { if distribution != oldValue { self.invalidateLayout() } }
+        didSet { if distribution != oldValue { invalidateLayout() } }
     }
     public var alignment: StackViewAlignment = .Fill {
-        didSet { if alignment != oldValue { self.invalidateLayout() } }
+        didSet { if alignment != oldValue { invalidateLayout() } }
     }
     public var spacing: CGFloat = 0.0 {
-        didSet { if spacing != oldValue { self.invalidateLayout() } }
+        didSet { if spacing != oldValue { invalidateLayout() } }
     }
     // FIXME: Implement
     public var baselineRelativeArrangement = false {
-        didSet { if baselineRelativeArrangement != oldValue { self.invalidateLayout() } }
+        didSet { if baselineRelativeArrangement != oldValue { invalidateLayout() } }
     }
-    // FIXME: Implement
+
     public var layoutMarginsRelativeArrangement = false {
-        didSet { if layoutMarginsRelativeArrangement != oldValue { self.invalidateLayout() } }
+        didSet { if layoutMarginsRelativeArrangement != oldValue { invalidateLayout() } }
     }
     
-    private var alignmentArrangement: LayoutArrangement? = nil
-    private var distrubitonArrangement: LayoutArrangement? = nil
+    private var alignmentArrangement: AlignedLayoutArrangement!
+    private var distributionArrangement: DistributionLayoutArrangement!
     
     private var invalidated = false
         
     public private(set) var arrangedSubviews: [UIView]
     
     public init(arrangedSubviews views: [UIView]) {
-        self.arrangedSubviews = views
+        arrangedSubviews = views
         super.init(frame: CGRectZero)
-        self.commonInit()
+        commonInit()
     }
 
     public convenience init() {
@@ -71,28 +71,28 @@ public class StackView : UIView {
     }
     
     public required init?(coder aDecoder: NSCoder) {
-        self.arrangedSubviews = []
+        arrangedSubviews = []
         super.init(coder: aDecoder)
-        self.commonInit()
+        commonInit()
         
         // FIXME:
-        self.arrangedSubviews.appendContentsOf(self.subviews)
-        self.invalidateLayout()
+        arrangedSubviews.appendContentsOf(subviews)
+        invalidateLayout()
     }
     
     private func commonInit() {
-        self.layoutMargins = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
-        self.alignmentArrangement = AlignedLayoutArrangement(canvas: self)
-        self.distrubitonArrangement = DistributionLayoutArrangement(canvas: self)
+        layoutMargins = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+        alignmentArrangement = AlignedLayoutArrangement(canvas: self)
+        distributionArrangement = DistributionLayoutArrangement(canvas: self)
     }
 
     // MARK: Managing Arranged Views
     
     public func addArrangedSubview(view: UIView) {
-        if view.superview != view && !self.arrangedSubviews.contains(view) {
-            self.arrangedSubviews.append(view)
-            self.addSubview(view)
-            self.invalidateLayout()
+        if view.superview != view && !arrangedSubviews.contains(view) {
+            arrangedSubviews.append(view)
+            addSubview(view)
+            invalidateLayout()
         }
     }
 
@@ -107,49 +107,63 @@ public class StackView : UIView {
     // MARK: Layout
     
     private func invalidateLayout() {
-        if !self.invalidated {
-            self.invalidated = true
-            self.setNeedsUpdateConstraints()
+        if !invalidated {
+            invalidated = true
+            setNeedsUpdateConstraints()
         }
     }
     
     public override func updateConstraints() {
-        if self.invalidated {
-            self.invalidated = false
+        if invalidated {
+            invalidated = false
+            
+            alignmentArrangement.views = arrangedSubviews
+            alignmentArrangement.axis = axis
+            alignmentArrangement.marginsEnabled = layoutMarginsRelativeArrangement
+            
+            alignmentArrangement.type = alignment
+            
+            distributionArrangement.views = arrangedSubviews
+            distributionArrangement.axis = axis
+            distributionArrangement.marginsEnabled = layoutMarginsRelativeArrangement
+            
+            distributionArrangement.type = distribution
+            distributionArrangement.spacing = spacing
+            
             // FIXME: Refresh only invalidated constraints (at least in most and perforamce-intensive common cases)
-            self.alignmentArrangement?.updateConstraints()
-            self.distrubitonArrangement?.updateConstraints()
+            alignmentArrangement.updateConstraints()
+            distributionArrangement.updateConstraints()
         }
         super.updateConstraints()
     }
 }
 
-class LayoutArrangement {
-    weak var canvas: StackView!
+private class LayoutArrangement {
+    weak var canvas: UIView!
+    var views = [UIView]() // Arranged views
+    
+    var axis: UILayoutConstraintAxis = .Horizontal
+    var horizontal: Bool { return axis == .Horizontal }
+    var marginsEnabled: Bool = false
+    
     var constraints = [NSLayoutConstraint]()
-    
-    // Convenience accessors
-    var hor: Bool { return canvas.axis == .Horizontal }
-    var align: StackViewAlignment { return canvas.alignment }
-    var distr: StackViewDistribution { return canvas.distribution }
-    var spacing: CGFloat { return canvas.spacing }
-    var marginsEnabled: Bool { return canvas.layoutMarginsRelativeArrangement }
-    
     
     init(canvas: StackView) {
         self.canvas = canvas
     }
     
     func updateConstraints() {
-        canvas.removeConstraints(self.constraints)
+        canvas.removeConstraints(constraints)
         constraints.removeAll()
     }
 }
 
-class AlignedLayoutArrangement: LayoutArrangement {
+private class AlignedLayoutArrangement: LayoutArrangement {
+    var type: StackViewAlignment = .Fill
+    
     override func updateConstraints() {
         super.updateConstraints()
-        let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
+        let _ = views.reduce(nil as UIView?) { previous, current in
             // Pin edges leading and trailing edges (either with .Equal : .GreaterThanOrEqual relation)
             if marginsEnabled {
                 constraints.append(current.autoPinEdgeToSuperviewMargin(leadingEdge, relation: leadingRelation))
@@ -158,39 +172,42 @@ class AlignedLayoutArrangement: LayoutArrangement {
                 constraints.append(current.autoPinEdgeToSuperviewEdge(leadingEdge, withInset: 0, relation: leadingRelation))
                 constraints.append(current.autoPinEdgeToSuperviewEdge(trailingEdge, withInset: 0, relation: trailingRelation))
             }
-            if align == .Center {
+            if type == .Center {
                 constraints.append(current.autoConstrainAttribute(centeringAttribute, toAttribute: centeringAttribute, ofView: canvas))
             }
-            if let previous = previous where align == .FirstBaseline || align == .LastBaseline {
-                assert(!hor, "baseline alignment not supported for vertical layout axis")
-                constraints.append(current.autoAlignAxis((align == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: previous))
+            if let previous = previous where type == .FirstBaseline || type == .LastBaseline {
+                assert(!horizontal, "baseline alignment not supported for vertical layout axis")
+                constraints.append(current.autoAlignAxis((type == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: previous))
             }
             return current
         }
     }
     
     var leadingEdge: ALEdge {
-        return hor ? .Top : .Leading
+        return horizontal ? .Top : .Leading
     }
     
     var trailingEdge: ALEdge {
-        return hor ? .Bottom : .Trailing
+        return horizontal ? .Bottom : .Trailing
     }
     
     var leadingRelation: NSLayoutRelation {
-        return (align == .Fill || align == .Leading ? .Equal : .GreaterThanOrEqual)
+        return (type == .Fill || type == .Leading ? .Equal : .GreaterThanOrEqual)
     }
     
     var trailingRelation: NSLayoutRelation {
-        return (align == .Fill || align == .Trailing ? .Equal : .GreaterThanOrEqual)
+        return (type == .Fill || type == .Trailing ? .Equal : .GreaterThanOrEqual)
     }
     
     var centeringAttribute: ALAttribute {
-        return marginsEnabled ? (hor ? .MarginAxisHorizontal : .MarginAxisVertical) : (hor ? .Horizontal : .Vertical)
+        return marginsEnabled ? (horizontal ? .MarginAxisHorizontal : .MarginAxisVertical) : (horizontal ? .Horizontal : .Vertical)
     }
 }
 
-class DistributionLayoutArrangement: LayoutArrangement {
+private class DistributionLayoutArrangement: LayoutArrangement {
+    var type: StackViewDistribution = .Fill
+    var spacing: CGFloat = 0
+    
     override func updateConstraints() {
         super.updateConstraints()
 
@@ -202,12 +219,12 @@ class DistributionLayoutArrangement: LayoutArrangement {
     func updateSpacingConstraints() {
         canvas.subviews.filter{ $0 is Spacer }.forEach{ $0.removeFromSuperview() }
         
-        let fromEdge: ALEdge = hor ? .Leading : .Top
-        let toEdge: ALEdge = hor ? .Trailing : .Bottom
+        let fromEdge: ALEdge = horizontal ? .Leading : .Top
+        let toEdge: ALEdge = horizontal ? .Trailing : .Bottom
         
         guard spacersEnabled else {
             // Set spacing without creating spacers
-            let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
+            let _ = views.reduce(nil as UIView?) { previous, current in
                 if let previous = previous {
                     let constraint = current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous, withOffset: spacing)
                     constraint.identifier = "ASV-spacing"
@@ -220,7 +237,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
         
         // Join views using spacers
         var spacers = [Spacer]()
-        let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
+        let _ = views.reduce(nil as UIView?) { previous, current in
             if let previous = previous {
                 let spacer = Spacer()
                 canvas.addSubview(spacer)
@@ -232,8 +249,8 @@ class DistributionLayoutArrangement: LayoutArrangement {
         }
         // Configure spacers
         let _ = spacers.reduce(nil as Spacer?) { previous, current in
-            let dimension: ALDimension = hor ? .Width : .Height
-            constraints.append(current.autoSetDimension(dimension, toSize: spacing, relation: (distr == .EqualSpacing ? .Equal : .GreaterThanOrEqual)))
+            let dimension: ALDimension = horizontal ? .Width : .Height
+            constraints.append(current.autoSetDimension(dimension, toSize: spacing, relation: (type == .EqualSpacing ? .Equal : .GreaterThanOrEqual)))
             if let previous = previous {
                 constraints.append(current.autoMatchDimension(dimension, toDimension: dimension, ofView: previous))
             }
@@ -242,15 +259,15 @@ class DistributionLayoutArrangement: LayoutArrangement {
     }
     
     var spacersEnabled: Bool {
-        return distr == .EqualSpacing
+        return type == .EqualSpacing
     }
     
     func updateCanvasConnectingCostraints() {
-        guard let first = canvas.arrangedSubviews.first, last = canvas.arrangedSubviews.last else {
+        guard let first = views.first, last = views.last else {
             return
         }
-        let leadingEdge: ALEdge = hor ? .Leading : .Top
-        let trailingEdge: ALEdge = hor ? .Trailing : .Bottom
+        let leadingEdge: ALEdge = horizontal ? .Leading : .Top
+        let trailingEdge: ALEdge = horizontal ? .Trailing : .Bottom
         if marginsEnabled {
             constraints.append(first.autoPinEdgeToSuperviewMargin(leadingEdge))
             constraints.append(last.autoPinEdgeToSuperviewMargin(trailingEdge))
@@ -262,11 +279,11 @@ class DistributionLayoutArrangement: LayoutArrangement {
 
     func updateDistributionConstraints() {
         // FIXME: Add support for other distributions
-        guard canvas.distribution == .FillEqually else {
+        guard type == .FillEqually else {
             return
         }
-        let _ = canvas.arrangedSubviews.reduce(nil as UIView?) { previous, current in
-            let dimension: ALDimension = (canvas.axis == .Horizontal ? .Width : .Height)
+        let _ = views.reduce(nil as UIView?) { previous, current in
+            let dimension: ALDimension = horizontal ? .Width : .Height
             if let previous = previous {
                 constraints.append(previous.autoMatchDimension(dimension, toDimension: dimension, ofView: current))
             }
@@ -275,7 +292,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
     }
 }
 
-class Spacer: UIView {
+private class Spacer: UIView {
     override func intrinsicContentSize() -> CGSize {
         return CGSize(width: 0, height: 0)
     }

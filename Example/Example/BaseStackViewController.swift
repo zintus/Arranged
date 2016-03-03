@@ -22,6 +22,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
     var stackView: T!
     var views = [UIView]()
     var pinStackViewConstraint: NSLayoutConstraint!
+    var pinStackViewConstraint2: NSLayoutConstraint!
 
     // Options
     var animated = true
@@ -61,8 +62,6 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.stackView.autoPinToTopLayoutGuideOfViewController(self, withInset: 16)
         self.stackView.autoPinEdgeToSuperviewMargin(.Leading)
         self.stackView.autoPinEdgeToSuperviewMargin(.Trailing, relation: .GreaterThanOrEqual)
-        self.pinStackViewConstraint = self.stackView.autoPinEdgeToSuperviewMargin(.Trailing)
-        self.pinStackViewConstraint.active = false
 
 
         // Create background for stack view
@@ -150,6 +149,13 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         controls.autoPinEdgeToSuperviewMargin(.Leading)
         controls2.autoPinEdgeToSuperviewMargin(.Trailing)
         controls.autoPinEdge(.Top, toEdge: .Bottom, ofView: self.stackView, withOffset: 16, relation: .GreaterThanOrEqual)
+
+        // Pin stack view
+
+        self.pinStackViewConstraint = self.stackView.autoPinEdgeToSuperviewMargin(.Trailing)
+        self.pinStackViewConstraint.active = false
+        self.pinStackViewConstraint2 = self.stackView.autoSetDimension(.Height, toSize: 200)
+        self.pinStackViewConstraint2.active = false
     }
 
     func refreshContent() {
@@ -244,6 +250,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.perform {
             sender.selected = !sender.selected
             self.pinStackViewConstraint.active = sender.selected
+            self.pinStackViewConstraint2.active = sender.selected
         }
     }
 

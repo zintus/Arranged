@@ -27,7 +27,9 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
     var animated = true
     var contentType: ContentType = .View {
         didSet {
-            refreshContent()
+            if oldValue != self.contentType {
+                refreshContent()
+            }
         }
     }
 
@@ -49,7 +51,6 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         // Creat stack view
 
         self.stackView = self.createStackView()
-
 
         self.refreshContent()
 
@@ -155,6 +156,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
 
         self.views.forEach {
             self.stackView.removeArrangedSubview($0)
+            $0.removeFromSuperview()
         }
         self.views.removeAll()
 
@@ -195,9 +197,8 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
             })
         }
 
-        for (index, view) in views.enumerate() {
+        for (index, view) in self.views.enumerate() {
             view.accessibilityIdentifier = "content-view-\(index)"
-            self.stackView.addArrangedSubview(view)
             view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "viewTapped:"))
             self.stackView.addArrangedSubview(view)
         }
@@ -205,7 +206,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
+
         if loggingEnabled {
             print("")
             print("horizontal")

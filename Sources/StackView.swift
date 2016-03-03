@@ -101,7 +101,6 @@ public class StackView : UIView {
         // FIXME: Make sure that behavior matches UIStackView
         if let index = arrangedSubviews.indexOf(view) {
             arrangedSubviews.removeAtIndex(index)
-            view.removeFromSuperview()
             invalidateLayout()
         }
     }
@@ -170,44 +169,40 @@ private class AlignedLayoutArrangement: LayoutArrangement {
     override func updateConstraints() {
         super.updateConstraints()
         items.forEach { item in
-            // Pin edges leading and trailing edges (either with .Equal : .GreaterThanOrEqual relation)
-            if marginsEnabled {
-                constraints.append(item.autoPinEdgeToSuperviewMargin(leadingEdge, relation: leadingRelation))
-                constraints.append(item.autoPinEdgeToSuperviewMargin(trailingEdge, relation: trailingRelation))
-            } else {
-                constraints.append(item.autoPinEdgeToSuperviewEdge(leadingEdge, withInset: 0, relation: leadingRelation))
-                constraints.append(item.autoPinEdgeToSuperviewEdge(trailingEdge, withInset: 0, relation: trailingRelation))
-            }
-            if type == .Center {
-                constraints.append(item.autoConstrainAttribute(centeringAttribute, toAttribute: centeringAttribute, ofView: canvas))
+            switch type {
+            case .Fill:
+                constraints.append(pinItemToLeadingEdge(item, relation: .Equal))
+                constraints.append(pinItemToTrailingEdge(item, relation: .Equal))
+            case .Leading, .Trailing:
+                constraints.append(pinItemToLeadingEdge(item, relation: (type == .Leading ? .Equal : .GreaterThanOrEqual)))
+                constraints.append(pinItemToTrailingEdge(item, relation: (type == .Leading ? .GreaterThanOrEqual : .Equal)))
+            case .Center:
+                constraints.append(pinItemToLeadingEdge(item, relation: .GreaterThanOrEqual))
+                let attribute: ALAttribute = marginsEnabled ? (horizontal ? .MarginAxisHorizontal : .MarginAxisVertical) : (horizontal ? .Horizontal : .Vertical)
+                constraints.append(item.autoConstrainAttribute(attribute, toAttribute: attribute, ofView: canvas))
+            case .FirstBaseline, .LastBaseline: break
             }
         }
-        items.forPair { previous, current in
-            if type == .FirstBaseline || type == .LastBaseline {
+        if type == .FirstBaseline || type == .LastBaseline {
+            items.forPair { previous, current in
                 assert(!horizontal, "baseline alignment not supported for vertical layout axis")
                 constraints.append(previous.autoAlignAxis((type == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: current))
             }
         }
     }
-    
-    var leadingEdge: ALEdge {
-        return horizontal ? .Top : .Leading
+
+    func pinItemToLeadingEdge(item: UIView, relation: NSLayoutRelation) -> NSLayoutConstraint {
+        let edge: ALEdge = horizontal ? .Top : .Leading
+        let constraint = marginsEnabled ? item.autoPinEdgeToSuperviewMargin(edge, relation: relation) : item.autoPinEdgeToSuperviewEdge(edge, withInset: 0, relation: relation)
+        constraint.identifier = "ASV-canvas-connection"
+        return constraint
     }
-    
-    var trailingEdge: ALEdge {
-        return horizontal ? .Bottom : .Trailing
-    }
-    
-    var leadingRelation: NSLayoutRelation {
-        return (type == .Fill || type == .Leading ? .Equal : .GreaterThanOrEqual)
-    }
-    
-    var trailingRelation: NSLayoutRelation {
-        return (type == .Fill || type == .Trailing ? .Equal : .GreaterThanOrEqual)
-    }
-    
-    var centeringAttribute: ALAttribute {
-        return marginsEnabled ? (horizontal ? .MarginAxisHorizontal : .MarginAxisVertical) : (horizontal ? .Horizontal : .Vertical)
+
+    func pinItemToTrailingEdge(item: UIView, relation: NSLayoutRelation) -> NSLayoutConstraint {
+        let edge: ALEdge = horizontal ? .Bottom : .Trailing
+        let constraint = marginsEnabled ? item.autoPinEdgeToSuperviewMargin(edge, relation: relation) : item.autoPinEdgeToSuperviewEdge(edge, withInset: 0, relation: relation)
+        constraint.identifier = "ASV-canvas-connection"
+        return constraint
     }
 }
 
@@ -234,7 +229,7 @@ private class DistributionLayoutArrangement: LayoutArrangement {
             // Set spacing without creating spacers
             items.forPair {  previous, current in
                 let constraint = current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous, withOffset: spacing)
-                constraint.identifier = "A.SV-spacing"
+                constraint.identifier = "ASV-spacing"
                 constraints.append(constraint)
             }
             return

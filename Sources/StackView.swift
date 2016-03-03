@@ -117,13 +117,13 @@ public class StackView : UIView {
         if invalidated {
             invalidated = false
             
-            alignmentArrangement.views = arrangedSubviews
+            alignmentArrangement.items = arrangedSubviews
             alignmentArrangement.axis = axis
             alignmentArrangement.marginsEnabled = layoutMarginsRelativeArrangement
             
             alignmentArrangement.type = alignment
             
-            distributionArrangement.views = arrangedSubviews
+            distributionArrangement.items = arrangedSubviews
             distributionArrangement.axis = axis
             distributionArrangement.marginsEnabled = layoutMarginsRelativeArrangement
             
@@ -140,7 +140,7 @@ public class StackView : UIView {
 
 private class LayoutArrangement {
     weak var canvas: UIView!
-    var views = [UIView]() // Arranged views
+    var items = [UIView]() // Arranged views
     
     var axis: UILayoutConstraintAxis = .Horizontal
     var horizontal: Bool { return axis == .Horizontal }
@@ -163,23 +163,24 @@ private class AlignedLayoutArrangement: LayoutArrangement {
     
     override func updateConstraints() {
         super.updateConstraints()
-        let _ = views.reduce(nil as UIView?) { previous, current in
+        items.forEach { item in
             // Pin edges leading and trailing edges (either with .Equal : .GreaterThanOrEqual relation)
             if marginsEnabled {
-                constraints.append(current.autoPinEdgeToSuperviewMargin(leadingEdge, relation: leadingRelation))
-                constraints.append(current.autoPinEdgeToSuperviewMargin(trailingEdge, relation: trailingRelation))
+                constraints.append(item.autoPinEdgeToSuperviewMargin(leadingEdge, relation: leadingRelation))
+                constraints.append(item.autoPinEdgeToSuperviewMargin(trailingEdge, relation: trailingRelation))
             } else {
-                constraints.append(current.autoPinEdgeToSuperviewEdge(leadingEdge, withInset: 0, relation: leadingRelation))
-                constraints.append(current.autoPinEdgeToSuperviewEdge(trailingEdge, withInset: 0, relation: trailingRelation))
+                constraints.append(item.autoPinEdgeToSuperviewEdge(leadingEdge, withInset: 0, relation: leadingRelation))
+                constraints.append(item.autoPinEdgeToSuperviewEdge(trailingEdge, withInset: 0, relation: trailingRelation))
             }
             if type == .Center {
-                constraints.append(current.autoConstrainAttribute(centeringAttribute, toAttribute: centeringAttribute, ofView: canvas))
+                constraints.append(item.autoConstrainAttribute(centeringAttribute, toAttribute: centeringAttribute, ofView: canvas))
             }
-            if let previous = previous where type == .FirstBaseline || type == .LastBaseline {
+        }
+        items.forEachPair { previous, current in
+            if type == .FirstBaseline || type == .LastBaseline {
                 assert(!horizontal, "baseline alignment not supported for vertical layout axis")
-                constraints.append(current.autoAlignAxis((type == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: previous))
+                constraints.append(previous.autoAlignAxis((type == .FirstBaseline ? .FirstBaseline : .LastBaseline), toSameAxisOfView: current))
             }
-            return current
         }
     }
     
@@ -217,6 +218,7 @@ private class DistributionLayoutArrangement: LayoutArrangement {
     }
     
     func updateSpacingConstraints() {
+        // FIXME: Don't remove all spacers
         canvas.subviews.filter{ $0 is Spacer }.forEach{ $0.removeFromSuperview() }
         
         let fromEdge: ALEdge = horizontal ? .Leading : .Top
@@ -224,37 +226,32 @@ private class DistributionLayoutArrangement: LayoutArrangement {
         
         guard spacersEnabled else {
             // Set spacing without creating spacers
-            let _ = views.reduce(nil as UIView?) { previous, current in
-                if let previous = previous {
-                    let constraint = current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous, withOffset: spacing)
-                    constraint.identifier = "ASV-spacing"
-                    constraints.append(constraint)
-                }
-                return current
+            items.forEachPair {  previous, current in
+                let constraint = current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous, withOffset: spacing)
+                constraint.identifier = "ASV-spacing"
+                constraints.append(constraint)
             }
             return
         }
         
-        // Join views using spacers
+        // Join views using spacer
         var spacers = [Spacer]()
-        let _ = views.reduce(nil as UIView?) { previous, current in
-            if let previous = previous {
-                let spacer = Spacer()
-                canvas.addSubview(spacer)
-                spacers.append(spacer)
-                constraints.append(spacer.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous))
-                constraints.append(current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: spacer))
-            }
-            return current
-        }
-        // Configure spacers
-        let _ = spacers.reduce(nil as Spacer?) { previous, current in
+        items.forEachPair { previous, current in
+            let spacer = Spacer()
+            canvas.addSubview(spacer)
+            spacers.append(spacer)
+            
             let dimension: ALDimension = horizontal ? .Width : .Height
             constraints.append(current.autoSetDimension(dimension, toSize: spacing, relation: (type == .EqualSpacing ? .Equal : .GreaterThanOrEqual)))
-            if let previous = previous {
-                constraints.append(current.autoMatchDimension(dimension, toDimension: dimension, ofView: previous))
-            }
-            return current
+            
+            constraints.append(spacer.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous))
+            constraints.append(current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: spacer))
+        }
+        
+        // Match spacers size
+        spacers.forEachPair { previous, current in
+            let dimension: ALDimension = horizontal ? .Width : .Height
+            constraints.append(current.autoMatchDimension(dimension, toDimension: dimension, ofView: previous))
         }
     }
     
@@ -263,7 +260,7 @@ private class DistributionLayoutArrangement: LayoutArrangement {
     }
     
     func updateCanvasConnectingCostraints() {
-        guard let first = views.first, last = views.last else {
+        guard let first = items.first, last = items.last else {
             return
         }
         let leadingEdge: ALEdge = horizontal ? .Leading : .Top
@@ -282,12 +279,9 @@ private class DistributionLayoutArrangement: LayoutArrangement {
         guard type == .FillEqually else {
             return
         }
-        let _ = views.reduce(nil as UIView?) { previous, current in
+        items.forEachPair { previous, current in
             let dimension: ALDimension = horizontal ? .Width : .Height
-            if let previous = previous {
-                constraints.append(previous.autoMatchDimension(dimension, toDimension: dimension, ofView: current))
-            }
-            return current
+            constraints.append(previous.autoMatchDimension(dimension, toDimension: dimension, ofView: current))
         }
     }
 }
@@ -295,5 +289,16 @@ private class DistributionLayoutArrangement: LayoutArrangement {
 private class Spacer: UIView {
     override func intrinsicContentSize() -> CGSize {
         return CGSize(width: 0, height: 0)
+    }
+}
+
+private extension SequenceType {
+    func forEachPair(@noescape closure: (first: Self.Generator.Element, second: Self.Generator.Element) -> Void) {
+        let _ = reduce(nil as Self.Generator.Element?) { previous, current in
+            if let previous = previous {
+                closure(first: previous, second: current)
+            }
+            return current
+        }
     }
 }

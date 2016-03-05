@@ -12,7 +12,7 @@ class LayoutArrangement {
     var horizontal: Bool { return axis == .Horizontal }
     var marginsEnabled: Bool = false
 
-    var constraints = [NSLayoutConstraint]()
+    private var constraints = [NSLayoutConstraint]()
 
     init(canvas: StackView) {
         self.canvas = canvas
@@ -21,10 +21,6 @@ class LayoutArrangement {
     func updateConstraints() {
         canvas.removeConstraints(constraints)
         constraints.removeAll()
-    }
-
-    func save(constraint: NSLayoutConstraint) {
-        constraints.append(constraint)
     }
     
     func addConstraint(item item1: UIView, attribute attr1: NSLayoutAttribute, toItem item2: UIView? = nil, attribute attr2: NSLayoutAttribute? = nil, relation: NSLayoutRelation = .Equal, multiplier: CGFloat = 1, constant c: CGFloat = 0) -> NSLayoutConstraint {

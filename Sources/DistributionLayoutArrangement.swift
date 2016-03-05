@@ -3,7 +3,6 @@
 // Copyright (c) 2016 Alexander Grebenyuk (github.com/kean).
 
 import UIKit
-import PureLayout
 
 class DistributionLayoutArrangement: LayoutArrangement {
     var type: StackViewDistribution = .Fill
@@ -12,8 +11,8 @@ class DistributionLayoutArrangement: LayoutArrangement {
     override func updateConstraints() {
         super.updateConstraints()
 
-        updateSpacingConstraints()
         updateCanvasConnectingCostraints()
+        updateSpacingConstraints()
         updateDistributionConstraints()
     }
 
@@ -27,7 +26,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
         case .Fill, .FillEqually:
             // Set spacing without creating spacers
             items.forPair {  previous, current in
-                save(addSpacing(current: current, previous: previous))
+                addSpacing(current: current, previous: previous)
             }
         case .FillProportionally:
             print(".FillProportionally not implemented")
@@ -39,60 +38,44 @@ class DistributionLayoutArrangement: LayoutArrangement {
         var spacers = [LayoutSpacer]()
         items.forPair { previous, current in
             let spacer = LayoutSpacer()
+            spacer.translatesAutoresizingMaskIntoConstraints = false
             canvas.addSubview(spacer)
             spacers.append(spacer)
 
-            save(addSpacing(current: current, previous: previous, relation: .GreaterThanOrEqual))
+            addSpacing(current: current, previous: previous, relation: .GreaterThanOrEqual)
 
             // Join views using spacer
-            let leadingAttribute: ALAttribute = horizontal ? .Leading : .Top
-            let trailingAttribute: ALAttribute = horizontal ? .Trailing : .Bottom
-            let centerAttribute: ALAttribute = horizontal ? .Vertical : .Horizontal
+            let leadingAttr: NSLayoutAttribute = horizontal ? .Leading : .Top
+            let trailingAttr: NSLayoutAttribute = horizontal ? .Trailing : .Bottom
+            let centerAttr: NSLayoutAttribute = horizontal ? .CenterX : .CenterY
             if type == .EqualCentering {
                 // Spacers are joined to the centers of the views
-                save(pinSpacer(spacer, attribute: leadingAttribute, toAttribute: centerAttribute, ofView: previous))
-                save(pinSpacer(spacer, attribute: trailingAttribute, toAttribute: centerAttribute, ofView: current))
+                connectItem(spacer, attribute: leadingAttr, toItem: previous, attribute: centerAttr)
+                connectItem(spacer, attribute: trailingAttr, toItem: current, attribute: centerAttr)
             } else {
-                save(pinSpacer(spacer, attribute: leadingAttribute, toAttribute: trailingAttribute, ofView: previous))
-                save(pinSpacer(spacer, attribute: trailingAttribute, toAttribute: leadingAttribute, ofView: current))
+                connectItem(spacer, attribute: leadingAttr, toItem: previous, attribute: trailingAttr)
+                connectItem(spacer, attribute: trailingAttr, toItem: current, attribute: leadingAttr)
             }
         }
 
         // Match spacers size
         spacers.forPair { previous, current in
-            let dimension: ALDimension = horizontal ? .Width : .Height
-            let constraint = current.autoMatchDimension(dimension, toDimension: dimension, ofView: previous)
-            constraint.identifier = "ASV-equal-spacers"
-            save(constraint)
+            addConstraint(item: previous, attribute: (horizontal ? .Width : .Height), toItem: current).identifier = "ASV-equal-spacers"
         }
     }
 
-    private func addSpacing(current current: UIView, previous: UIView, relation: NSLayoutRelation = .Equal) -> NSLayoutConstraint {
-        let fromEdge: ALEdge = horizontal ? .Leading : .Top
-        let toEdge: ALEdge = horizontal ? .Trailing : .Bottom
-        let constraint = current.autoPinEdge(fromEdge, toEdge: toEdge, ofView: previous, withOffset: spacing, relation: relation)
-        constraint.identifier = "ASV-spacing"
-        return constraint
+    private func addSpacing(current current: UIView, previous: UIView, relation: NSLayoutRelation = .Equal) {
+        addConstraint(item: current, attribute: (horizontal ? .Leading : .Top), toItem: previous, attribute: (horizontal ? .Trailing : .Bottom), relation: relation, constant: spacing).identifier = "ASV-spacing"
     }
 
-    private func pinSpacer(spacer: LayoutSpacer, attribute: ALAttribute, toAttribute: ALAttribute, ofView view: UIView) -> NSLayoutConstraint {
-        let constraint = spacer.autoConstrainAttribute(attribute, toAttribute: toAttribute, ofView: view)
-        constraint.identifier = "AVS-spacer-connection"
-        return constraint
+    private func connectItem(item1: UIView, attribute attr1: NSLayoutAttribute, toItem item2: UIView, attribute attr2: NSLayoutAttribute) {
+        addConstraint(item: item1, attribute: attr1, toItem: item2, attribute: attr2).identifier = "AVS-spacer-connection"
     }
 
     private func updateCanvasConnectingCostraints() {
-        guard let first = items.first, last = items.last else {
-            return
-        }
-        let leadingEdge: ALEdge = horizontal ? .Leading : .Top
-        let trailingEdge: ALEdge = horizontal ? .Trailing : .Bottom
-        if marginsEnabled {
-            save(first.autoPinEdgeToSuperviewMargin(leadingEdge))
-            save(last.autoPinEdgeToSuperviewMargin(trailingEdge))
-        } else {
-            save(first.autoPinEdgeToSuperviewEdge(leadingEdge))
-            save(last.autoPinEdgeToSuperviewEdge(trailingEdge))
+        if let first = items.first, last = items.last {
+            connectToCanvas(first, attribute: horizontal ? .Leading : .Top)
+            connectToCanvas(last, attribute: horizontal ? .Trailing : .Bottom)
         }
     }
 
@@ -102,8 +85,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
             return
         }
         items.forPair { previous, current in
-            let dimension: ALDimension = horizontal ? .Width : .Height
-            save(previous.autoMatchDimension(dimension, toDimension: dimension, ofView: current))
+            addConstraint(item: previous, attribute: (horizontal ? .Width : .Height), toItem: current)
         }
     }
 }

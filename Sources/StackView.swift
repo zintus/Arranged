@@ -3,7 +3,6 @@
 // Copyright (c) 2016 Alexander Grebenyuk (github.com/kean).
 
 import UIKit
-import PureLayout
 
 public enum StackViewDistribution {
     case Fill
@@ -90,6 +89,7 @@ public class StackView : UIView {
     public func addArrangedSubview(view: UIView) {
         // FIXME: Make sure that behavior matches UIStackView
         if view.superview != view && !arrangedSubviews.contains(view) {
+            view.translatesAutoresizingMaskIntoConstraints = false
             arrangedSubviews.append(view)
             addSubview(view)
             invalidateLayout()

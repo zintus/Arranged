@@ -2,14 +2,19 @@
 //
 // Copyright (c) 2016 Alexander Grebenyuk (github.com/kean).
 
-import PureLayout
+import UIKit
 
 
-class LayoutSpacer: UIView {
+class LayoutGuide: UIView {}
+
+class GapLayoutGuide: LayoutGuide {
     override func intrinsicContentSize() -> CGSize {
         return CGSize(width: 0, height: 0)
     }
 }
+
+
+class LayoutSpacer: LayoutGuide {}
 
 
 extension SequenceType {

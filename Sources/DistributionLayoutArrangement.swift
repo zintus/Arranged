@@ -11,18 +11,17 @@ class DistributionLayoutArrangement: LayoutArrangement {
     override func updateConstraints() {
         super.updateConstraints()
 
-        updateCanvasConnectingCostraints()
         updateSpacingConstraints()
         updateDistributionConstraints()
     }
 
     private func updateSpacingConstraints() {
-        // FIXME: Don't remove all spacers
-        canvas.subviews.filter{ $0 is LayoutSpacer }.forEach{ $0.removeFromSuperview() }
+        // FIXME: Don't remove all gaps
+        canvas.subviews.filter{ $0 is GapLayoutGuide }.forEach{ $0.removeFromSuperview() }
 
         switch type {
         case .EqualSpacing, .EqualCentering:
-            updateLayoutSpacers()
+            updateGapLayoutGuides()
         case .Fill, .FillEqually:
             // Set spacing without creating spacers
             items.forPair {  previous, current in
@@ -33,14 +32,14 @@ class DistributionLayoutArrangement: LayoutArrangement {
         }
     }
 
-    private func updateLayoutSpacers() {
-        // Join views using spacer
-        var spacers = [LayoutSpacer]()
+    private func updateGapLayoutGuides() {
+        // Join views using gaps
+        var gaps = [GapLayoutGuide]()
         items.forPair { previous, current in
-            let spacer = LayoutSpacer()
-            spacer.translatesAutoresizingMaskIntoConstraints = false
-            canvas.addSubview(spacer)
-            spacers.append(spacer)
+            let gap = GapLayoutGuide()
+            gap.translatesAutoresizingMaskIntoConstraints = false
+            canvas.addSubview(gap)
+            gaps.append(gap)
 
             addSpacing(current: current, previous: previous, relation: .GreaterThanOrEqual)
 
@@ -50,33 +49,26 @@ class DistributionLayoutArrangement: LayoutArrangement {
             let centerAttr: NSLayoutAttribute = horizontal ? .CenterX : .CenterY
             if type == .EqualCentering {
                 // Spacers are joined to the centers of the views
-                connectItem(spacer, attribute: leadingAttr, toItem: previous, attribute: centerAttr)
-                connectItem(spacer, attribute: trailingAttr, toItem: current, attribute: centerAttr)
+                connectItem(gap, attribute: leadingAttr, toItem: previous, attribute: centerAttr)
+                connectItem(gap, attribute: trailingAttr, toItem: current, attribute: centerAttr)
             } else {
-                connectItem(spacer, attribute: leadingAttr, toItem: previous, attribute: trailingAttr)
-                connectItem(spacer, attribute: trailingAttr, toItem: current, attribute: leadingAttr)
+                connectItem(gap, attribute: leadingAttr, toItem: previous, attribute: trailingAttr)
+                connectItem(gap, attribute: trailingAttr, toItem: current, attribute: leadingAttr)
             }
         }
 
         // Match spacers size
-        spacers.forPair { previous, current in
-            addConstraint(item: previous, attribute: (horizontal ? .Width : .Height), toItem: current).identifier = "ASV-equal-spacers"
+        gaps.forPair { previous, current in
+            add(constraint(item: previous, attribute: (horizontal ? .Width : .Height), toItem: current, identifier: "ASV-equal-spacers"))
         }
     }
 
     private func addSpacing(current current: UIView, previous: UIView, relation: NSLayoutRelation = .Equal) {
-        addConstraint(item: current, attribute: (horizontal ? .Leading : .Top), toItem: previous, attribute: (horizontal ? .Trailing : .Bottom), relation: relation, constant: spacing).identifier = "ASV-spacing"
+        add(constraint(item: current, attribute: (horizontal ? .Leading : .Top), toItem: previous, attribute: (horizontal ? .Trailing : .Bottom), relation: relation, constant: spacing, identifier: "ASV-spacing"))
     }
 
     private func connectItem(item1: UIView, attribute attr1: NSLayoutAttribute, toItem item2: UIView, attribute attr2: NSLayoutAttribute) {
-        addConstraint(item: item1, attribute: attr1, toItem: item2, attribute: attr2).identifier = "AVS-spacer-connection"
-    }
-
-    private func updateCanvasConnectingCostraints() {
-        if let first = items.first, last = items.last {
-            connectToCanvas(first, attribute: horizontal ? .Leading : .Top)
-            connectToCanvas(last, attribute: horizontal ? .Trailing : .Bottom)
-        }
+        add(constraint(item: item1, attribute: attr1, toItem: item2, attribute: attr2, identifier: "AVS-spacer-connection"))
     }
 
     private func updateDistributionConstraints() {
@@ -85,7 +77,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
             return
         }
         items.forPair { previous, current in
-            addConstraint(item: previous, attribute: (horizontal ? .Width : .Height), toItem: current)
+            add(constraint(item: previous, attribute: (horizontal ? .Width : .Height), toItem: current, identifier: "AVS-fill-equally"))
         }
     }
 }

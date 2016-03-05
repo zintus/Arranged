@@ -217,7 +217,8 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
             print("\n\n")
             print("===========================")
             print("all stack view constraints:")
-            printConstraints(stackView.constraints)
+            printConstraints(constraintsForView(stackView))
+
 
             print("")
             print("horizontal")
@@ -276,6 +277,15 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         for constraint in constraints {
             print(constraint)
         }
+    }
+    
+    func constraintsForView(item: UIView) -> [NSLayoutConstraint] {
+        var constraints = [NSLayoutConstraint]()
+        constraints.appendContentsOf(item.constraints)
+        for subview in item.subviews {
+                constraints.appendContentsOf(subview.constraints)
+        }
+        return constraints
     }
 }
 

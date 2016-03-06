@@ -23,3 +23,20 @@ extension SequenceType {
         }
     }
 }
+
+
+extension NSLayoutAttribute {
+    var toMargin: NSLayoutAttribute {
+        switch self {
+        case .Left: return .LeftMargin
+        case .Right: return .RightMargin
+        case .Top: return .TopMargin
+        case .Bottom: return .BottomMargin
+        case .Leading: return .LeadingMargin
+        case .Trailing: return .TrailingMargin
+        case .CenterX: return .CenterXWithinMargins
+        case .CenterY: return .CenterYWithinMargins
+        default: return self
+        }
+    }
+}

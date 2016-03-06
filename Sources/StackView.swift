@@ -43,7 +43,6 @@ public class StackView : UIView {
     public var baselineRelativeArrangement = false {
         didSet { if baselineRelativeArrangement != oldValue { invalidateLayout() } }
     }
-
     public var layoutMarginsRelativeArrangement = false {
         didSet { if layoutMarginsRelativeArrangement != oldValue { invalidateLayout() } }
     }
@@ -54,6 +53,7 @@ public class StackView : UIView {
     private var invalidated = false
 
     public private(set) var arrangedSubviews: [UIView]
+    private var hiddenViews = Set<UIView>()
     
     public init(arrangedSubviews views: [UIView]) {
         arrangedSubviews = views
@@ -97,6 +97,7 @@ public class StackView : UIView {
         // FIXME: Make sure that behavior matches UIStackView
         if let index = arrangedSubviews.indexOf(view) {
             arrangedSubviews.removeAtIndex(index)
+            hiddenViews.remove(view)
             invalidateLayout()
         }
     }
@@ -118,15 +119,14 @@ public class StackView : UIView {
         if invalidated {
             invalidated = false
             
-            alignmentArrangement.items = arrangedSubviews
-            alignmentArrangement.axis = axis
-            alignmentArrangement.marginsEnabled = layoutMarginsRelativeArrangement
+            for arrangement in [alignmentArrangement, distributionArrangement] {
+                arrangement.items = arrangedSubviews
+                arrangement.axis = axis
+                arrangement.marginsEnabled = layoutMarginsRelativeArrangement
+                arrangement.hiddenItems = hiddenViews
+            }
             
             alignmentArrangement.type = alignment
-            
-            distributionArrangement.items = arrangedSubviews
-            distributionArrangement.axis = axis
-            distributionArrangement.marginsEnabled = layoutMarginsRelativeArrangement
             
             distributionArrangement.type = distribution
             distributionArrangement.spacing = spacing
@@ -136,5 +136,14 @@ public class StackView : UIView {
             distributionArrangement.updateConstraints()
         }
         super.updateConstraints()
+    }
+    
+    public func setViewHidden(view: UIView, hidden: Bool, animated: Bool) {
+        if hidden {
+            hiddenViews.insert(view)
+        } else {
+            hiddenViews.remove(view)
+        }
+        invalidateLayout()
     }
 }

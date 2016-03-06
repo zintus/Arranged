@@ -19,10 +19,12 @@ class DistributionLayoutArrangement: LayoutArrangement {
             updateSpacingConstraints()
             updateDistributionConstraints()
         }
+        if hiddenItems.count > 0 {
+            updateHiddenItemsConstraints()
+        }
     }
 
     private func updateSpacingConstraints() {
-
         switch type {
         case .Fill, .FillEqually, .FillProportionally:
             addSpacings()
@@ -71,10 +73,30 @@ class DistributionLayoutArrangement: LayoutArrangement {
         }
     }
     
+    private func updateHiddenItemsConstraints() {
+        hiddenItems.forEach {
+            add(constraint(item: $0, attribute: (horizontal ? .Width : .Height), constant: 0, identifier: "ASV-hiding"))
+        }
+    }
+    
     // MARK: Helpers
     
     private func addSpacings(relation: NSLayoutRelation = .Equal) {
+        func spacing(previous previous: UIView, current: UIView) -> CGFloat {
+            if current === visibleItems.first || previous === visibleItems.last {
+                return 0.0
+            } else {
+                var spacing = self.spacing
+                [previous, current].forEach {
+                    if isHidden($0) {
+                        spacing -= self.spacing / 2.0
+                    }
+                }
+                return spacing
+            }
+        }
         items.forPair { previous, current in
+            let spacing = spacing(previous: previous, current: current)
             add(constraint(item: current, attribute: (horizontal ? .Leading : .Top), toItem: previous, attribute: (horizontal ? .Trailing : .Bottom), relation: relation, constant: spacing, identifier: "ASV-spacing"))
         }
     }

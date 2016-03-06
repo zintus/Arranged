@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import Arranged
 
-let loggingEnabled = false
+let loggingEnabled = true
+let logAffectingViewsConstraints = false
 
 
 // MARK: BaseStackViewController
@@ -68,7 +70,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.heightConstraint.active = false
 
         let fittingWidth = NSLayoutConstraint(item: self.stackView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 0)
-        let fittingHeight = NSLayoutConstraint(item: self.stackView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 0)
+        let fittingHeight = NSLayoutConstraint(item: self.stackView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 0)
         for constraint in [fittingWidth, fittingHeight] {
             constraint.priority = 10
             self.stackView.addConstraint(constraint)
@@ -224,40 +226,52 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         if loggingEnabled {
             print("\n\n")
             print("===========================")
-            print("all stack view constraints:")
+            print("constraints:")
             printConstraints(constraintsForView(stackView))
 
-
-            print("")
-            print("horizontal")
-            print("==========")
-            print("\naffecting stack view:")
-            printConstraints(stackView.constraintsAffectingLayoutForAxis(.Horizontal))
-            for view in views {
-                print("\naffecting view \(view.accessibilityIdentifier):")
-                printConstraints(view.constraintsAffectingLayoutForAxis(.Horizontal))
-            }
-            print("")
-            print("vertical")
-            print("==========")
-            print("\naffecting stack view:")
-            printConstraints(stackView.constraintsAffectingLayoutForAxis(.Vertical))
-            for view in views {
-                print("\naffecting view \(view.accessibilityIdentifier):")
-                printConstraints(view.constraintsAffectingLayoutForAxis(.Vertical))
+            if logAffectingViewsConstraints {
+                print("")
+                print("horizontal")
+                print("==========")
+                print("\naffecting stack view:")
+                printConstraints(stackView.constraintsAffectingLayoutForAxis(.Horizontal))
+                for view in views {
+                    print("\naffecting view \(view.accessibilityIdentifier):")
+                    printConstraints(view.constraintsAffectingLayoutForAxis(.Horizontal))
+                }
+                print("")
+                print("vertical")
+                print("==========")
+                print("\naffecting stack view:")
+                printConstraints(stackView.constraintsAffectingLayoutForAxis(.Vertical))
+                for view in views {
+                    print("\naffecting view \(view.accessibilityIdentifier):")
+                    printConstraints(view.constraintsAffectingLayoutForAxis(.Vertical))
+                }
             }
         }
     }
     
     @objc func buttonShowAllTapped(sender: UIButton) {
         self.perform {
-            self.stackView.subviews.forEach{ $0.hidden = false }
+            self.stackView.subviews.forEach{
+                if let stack = self.stackView as? Arranged.StackView {
+                    stack .setViewHidden($0, hidden: false, animated: true)
+                } else {
+                    $0.hidden = false
+                }
+            }
         }
     }
 
     @objc func viewTapped(sender: UITapGestureRecognizer) {
         self.perform {
-            sender.view?.hidden = true
+            // TEMP:
+            if let stack = self.stackView as? Arranged.StackView {
+                stack .setViewHidden(sender.view!, hidden: true, animated: true)
+            } else {
+                sender.view?.hidden = true
+            }
         }
     }
     
@@ -266,7 +280,9 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
             UIView.animateWithDuration(0.33) {
                 closure()
                 // Arranged.StackView requires call to layoutIfNeeded
-                self.view.layoutIfNeeded()
+                if !(self.stackView is UIStackView) {
+                    self.view.layoutIfNeeded()
+                }
             }
         } else {
             closure()

@@ -7,7 +7,9 @@ import UIKit
 class LayoutArrangement {
     weak var canvas: UIView!
     var items = [UIView]() // Arranged views
-
+    var hiddenItems = Set<UIView>()
+    var visibleItems = Array<UIView>()
+    
     var axis: UILayoutConstraintAxis = .Horizontal
     var horizontal: Bool { return axis == .Horizontal }
     var marginsEnabled: Bool = false
@@ -19,6 +21,7 @@ class LayoutArrangement {
     }
 
     func updateConstraints() {
+        visibleItems = items.filter { return !isHidden($0) }
         NSLayoutConstraint.deactivateConstraints(constraints)
         constraints.removeAll()
     }
@@ -44,5 +47,9 @@ class LayoutArrangement {
     
     func add(constraint: NSLayoutConstraint) {
         constraints.append(constraint)
+    }
+    
+    func isHidden(item: UIView) -> Bool {
+        return hiddenItems.contains(item)
     }
 }

@@ -9,7 +9,7 @@
 import UIKit
 import Arranged
 
-let loggingEnabled = false
+let loggingEnabled = true
 let logAffectingViewsConstraints = false
 
 
@@ -68,11 +68,12 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.widthConstraint.active = false
         self.heightConstraint = self.stackView.autoSetDimension(.Height, toSize: 100)
         self.heightConstraint.active = false
+        self.stackView.baselineRelativeArrangement = true
 
         // Create background for stack view
 
         let background = UIView()
-        background.backgroundColor = UIColor.yellowColor()
+        background.backgroundColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1.0)
         self.view.insertSubview(background, belowSubview: self.stackView)
         background.autoMatchDimension(.Width, toDimension: .Width, ofView: self.stackView)
         background.autoMatchDimension(.Height, toDimension: .Height, ofView: self.stackView)
@@ -189,18 +190,21 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         case .Label:
             self.views.append(UILabel().then {
                 $0.text = "Sed ut perspiciatis unde omnis iste natus"
+                $0.font = UIFont.systemFontOfSize(26)
                 $0.numberOfLines = 0
                 $0.backgroundColor = UIColor.redColor()
             })
 
             self.views.append(UILabel().then {
-                $0.text = "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
+                $0.text = "Neque porro quisquam est, qui dolorem ipsum"
+                $0.font = UIFont.systemFontOfSize(20)
                 $0.numberOfLines = 0
                 $0.backgroundColor = UIColor.blueColor()
             })
 
             self.views.append(UILabel().then {
-                $0.text = "Neque porro quisquam est, qui dolorem ipsum"
+                $0.text = "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
+                $0.font = UIFont.systemFontOfSize(14)
                 $0.numberOfLines = 0
                 $0.backgroundColor = UIColor.greenColor()
             })

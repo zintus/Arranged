@@ -46,8 +46,8 @@ class AlignedLayoutArrangement: LayoutArrangement {
             case .Leading: return [top]
             case .Trailing: return [bottom]
             case .Center: return [horizontal ? .CenterY : .CenterX]
-            case .FirstBaseline: return [.FirstBaseline]
-            case .LastBaseline: return [.LastBaseline]
+            case .FirstBaseline: return horizontal ? [.FirstBaseline] : []
+            case .LastBaseline: return horizontal ? [.LastBaseline] : []
             }
         }
         for attribute in attributes() {

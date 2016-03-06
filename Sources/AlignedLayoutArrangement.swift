@@ -31,9 +31,10 @@ class AlignedLayoutArrangement: LayoutArrangement {
         if type != .Fill {
             addItemsAmbiguitySuppressors(items)
         }
-        if type == .FirstBaseline || type == .LastBaseline {
-            addCanvasFitConstraint()
-        }
+        
+        // UIStackView adds those constraints only in certain (complicated conditions)
+        // It seems that it's safe to always add them (for consistency)
+        addCanvasFitConstraints()
     }
     
     private func updateAlignmentConstraints() {
@@ -132,7 +133,9 @@ class AlignedLayoutArrangement: LayoutArrangement {
         }
     }
     
-    private func addCanvasFitConstraint() {
-        add(constraint(item: canvas, attribute: (horizontal ? .Height : .Width), constant: 0, priority: 49, identifier: "ASV-canvas-fit"))
+    func addCanvasFitConstraints() {
+        for attribute in [NSLayoutAttribute.Width, NSLayoutAttribute.Height] {
+            add(constraint(item: canvas, attribute: attribute, constant: 0, priority: 49, identifier: "ASV-canvas-fit"))
+        }
     }
 }

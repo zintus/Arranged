@@ -48,7 +48,6 @@ class DistributionLayoutArrangement: LayoutArrangement {
             connectItem(previous, attribute: (centering ? center : trailing), item: gap, attribute: leading)
             connectItem(gap, attribute: trailing, item: current, attribute: (centering ? center : leading))
         }
-
         matchItemsSize(gaps)
     }
 
@@ -59,16 +58,16 @@ class DistributionLayoutArrangement: LayoutArrangement {
                 let intrinsic = item.intrinsicContentSize()
                 return horizontal ? intrinsic.width : intrinsic.height
             }
-            let totalSize = items.reduce(CGFloat(0)) { total, item in
+            let totalSize = visibleItems.reduce(CGFloat(0)) { total, item in
                 return total + size(item)
             }
             var priority: UILayoutPriority = 999
-            items.forEach { item in
-                add(constraint(item: item, attribute: (horizontal ? .Width : .Height), toItem: canvas, relation: .Equal, multiplier: (size(item) / totalSize), priority: priority, identifier: "ASV-fill-proportionally"))
+            visibleItems.forEach {
+                add(constraint(item: $0, attribute: (horizontal ? .Width : .Height), toItem: canvas, relation: .Equal, multiplier: (size($0) / totalSize), priority: priority, identifier: "ASV-fill-proportionally"))
                 priority -= 1
             }
         case .FillEqually:
-            matchItemsSize(items)
+            matchItemsSize(visibleItems)
         default: break
         }
     }
@@ -82,21 +81,15 @@ class DistributionLayoutArrangement: LayoutArrangement {
     // MARK: Helpers
     
     private func addSpacings(relation: NSLayoutRelation = .Equal) {
-        func spacing(previous previous: UIView, current: UIView) -> CGFloat {
+        func spacingFor(previous previous: UIView, current: UIView) -> CGFloat {
             if current === visibleItems.first || previous === visibleItems.last {
                 return 0.0
             } else {
-                var spacing = self.spacing
-                [previous, current].forEach {
-                    if isHidden($0) {
-                        spacing -= self.spacing / 2.0
-                    }
-                }
-                return spacing
+                return spacing - (spacing / 2.0) * CGFloat([previous, current].filter{ isHidden($0) }.count)
             }
         }
         items.forPair { previous, current in
-            let spacing = spacing(previous: previous, current: current)
+            let spacing = spacingFor(previous: previous, current: current)
             add(constraint(item: current, attribute: (horizontal ? .Leading : .Top), toItem: previous, attribute: (horizontal ? .Trailing : .Bottom), relation: relation, constant: spacing, identifier: "ASV-spacing"))
         }
     }

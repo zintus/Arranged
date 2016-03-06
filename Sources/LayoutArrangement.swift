@@ -49,6 +49,8 @@ class LayoutArrangement {
         constraints.append(constraint)
     }
     
+    // MARK: Helpers
+    
     func isHidden(item: UIView) -> Bool {
         return hiddenItems.contains(item)
     }

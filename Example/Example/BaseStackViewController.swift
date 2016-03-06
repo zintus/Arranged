@@ -9,7 +9,7 @@
 import UIKit
 import Arranged
 
-let loggingEnabled = true
+let loggingEnabled = false
 let logAffectingViewsConstraints = false
 
 
@@ -68,13 +68,6 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.widthConstraint.active = false
         self.heightConstraint = self.stackView.autoSetDimension(.Height, toSize: 100)
         self.heightConstraint.active = false
-
-        let fittingWidth = NSLayoutConstraint(item: self.stackView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 0)
-        let fittingHeight = NSLayoutConstraint(item: self.stackView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 0)
-        for constraint in [fittingWidth, fittingHeight] {
-            constraint.priority = 10
-            self.stackView.addConstraint(constraint)
-        }
 
         // Create background for stack view
 

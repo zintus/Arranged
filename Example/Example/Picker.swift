@@ -41,11 +41,13 @@ class ValuePicker<Value> {
     }
     let button = UIButton(type: .System)
     let observer: (value: Value) -> Void
+    var view: UIView
 
     init(value: Value, presenter: UIViewController, observer: (value: Value) -> Void) {
         self.value = value
         self.presenter = presenter
         self.observer = observer
+        self.view = button
         self.update()
         objc_setAssociatedObject(button, &AssociatedKeys.Controller, self, .OBJC_ASSOCIATION_RETAIN)
         button.addTarget(self, action: "buttonTapped:", forControlEvents: .TouchUpInside)
@@ -165,7 +167,7 @@ class BaselineRelativeArrangementPicker : ValuePicker<Bool> {
     }
 
     override func update() {
-        button.setTitle("baselineRelativeArrangement:", value: "\(value)")
+        button.setTitle("baselineRelative:", value: "\(value)")
     }
 
     override func tapped() {
@@ -179,7 +181,7 @@ class LayoutMarginsRelativeArrangementPicker : ValuePicker<Bool> {
     }
 
     override func update() {
-        button.setTitle("layoutMarginsRelativeArrangement:", value: "\(value)")
+        button.setTitle("marginsRelative:", value: "\(value)")
     }
 
     override func tapped() {
@@ -217,6 +219,47 @@ class ContentTypePicker : ValuePicker<ContentType> {
         presenter.showPicker("Content Type", items: items, selected: values.indexOf(self.value)) { index in
             self.value = self.values[index]
         }
+    }
+}
+
+enum SizeType {
+    case Width, Height
+}
+
+class SizePicker: ValuePicker<(Bool, CGFloat)> {
+    let type: SizeType
+    init(value: (Bool, CGFloat), type: SizeType, presenter: UIViewController, observer: (value: (Bool, CGFloat)) -> Void) {
+        self.type = type
+        super.init(value: value, presenter: presenter, observer: observer)
+        
+        let prefix = type == .Width ? "H:" : "V:"
+        button.setTitle("\(prefix) pin", forState: .Normal)
+        button.setTitle("\(prefix) unpin", forState: .Selected)
+        
+        let slider = UISlider()
+        slider.autoSetDimension(.Width, toSize: 100)
+        slider.value = Float(value.1)
+        slider.addTarget(self, action: "sliderValueChanged:", forControlEvents: .ValueChanged)
+        
+        let container = UIStackView(arrangedSubviews: [button, slider])
+        container.spacing = 8
+        view = container
+    }
+    
+    override func update() {
+        button.selected = value.0
+    }
+    
+    override func tapped() {
+        var value = self.value
+        value.0 = !value.0
+        self.value = value
+    }
+    
+    @objc func sliderValueChanged(sender: UISlider) {
+        var value = self.value
+        value.1 = CGFloat(sender.value)
+        self.value = value
     }
 }
 

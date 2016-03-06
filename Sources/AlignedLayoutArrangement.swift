@@ -93,11 +93,11 @@ class AlignedLayoutArrangement: LayoutArrangement {
             let priority: UILayoutPriority? = equal ? 999.5 : nil
             add(constraint(item: spacer, attribute: attr, toItem: item, relation: relation, priority: priority, identifier: "ASV-spanning-boundary"))
         }
-        let topAttr: NSLayoutAttribute = horizontal ? .Top : .Leading
-        let bottomAttr: NSLayoutAttribute = horizontal ? .Bottom : .Trailing
+        let top: NSLayoutAttribute = horizontal ? .Top : .Leading
+        let bottom: NSLayoutAttribute = horizontal ? .Bottom : .Trailing
         items.forEach {
-            connectToSpacer($0, attribute: topAttr, equal: topEqual)
-            connectToSpacer($0, attribute: bottomAttr, equal: bottomEqual)
+            connectToSpacer($0, attribute: top, equal: topEqual)
+            connectToSpacer($0, attribute: bottom, equal: bottomEqual)
         }
     }
     

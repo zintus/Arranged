@@ -8,7 +8,7 @@
 
 import UIKit
 
-let loggingEnabled = true
+let loggingEnabled = false
 
 
 // MARK: BaseStackViewController
@@ -21,8 +21,8 @@ enum ContentType {
 class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewController {
     var stackView: T!
     var views = [UIView]()
-    var pinStackViewConstraint: NSLayoutConstraint!
-    var pinStackViewConstraint2: NSLayoutConstraint!
+    var widthConstraint: NSLayoutConstraint!
+    var heightConstraint: NSLayoutConstraint!
 
     // Options
     var animated = true
@@ -62,7 +62,10 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.stackView.autoPinToTopLayoutGuideOfViewController(self, withInset: 16)
         self.stackView.autoPinEdgeToSuperviewMargin(.Leading)
         self.stackView.autoPinEdgeToSuperviewMargin(.Trailing, relation: .GreaterThanOrEqual)
-
+        self.widthConstraint = self.stackView.autoSetDimension(.Width, toSize: 100)
+        self.widthConstraint.active = false
+        self.heightConstraint = self.stackView.autoSetDimension(.Height, toSize: 100)
+        self.heightConstraint.active = false
 
         // Create background for stack view
 
@@ -78,7 +81,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         // Create controls
 
         let controls = UIStackView()
-        controls.spacing = 0
+        controls.spacing = 2
         controls.axis = .Vertical
         controls.layoutMarginsRelativeArrangement = true
         controls.alignment = .Leading
@@ -87,42 +90,42 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
             self.perform {
                 self.stackView.axis = axis
             }
-        }.button)
+        }.view)
         controls.addArrangedSubview(SpacingPicker(value: self.stackView.spacing, presenter: self) { value in
             self.perform {
                 self.stackView.spacing = value
             }
-        }.button)
+        }.view)
         controls.addArrangedSubview(DistrubituonPicker(value: self.stackView.ar_distribution, presenter: self) { value in
             self.perform {
                 self.stackView.ar_distribution = value
             }
-        }.button)
+        }.view)
         controls.addArrangedSubview(AlignmentPicker(value: self.stackView.ar_alignment, presenter: self) { value in
             self.perform {
                 self.stackView.ar_alignment = value
             }
-        }.button)
+        }.view)
         controls.addArrangedSubview(MarginsPicker(value: self.stackView.layoutMargins, presenter: self) { value in
             self.perform {
                 self.stackView.layoutMargins = value
             }
-        }.button)
+        }.view)
         controls.addArrangedSubview(BaselineRelativeArrangementPicker(value: self.stackView.baselineRelativeArrangement
             , presenter: self) { value in
             self.perform {
                 self.stackView.baselineRelativeArrangement = value
             }
-        }.button)
+        }.view)
         controls.addArrangedSubview(LayoutMarginsRelativeArrangementPicker(value: self.stackView.layoutMarginsRelativeArrangement
             , presenter: self) { value in
             self.perform {
                 self.stackView.layoutMarginsRelativeArrangement = value
             }
-        }.button)
+        }.view)
 
         let controls2 = UIStackView()
-        controls2.spacing = 0
+        controls2.spacing = 2
         controls2.axis = .Vertical
         controls2.layoutMarginsRelativeArrangement = true
         controls2.alignment = .Trailing
@@ -130,17 +133,22 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
             $0.setTitle("show all subviews", forState: .Normal)
             $0.addTarget(self, action: "buttonShowAllTapped:", forControlEvents: .TouchUpInside)
         })
-        controls2.addArrangedSubview(UIButton(type: .System).then {
-            $0.setTitle("pin stack view", forState: .Normal)
-            $0.setTitle("unpin stack view", forState: .Selected)
-            $0.addTarget(self, action: "buttonPinTapped:", forControlEvents: .TouchUpInside)
-        })
         controls2.addArrangedSubview(AnimatedPicker(value: self.animated, presenter: self) {
             self.animated = $0
-        }.button)
+        }.view)
         controls2.addArrangedSubview(ContentTypePicker(value: self.contentType, presenter: self) {
             self.contentType = $0
-        }.button)
+        }.view)
+        controls2.addArrangedSubview(SizePicker(value: (false, 0.5), type: .Width, presenter: self) { active, ratio in
+            self.widthConstraint.active = active
+            let bound = self.view.bounds.size.width
+            self.widthConstraint.constant = ratio * bound
+        }.view)
+        controls2.addArrangedSubview(SizePicker(value: (false, 0.5), type: .Height, presenter: self) { active, ratio in
+            self.heightConstraint.active = active
+            let bound = self.view.bounds.size.width
+            self.heightConstraint.constant = ratio * bound
+        }.view)
 
         self.view.addSubview(controls)
         self.view.addSubview(controls2)
@@ -149,13 +157,6 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         controls.autoPinEdgeToSuperviewMargin(.Leading)
         controls2.autoPinEdgeToSuperviewMargin(.Trailing)
         controls.autoPinEdge(.Top, toEdge: .Bottom, ofView: self.stackView, withOffset: 16, relation: .GreaterThanOrEqual)
-
-        // Pin stack view
-
-        self.pinStackViewConstraint = self.stackView.autoPinEdgeToSuperviewMargin(.Trailing)
-        self.pinStackViewConstraint.active = false
-        self.pinStackViewConstraint2 = self.stackView.autoSetDimension(.Height, toSize: 200)
-        self.pinStackViewConstraint2.active = false
     }
 
     func refreshContent() {
@@ -244,14 +245,6 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
     @objc func buttonShowAllTapped(sender: UIButton) {
         self.perform {
             self.stackView.subviews.forEach{ $0.hidden = false }
-        }
-    }
-
-    @objc func buttonPinTapped(sender: UIButton ) {
-        self.perform {
-            sender.selected = !sender.selected
-            self.pinStackViewConstraint.active = sender.selected
-            self.pinStackViewConstraint2.active = sender.selected
         }
     }
 

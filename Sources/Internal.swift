@@ -5,7 +5,16 @@
 import UIKit
 
 
-class LayoutGuide: UIView {}
+class LayoutGuide: UIView {
+    override class func layerClass() -> AnyClass {
+        return CATransformLayer.self
+    }
+    
+    override var backgroundColor: UIColor? {
+        get { return nil }
+        set { return }
+    }
+}
 
 class GapLayoutGuide: LayoutGuide {}
 

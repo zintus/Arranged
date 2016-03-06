@@ -77,7 +77,7 @@ public class StackView : UIView {
             addArrangedSubview($0)
         }
     }
-
+    
     // MARK: Managing Arranged Views
     
     public func addArrangedSubview(view: UIView) {
@@ -143,5 +143,16 @@ public class StackView : UIView {
             distributionArrangement.updateConstraints()
         }
         super.updateConstraints()
+    }
+    
+    // MARK: Misc
+    
+    public override class func layerClass() -> AnyClass {
+        return CATransformLayer.self
+    }
+    
+    public override var backgroundColor: UIColor? {
+        get { return nil }
+        set { return }
     }
 }

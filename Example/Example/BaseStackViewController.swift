@@ -249,7 +249,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.perform {
             self.stackView.subviews.forEach{
                 if let stack = self.stackView as? Arranged.StackView {
-                    stack .setViewHidden($0, hidden: false, animated: true)
+                    stack.setView($0, hidden: false)
                 } else {
                     $0.hidden = false
                 }
@@ -259,9 +259,8 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
 
     @objc func viewTapped(sender: UITapGestureRecognizer) {
         self.perform {
-            // TEMP:
             if let stack = self.stackView as? Arranged.StackView {
-                stack .setViewHidden(sender.view!, hidden: true, animated: true)
+                stack.setView(sender.view!, hidden: true)
             } else {
                 sender.view?.hidden = true
             }

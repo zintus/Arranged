@@ -106,6 +106,17 @@ public class StackView : UIView {
         // FIXME:
     }
     
+    // MARK: Hiding Views
+    
+    public func setView(view: UIView, hidden: Bool) {
+        if hidden {
+            hiddenViews.insert(view)
+        } else {
+            hiddenViews.remove(view)
+        }
+        invalidateLayout()
+    }
+    
     // MARK: Layout
     
     public func invalidateLayout() {
@@ -131,19 +142,9 @@ public class StackView : UIView {
             distributionArrangement.type = distribution
             distributionArrangement.spacing = spacing
             
-            // FIXME: Refresh only invalidated constraints (at least in most and perforamce-intensive common cases)
             alignmentArrangement.updateConstraints()
             distributionArrangement.updateConstraints()
         }
         super.updateConstraints()
-    }
-    
-    public func setViewHidden(view: UIView, hidden: Bool, animated: Bool) {
-        if hidden {
-            hiddenViews.insert(view)
-        } else {
-            hiddenViews.remove(view)
-        }
-        invalidateLayout()
     }
 }

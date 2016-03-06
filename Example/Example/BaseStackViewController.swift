@@ -210,6 +210,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
             view.accessibilityIdentifier = "content-view-\(index + 1)"
             view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "viewTapped:"))
             self.stackView.addArrangedSubview(view)
+            self.stackView.addArrangedSubview(view)
         }
     }
 

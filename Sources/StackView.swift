@@ -52,13 +52,12 @@ public class StackView : UIView {
 
     private var invalidated = false
 
-    public private(set) var arrangedSubviews: [UIView]
+    public private(set) var arrangedSubviews = [UIView]()
     private var hiddenViews = Set<UIView>()
     
     public init(arrangedSubviews views: [UIView]) {
-        arrangedSubviews = views
         super.init(frame: CGRectZero)
-        commonInit()
+        commonInit(views: views)
     }
 
     public convenience init() {
@@ -66,35 +65,26 @@ public class StackView : UIView {
     }
     
     public required init?(coder aDecoder: NSCoder) {
-        arrangedSubviews = []
         super.init(coder: aDecoder)
-        commonInit()
-        
-        // FIXME:
-        arrangedSubviews.appendContentsOf(subviews)
-        invalidateLayout()
+        commonInit(views: subviews)
     }
     
-    private func commonInit() {
+    private func commonInit(views views: [UIView]) {
         layoutMargins = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         alignmentArrangement = AlignedLayoutArrangement(canvas: self)
         distributionArrangement = DistributionLayoutArrangement(canvas: self)
+        views.forEach {
+            addArrangedSubview($0)
+        }
     }
 
     // MARK: Managing Arranged Views
     
     public func addArrangedSubview(view: UIView) {
-        // FIXME: Make sure that behavior matches UIStackView
-        if view.superview != view && !arrangedSubviews.contains(view) {
-            view.translatesAutoresizingMaskIntoConstraints = false
-            arrangedSubviews.append(view)
-            addSubview(view)
-            invalidateLayout()
-        }
+        insertArrangedSubview(view, atIndex: arrangedSubviews.count)
     }
 
     public func removeArrangedSubview(view: UIView) {
-        // FIXME: Make sure that behavior matches UIStackView
         if let index = arrangedSubviews.indexOf(view) {
             arrangedSubviews.removeAtIndex(index)
             hiddenViews.remove(view)
@@ -103,7 +93,14 @@ public class StackView : UIView {
     }
     
     public func insertArrangedSubview(view: UIView, atIndex stackIndex: Int) {
-        // FIXME:
+        if !arrangedSubviews.contains(view) {
+            view.translatesAutoresizingMaskIntoConstraints = false
+            arrangedSubviews.insert(view, atIndex: stackIndex)
+            if view.superview != self {
+                addSubview(view)
+            }
+            invalidateLayout()
+        }
     }
     
     // MARK: Hiding Views

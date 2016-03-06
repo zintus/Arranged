@@ -67,21 +67,16 @@ class ValuePicker<Value> {
 }
 
 class AxisPicker : ValuePicker<UILayoutConstraintAxis> {
-    let values: [UILayoutConstraintAxis] = [.Vertical, .Horizontal]
-    let items = [".Vertical", ".Horizontal"]
-
     override init(value: UILayoutConstraintAxis, presenter: UIViewController, observer: (value: UILayoutConstraintAxis) -> Void) {
         super.init(value: value, presenter: presenter, observer: observer)
     }
 
     override func update() {
-        button.setTitle("axis:", value: "\(items[values.indexOf(value)!])")
+        button.setTitle("axis:", value: (value == .Vertical ? ".Vertical" : ".Horizontal"))
     }
 
     override func tapped() {
-        presenter.showPicker("Constraint Axis (UILayoutConstraintAxis)", items: items, selected: values.indexOf(self.value)) { index in
-            self.value = self.values[index]
-        }
+        value = value == .Vertical ? .Horizontal : .Vertical
     }
 }
 

@@ -8,7 +8,7 @@
 
 import UIKit
 
-let loggingEnabled = false
+let loggingEnabled = true
 
 
 // MARK: BaseStackViewController

@@ -25,8 +25,8 @@ class AlignedLayoutArrangement: LayoutArrangement {
         _spacer = nil
         
         if items.count > 0 {
-            updateAlignmentConstraints()
             updateCanvasConnectingCostraints()
+            updateAlignmentConstraints()
         }
     }
     
@@ -39,7 +39,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
         
         switch type {
         case .Fill:
-            for attribute in [bottom, top] {
+            for attribute in [top, bottom] {
                 connectToCanvas(firstItem, attribute: attribute)
                 alignItems(attribute: attribute)
             }
@@ -73,6 +73,8 @@ class AlignedLayoutArrangement: LayoutArrangement {
             connectToCanvas(last, attribute: horizontal ? .Trailing : .Bottom)
         }
     }
+    
+    // MARK: Helpers
     
     private func alignItems(attribute attribute: NSLayoutAttribute) {
         let firstItem = items.first!

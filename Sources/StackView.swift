@@ -7,10 +7,8 @@ import UIKit
 public enum StackViewDistribution {
     case Fill
     case FillEqually
-    // FIXME: Implement
     case FillProportionally
     case EqualSpacing
-    // FIXME: Implement
     case EqualCentering
 }
 
@@ -42,7 +40,6 @@ public class StackView : UIView {
     public var spacing: CGFloat = 0.0 {
         didSet { if spacing != oldValue { invalidateLayout() } }
     }
-    // FIXME: Implement
     public var baselineRelativeArrangement = false {
         didSet { if baselineRelativeArrangement != oldValue { invalidateLayout() } }
     }
@@ -110,7 +107,7 @@ public class StackView : UIView {
     
     // MARK: Layout
     
-    private func invalidateLayout() {
+    public func invalidateLayout() {
         if !invalidated {
             invalidated = true
             setNeedsUpdateConstraints()

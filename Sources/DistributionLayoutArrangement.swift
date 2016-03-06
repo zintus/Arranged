@@ -7,77 +7,85 @@ import UIKit
 class DistributionLayoutArrangement: LayoutArrangement {
     var type: StackViewDistribution = .Fill
     var spacing: CGFloat = 0
+    private var gaps = [GapLayoutGuide]()
 
     override func updateConstraints() {
         super.updateConstraints()
 
-        updateSpacingConstraints()
-        updateDistributionConstraints()
+        gaps.forEach { $0.removeFromSuperview() }
+        gaps.removeAll()
+        
+        if items.count > 0 {
+            updateSpacingConstraints()
+            updateDistributionConstraints()
+        }
     }
 
     private func updateSpacingConstraints() {
-        // FIXME: Don't remove all gaps
-        canvas.subviews.filter{ $0 is GapLayoutGuide }.forEach{ $0.removeFromSuperview() }
 
         switch type {
+        case .Fill, .FillEqually, .FillProportionally:
+            addSpacings()
         case .EqualSpacing, .EqualCentering:
+            addSpacings(.GreaterThanOrEqual)
             updateGapLayoutGuides()
-        case .Fill, .FillEqually:
-            // Set spacing without creating spacers
-            items.forPair {  previous, current in
-                addSpacing(current: current, previous: previous)
-            }
-        case .FillProportionally:
-            print(".FillProportionally not implemented")
         }
     }
 
     private func updateGapLayoutGuides() {
-        // Join views using gaps
-        var gaps = [GapLayoutGuide]()
         items.forPair { previous, current in
             let gap = GapLayoutGuide()
             gap.translatesAutoresizingMaskIntoConstraints = false
             canvas.addSubview(gap)
             gaps.append(gap)
 
-            addSpacing(current: current, previous: previous, relation: .GreaterThanOrEqual)
-
-            // Join views using spacer
-            let leadingAttr: NSLayoutAttribute = horizontal ? .Leading : .Top
-            let trailingAttr: NSLayoutAttribute = horizontal ? .Trailing : .Bottom
-            let centerAttr: NSLayoutAttribute = horizontal ? .CenterX : .CenterY
-            if type == .EqualCentering {
-                // Spacers are joined to the centers of the views
-                connectItem(gap, attribute: leadingAttr, toItem: previous, attribute: centerAttr)
-                connectItem(gap, attribute: trailingAttr, toItem: current, attribute: centerAttr)
-            } else {
-                connectItem(gap, attribute: leadingAttr, toItem: previous, attribute: trailingAttr)
-                connectItem(gap, attribute: trailingAttr, toItem: current, attribute: leadingAttr)
-            }
+            let leading: NSLayoutAttribute = horizontal ? .Leading : .Top
+            let trailing: NSLayoutAttribute = horizontal ? .Trailing : .Bottom
+            let center: NSLayoutAttribute = horizontal ? .CenterX : .CenterY
+            let centering = type == .EqualCentering
+            connectItem(previous, attribute: (centering ? center : trailing), item: gap, attribute: leading)
+            connectItem(gap, attribute: trailing, item: current, attribute: (centering ? center : leading))
         }
 
-        // Match spacers size
-        gaps.forPair { previous, current in
-            add(constraint(item: previous, attribute: (horizontal ? .Width : .Height), toItem: current, identifier: "ASV-equal-spacers"))
-        }
-    }
-
-    private func addSpacing(current current: UIView, previous: UIView, relation: NSLayoutRelation = .Equal) {
-        add(constraint(item: current, attribute: (horizontal ? .Leading : .Top), toItem: previous, attribute: (horizontal ? .Trailing : .Bottom), relation: relation, constant: spacing, identifier: "ASV-spacing"))
-    }
-
-    private func connectItem(item1: UIView, attribute attr1: NSLayoutAttribute, toItem item2: UIView, attribute attr2: NSLayoutAttribute) {
-        add(constraint(item: item1, attribute: attr1, toItem: item2, attribute: attr2, identifier: "AVS-spacer-connection"))
+        matchItemsSize(gaps)
     }
 
     private func updateDistributionConstraints() {
-        // FIXME: Cleanup
-        guard type == .FillEqually else {
-            return
+        switch type {
+        case .FillProportionally:
+            func size(item: UIView) -> CGFloat {
+                let intrinsic = item.intrinsicContentSize()
+                return horizontal ? intrinsic.width : intrinsic.height
+            }
+            let totalSize = items.reduce(CGFloat(0)) { total, item in
+                return total + size(item)
+            }
+            var priority: UILayoutPriority = 999
+            items.forEach { item in
+                add(constraint(item: item, attribute: (horizontal ? .Width : .Height), toItem: canvas, relation: .Equal, multiplier: (size(item) / totalSize), priority: priority, identifier: "ASV-fill-proportionally"))
+                priority -= 1
+            }
+        case .FillEqually:
+            matchItemsSize(items)
+        default: break
         }
+    }
+    
+    // MARK: Helpers
+    
+    private func addSpacings(relation: NSLayoutRelation = .Equal) {
         items.forPair { previous, current in
-            add(constraint(item: previous, attribute: (horizontal ? .Width : .Height), toItem: current, identifier: "AVS-fill-equally"))
+            add(constraint(item: current, attribute: (horizontal ? .Leading : .Top), toItem: previous, attribute: (horizontal ? .Trailing : .Bottom), relation: relation, constant: spacing, identifier: "ASV-spacing"))
+        }
+    }
+    
+    private func connectItem(item1: UIView, attribute attr1: NSLayoutAttribute, item item2: UIView, attribute attr2: NSLayoutAttribute) {
+        add(constraint(item: item1, attribute: attr1, toItem: item2, attribute: attr2, identifier: "ASV-distributing-edge"))
+    }
+    
+    private func matchItemsSize(items: [UIView]) {
+        items.forPair { previous, current in
+            add(constraint(item: previous, attribute: (horizontal ? .Width : .Height), toItem: current, identifier: "ASV-fill-equally"))
         }
     }
 }

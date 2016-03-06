@@ -7,12 +7,7 @@ import UIKit
 
 class LayoutGuide: UIView {}
 
-class GapLayoutGuide: LayoutGuide {
-    override func intrinsicContentSize() -> CGSize {
-        return CGSize(width: 0, height: 0)
-    }
-}
-
+class GapLayoutGuide: LayoutGuide {}
 
 class LayoutSpacer: LayoutGuide {}
 

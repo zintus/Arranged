@@ -63,21 +63,38 @@ class DistributionLayoutArrangement: LayoutArrangement {
     private func updateDistributionConstraints() {
         switch type {
         case .FillProportionally:
-            func size(item: UIView) -> CGFloat {
-                let intrinsic = item.intrinsicContentSize()
-                return horizontal ? intrinsic.width : intrinsic.height
-            }
-            let totalSize = visibleItems.reduce(spacing * CGFloat(visibleItems.count - 1)) { total, item in
-                return total + size(item)
-            }
-            var priority: UILayoutPriority = 999
-            visibleItems.forEach {
-                add(constraint(item: $0, attribute: (horizontal ? .Width : .Height), toItem: canvas, relation: .Equal, multiplier: (size($0) / totalSize), priority: priority, identifier: "ASV-fill-proportionally"))
-                priority -= 1
-            }
+            fillItemsProportionally()
         case .FillEqually:
             matchItemsSize(visibleItems)
         default: break
+        }
+    }
+        
+    private func fillItemsProportionally() {
+        func size(item: UIView) -> CGFloat {
+            let intrinsic = item.intrinsicContentSize()
+            return horizontal ? intrinsic.width : intrinsic.height
+        }
+        let itemsWithIntrinsic: [UIView] = visibleItems.filter {
+            return size($0) != UIViewNoIntrinsicMetric
+        }
+        guard itemsWithIntrinsic.count > 0 else {
+            matchItemsSize(visibleItems)
+            return
+        }
+        let totalSize = itemsWithIntrinsic.reduce(spacing * CGFloat(itemsWithIntrinsic.count - 1)) { total, item in
+            return total + size(item)
+        }
+        var priority: UILayoutPriority = 999
+        let dimension: NSLayoutAttribute = horizontal ? .Width : .Height
+        visibleItems.forEach {
+            let size = size($0)
+            if size != UIViewNoIntrinsicMetric {
+                priority -= 1
+                add(constraint(item: $0, attribute: dimension, toItem: canvas, relation: .Equal, multiplier: (size / totalSize), priority: priority, identifier: "ASV-fill-proportionally"))
+            } else {
+                add(constraint(item: $0, attribute: dimension, constant: 0, identifier: "ASV-fill-proportionally"))
+            }
         }
     }
     

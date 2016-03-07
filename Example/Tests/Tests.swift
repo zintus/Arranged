@@ -37,11 +37,18 @@ class Tests: XCTestCase {
     }
     
     func test2() {
-        printTestTitle("Test: 3 content views, 1 without intrinsic, 2 with")
+        printTestTitle("Test: 3 content views, 1 without intrinsic")
         _test{
+            return [ContentView(),
+                ContentView(contentSize: CGSize(width: UIViewNoIntrinsicMetric, height: UIViewNoIntrinsicMetric)),
+                ContentView()]
+        }
+        
+        printTestTitle("Test: 3 content views, 2 without intrinsic")
+        _test {
             return [ContentView(contentSize: CGSize(width: UIViewNoIntrinsicMetric, height: UIViewNoIntrinsicMetric)),
                 ContentView(),
-                ContentView()]
+                ContentView(contentSize: CGSize(width: UIViewNoIntrinsicMetric, height: UIViewNoIntrinsicMetric))]
         }
         
         printTestTitle("Test: 3 content views, 3 without intrinsic")

@@ -150,6 +150,51 @@ public class StackView : UIView {
         super.updateConstraints()
     }
     
+    // MARK: Baseline Alignment
+    
+    // FIXME: Signal UIView when viewForFirst(Last)BaselineLayout changes.
+    
+    public override func viewForBaselineLayout() -> UIView {
+        return _viewForFirstBaselineLayout
+    }
+    
+    public override var viewForFirstBaselineLayout: UIView {
+        return _viewForFirstBaselineLayout
+    }
+    
+    public var _viewForFirstBaselineLayout: UIView {
+        switch axis {
+        case .Vertical:
+            if let first = arrangedSubviews.first {
+                if #available(iOS 9.0, *) {
+                    return first.viewForFirstBaselineLayout
+                } else {
+                    return first.viewForBaselineLayout()
+                }
+            } else {
+                return self
+            }
+            // FIXME: UIStackView: A horizontal stack view returns its tallest view (whatever that means)
+        case .Horizontal: return self
+        }
+    }
+    
+    public override var viewForLastBaselineLayout: UIView {
+        switch axis {
+        case .Vertical:
+            if let last = arrangedSubviews.last {
+                if #available(iOS 9.0, *) {
+                    return last.viewForLastBaselineLayout
+                } else {
+                    return last
+                }
+            } else {
+                return self
+            }
+        case .Horizontal: return self
+        }
+    }
+    
     // MARK: Misc
     
     public override class func layerClass() -> AnyClass {

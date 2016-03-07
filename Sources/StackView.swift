@@ -102,6 +102,10 @@ public class StackView : UIView {
             invalidateLayout()
         }
     }
+        
+    public override func willRemoveSubview(subview: UIView) {
+        removeArrangedSubview(subview)
+    }
     
     // MARK: Hiding Views
     

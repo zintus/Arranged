@@ -9,7 +9,7 @@
 import UIKit
 import Arranged
 
-let loggingEnabled = true
+let loggingEnabled = false
 let logAffectingViewsConstraints = false
 
 

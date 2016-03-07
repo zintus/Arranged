@@ -228,7 +228,7 @@ public class StackView : UIView {
             
             distributionArrangement.type = distribution
             distributionArrangement.spacing = spacing
-            distributionArrangement.baselineRelative = baselineRelativeArrangement
+            distributionArrangement.baselineRelative = baselineRelativeArrangement && axis == .Vertical
             
             alignmentArrangement.updateConstraints()
             distributionArrangement.updateConstraints()

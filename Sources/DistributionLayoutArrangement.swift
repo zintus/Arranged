@@ -45,17 +45,12 @@ class DistributionLayoutArrangement: LayoutArrangement {
             canvas.addSubview(gap)
             gaps.append(gap)
 
-            let leading: NSLayoutAttribute = horizontal ? .Leading : .Top
-            let trailing: NSLayoutAttribute = horizontal ? .Trailing : .Bottom
+            let leading: NSLayoutAttribute = baselineRelative ? .FirstBaseline : (horizontal ? .Leading : .Top)
+            let trailing: NSLayoutAttribute = baselineRelative ? .LastBaseline : (horizontal ? .Trailing : .Bottom)
             let center: NSLayoutAttribute = horizontal ? .CenterX : .CenterY
-            let centering = type == .EqualCentering
-            if baselineRelative && !centering {
-                connectItem(gap, attribute: .FirstBaseline, item: previous, attribute: .LastBaseline)
-                connectItem(gap, attribute: .LastBaseline, item: current, attribute: .FirstBaseline)
-            } else {
-                connectItem(gap, attribute: leading, item: previous, attribute: (centering ? center : trailing))
-                connectItem(gap, attribute: trailing, item: current, attribute: (centering ? center : leading))
-            }
+            
+            connectItem(gap, attribute: leading, item: previous, attribute: (type == .EqualCentering ? center : trailing))
+            connectItem(gap, attribute: trailing, item: current, attribute: (type == .EqualCentering ? center : leading))
         }
         matchItemsSize(gaps, priority: type == .EqualCentering ? 149 : nil)
     }
@@ -91,10 +86,10 @@ class DistributionLayoutArrangement: LayoutArrangement {
             let size = size($0)
             if size != UIViewNoIntrinsicMetric {
                 add(constraint(item: $0, attribute: dimension, toItem: canvas, relation: .Equal, multiplier: (size / totalSize), priority: priority, identifier: "ASV-fill-proportionally"))
-                priority -= 1
             } else {
                 add(constraint(item: $0, attribute: dimension, constant: 0, identifier: "ASV-fill-proportionally"))
             }
+            priority -= 1
         }
     }
     

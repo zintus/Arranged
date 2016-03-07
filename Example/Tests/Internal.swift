@@ -18,7 +18,7 @@ func assertEqualConstraints(constraints1: [NSLayoutConstraint], _ constraints2: 
 
 func _assertEqualConstraints(constraints1: [NSLayoutConstraint], _ constraints2: [NSLayoutConstraint]) -> Bool {
     guard constraints1.count == constraints2.count else {
-        XCTFail("Constraints count doesnt match: \(toString(constraints1, constraints2))")
+        XCTFail("Constraints count doesnt match")
         return false
     }
     
@@ -30,14 +30,14 @@ func _assertEqualConstraints(constraints1: [NSLayoutConstraint], _ constraints2:
             return isEqual(c1, c2)
         }
         guard let unpackedIdx2 = idx2 else {
-            XCTFail("Couldn't find matching constraint for \(c1) \(toString(constraints1, constraints2))")
+            XCTFail("Couldn't find matching constraint for \(c1)")
             return false
         }
         array2.removeAtIndex(unpackedIdx2)
     }
     
     guard array1.count == 0 && array2.count == 0 else {
-        XCTFail("Failed to match all constraints: \(toString(constraints1, constraints2))")
+        XCTFail("Failed to match all constraints")
         return false
     }
     
@@ -96,30 +96,6 @@ func constraintsFor(view: UIView) -> [NSLayoutConstraint] {
         constraints.appendContentsOf(subview.constraints)
     }
     return constraints
-}
-
-var constraintsPrinted = 0
-let maxConstraintsPrinted = 50
-
-func toString(constraints1: [NSLayoutConstraint], _ constraints2: [NSLayoutConstraint]) -> String {
-    constraintsPrinted++
-    guard constraintsPrinted < maxConstraintsPrinted else {
-        return ""
-    }
-    func toString(constraints: [NSLayoutConstraint]) -> String {
-        var string = String()
-        constraints.forEach {
-            string.appendContentsOf("\n\($0)")
-        }
-        return string
-    }
-    var string = String()
-    [constraints1, constraints2].enumerate().forEach {
-        string.appendContentsOf("\n\nConstraints \($0+1) (count: \($1.count)):\n")
-        string.appendContentsOf(toString($1))
-    }
-    string.appendContentsOf("\n")
-    return string
 }
 
 extension UIStackViewAlignment {

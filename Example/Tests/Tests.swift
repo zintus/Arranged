@@ -6,6 +6,9 @@ import XCTest
 import Arranged
 import UIKit
 
+var constraintsPrinted = 0
+let maxConstraintsPrinted = 10
+
 
 class Tests: XCTestCase {
     func test0() {
@@ -49,8 +52,6 @@ class Tests: XCTestCase {
         combinations.forEach {
             if !_test(views, conf: $0) {
                 failedCount += 1
-                print("Failed configuration:\n\n \($0)")
-                print("\n================================================\n")
             }
         }
         print("Current pass: \(combinations.count - failedCount)/\(combinations.count) combinations")
@@ -80,7 +81,21 @@ class Tests: XCTestCase {
             stack.updateConstraints()
             return constraintsFor(stack)
         }
-        return assertEqualConstraints(constraints(stack1), constraints(stack2))
+        let constraints1 = constraints(stack1)
+        let constraints2 = constraints(stack2)
+        let success = assertEqualConstraints(constraints1, constraints2)
+        if !success {
+            print("Failed configuration:\n\n \(conf)")
+            
+            print("UIStackView constraints (count: \(constraints1.count)):\n")
+            _print(constraints1)
+            
+            print("Arranged.StackView constraints (count: \(constraints2.count)):\n")
+            _print(constraints2)
+            
+            print("\n===============================================")
+        }
+        return success
     }
     
     // MARK: Helpers
@@ -88,6 +103,17 @@ class Tests: XCTestCase {
     func printTestTitle(string: String) {
         print("\n\n===============================================")
         print(string)
+    }
+    
+    func _print(constraints: [NSLayoutConstraint]) {
+        constraintsPrinted++
+        guard constraintsPrinted < maxConstraintsPrinted else {
+            return
+        }
+        print("Constraints (count: \(constraints.count)):")
+        constraints.forEach {
+            print($0)
+        }
     }
 }
 

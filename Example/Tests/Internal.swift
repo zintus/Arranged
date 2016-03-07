@@ -7,15 +7,21 @@ import UIKit
 import XCTest
 
 func assertEqualConstraints(constraints1: [NSLayoutConstraint], _ constraints2: [NSLayoutConstraint]) -> Bool {
-    guard constraints1.count > 0 && constraints2.count > 0 else {
-        XCTFail("Empty constraints: \(toString(constraints1, constraints2))")
-        return false
+    func filterOutMarginContraints(constraints: [NSLayoutConstraint]) -> [NSLayoutConstraint] {
+        return constraints.filter {
+            return $0.identifier?.hasSuffix("Margin-guide-constraint") == false
+        }
     }
+    // We fitler out margin-guide constraints because Arranged.StackView doesn't use those
+    return _assertEqualConstraints(filterOutMarginContraints(constraints1), filterOutMarginContraints(constraints2))
+}
+
+func _assertEqualConstraints(constraints1: [NSLayoutConstraint], _ constraints2: [NSLayoutConstraint]) -> Bool {
     guard constraints1.count == constraints2.count else {
         XCTFail("Constraints count doesnt match: \(toString(constraints1, constraints2))")
         return false
     }
-
+    
     var array1 = constraints1
     var array2 = constraints2
     
@@ -37,7 +43,6 @@ func assertEqualConstraints(constraints1: [NSLayoutConstraint], _ constraints2: 
     
     return true
 }
-
 
 // MARK: Constrain Comparison
 
@@ -94,7 +99,14 @@ func constraintsFor(view: UIView) -> [NSLayoutConstraint] {
     return constraints
 }
 
+var constraintsPrinted = 0
+let maxConstraintsPrinted = 50
+
 func toString(constraints1: [NSLayoutConstraint], _ constraints2: [NSLayoutConstraint]) -> String {
+    constraintsPrinted++
+    guard constraintsPrinted < maxConstraintsPrinted else {
+        return ""
+    }
     func toString(constraints: [NSLayoutConstraint]) -> String {
         var string = String()
         constraints.forEach {

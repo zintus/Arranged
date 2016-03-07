@@ -31,7 +31,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
         if type != .Fill {
             addItemsAmbiguitySuppressors(items)
         }
-        if type == .FirstBaseline || type == .LastBaseline {
+        if items.count > 0 && (type == .FirstBaseline || type == .LastBaseline) {
             addCanvasFitConstraint(attribute: (horizontal ? .Height : .Width))
         }
     }
@@ -97,6 +97,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
     // MARK: Helpers
     
     private func alignItems(items: [UIView], attribute: NSLayoutAttribute) {
+        guard items.count > 0 else { return }
         let firstItem = items.first!
         items.dropFirst().forEach {
             add(constraint(item: firstItem, attribute: attribute, toItem: $0, attribute: nil, identifier: "ASV-alignment"))

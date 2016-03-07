@@ -9,6 +9,7 @@ import UIKit
 
 struct StackTestConfiguraton {
     // StackView Parameters
+    var axis: UILayoutConstraintAxis = .Horizontal
     var alignment: UIStackViewAlignment = .Fill
     var distribution: UIStackViewDistribution = .Fill
     var baselineRelativeArrangement: Bool = false
@@ -31,6 +32,11 @@ extension StackTestConfiguraton: CustomStringConvertible {
 
 
 class Tests: XCTestCase {
+    func test0() {
+        printTestTitle("Test: 0 views")
+        _test{ return [] }
+    }
+    
     func test1() {
         printTestTitle("Test: 3 content views with defined content size")
         _test{ return [ContentView(), ContentView(), ContentView()] }
@@ -109,16 +115,19 @@ class Tests: XCTestCase {
         
         var combinations = [StackTestConfiguraton]()
         
-        for alignment in alignments {
-            for distribution in distributions {
-                for marginsRelative in [false] {
-                    for baselineRelative in [true, false] {
-                        var conf = StackTestConfiguraton()
-                        conf.alignment = alignment
-                        conf.distribution = distribution
-                        conf.baselineRelativeArrangement = baselineRelative
-                        conf.layoutMarginsRelativeArrangement = marginsRelative
-                        combinations.append(conf)
+        for axis in [UILayoutConstraintAxis.Horizontal, UILayoutConstraintAxis.Vertical] {
+            for alignment in alignments {
+                for distribution in distributions {
+                    for marginsRelative in [true, false] {
+                        for baselineRelative in [true, false] {
+                            var conf = StackTestConfiguraton()
+                            conf.axis = axis
+                            conf.alignment = alignment
+                            conf.distribution = distribution
+                            conf.baselineRelativeArrangement = baselineRelative
+                            conf.layoutMarginsRelativeArrangement = marginsRelative
+                            combinations.append(conf)
+                        }
                     }
                 }
             }

@@ -66,6 +66,7 @@
 - `UIStackView` observes `hidden` property of arranged views, delays its effect if called inside animation block, and updates constraints accordingly. I find this behavior confusing and impractical to implement. `Arranged.StackView` provides a straightforward method `setArrangedView(_:hidden:)` which updates constraints exactly the same way as `UIStackView` does, but it doesn't affect `hidden` property.
 - Animations require you to call `view.layoutIfNeeded()` method, just like with any regular layout
 - `StackViewDistribution.FillProportionally` doesn't update its constrains when `intrinsicContentSize` of arranged views changes, due to the fact that `UIStackView` uses private API (`_intrinsicContentSizeInvalidatedForChildView`) to do that
+- `UISV-text-width-disambiguation` constraints are not implemented because they are confusing and not documented
 
 ## Installation<a name="installation"></a>
 

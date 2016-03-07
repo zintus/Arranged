@@ -1,10 +1,6 @@
+// The MIT License (MIT)
 //
-//  Adapter.swift
-//  Example
-//
-//  Created by Alexander Grebenyuk on 02/03/16.
-//  Copyright © 2016 Alexander Grebenyuk. All rights reserved.
-//
+// Copyright (c) 2016 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import UIKit
@@ -18,7 +14,7 @@ protocol StackViewAdapter: class {
     var spacing: CGFloat { get set }
     var baselineRelativeArrangement: Bool { get set }
     var layoutMarginsRelativeArrangement: Bool { get set }
-
+    
     var ar_distribution: UIStackViewDistribution { get set }
     var ar_alignment: UIStackViewAlignment { get set }
 }
@@ -55,7 +51,7 @@ extension StackViewDistribution {
         case .EqualCentering: return .EqualCentering
         }
     }
-
+    
     static func fromStackViewDistrubition(distribution: UIStackViewDistribution) -> StackViewDistribution {
         switch distribution {
         case .Fill: return .Fill
@@ -78,7 +74,7 @@ extension StackViewAlignment {
         case .LastBaseline: return .LastBaseline
         }
     }
-
+    
     static func fromStackViewAlignment(alignment: UIStackViewAlignment) -> StackViewAlignment {
         switch alignment {
         case .Fill: return .Fill

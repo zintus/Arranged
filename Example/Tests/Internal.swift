@@ -54,10 +54,7 @@ func isEqual(lhs: NSLayoutConstraint, _ rhs: NSLayoutConstraint) -> Bool {
     guard identifier(lhs) == identifier(rhs) else {
         return false
     }
-    
-    // For now we just make sure that we create the equivalent number of constraints with the same type
-    return true
-    
+        
     // FIXME: Fix comparison
     func isEqual(item1: AnyObject?, _ item2: AnyObject?) -> Bool {
         // True if both nil
@@ -81,7 +78,9 @@ func isEqual(lhs: NSLayoutConstraint, _ rhs: NSLayoutConstraint) -> Bool {
         isEqual(lhs.secondItem, rhs.secondItem) else {
             return false
     }
-    return lhs.relation == rhs.relation &&
+    return lhs.firstAttribute == rhs.firstAttribute &&
+        lhs.secondAttribute == rhs.secondAttribute &&
+        lhs.relation == rhs.relation &&
         lhs.constant == rhs.constant &&
         lhs.multiplier == rhs.multiplier &&
         lhs.priority == rhs.priority

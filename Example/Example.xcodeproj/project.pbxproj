@@ -16,6 +16,7 @@
 		0C64A35D1C8DF57200037947 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C64A35C1C8DF57200037947 /* Tests.swift */; };
 		0C64A3661C8DF58B00037947 /* Adapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C64A3641C8DF58B00037947 /* Adapter.swift */; };
 		0C64A3671C8DF58B00037947 /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C64A3651C8DF58B00037947 /* Internal.swift */; };
+		0C64A3691C8E2ABB00037947 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C64A3681C8E2ABB00037947 /* Configuration.swift */; };
 		0C8A192A1C861A9E00BC750F /* ArrangedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8A19291C861A9E00BC750F /* ArrangedViewController.swift */; };
 		0C8A192C1C861AAC00BC750F /* StackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8A192B1C861AAC00BC750F /* StackViewController.swift */; };
 		9322B6BEF5D03BD1A7EADFF8 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B48553BF4953ED7C0FB382BE /* Pods.framework */; };
@@ -45,6 +46,7 @@
 		0C64A35E1C8DF57200037947 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C64A3641C8DF58B00037947 /* Adapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Adapter.swift; sourceTree = "<group>"; };
 		0C64A3651C8DF58B00037947 /* Internal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
+		0C64A3681C8E2ABB00037947 /* Configuration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		0C8A19291C861A9E00BC750F /* ArrangedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrangedViewController.swift; sourceTree = "<group>"; };
 		0C8A192B1C861AAC00BC750F /* StackViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StackViewController.swift; sourceTree = "<group>"; };
 		A2A3BC033E6FA3229639FF80 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 				0C64A35C1C8DF57200037947 /* Tests.swift */,
 				0C64A3641C8DF58B00037947 /* Adapter.swift */,
 				0C64A3651C8DF58B00037947 /* Internal.swift */,
+				0C64A3681C8E2ABB00037947 /* Configuration.swift */,
 				0C64A35E1C8DF57200037947 /* Info.plist */,
 			);
 			path = Tests;
@@ -301,6 +304,7 @@
 			files = (
 				0C64A35D1C8DF57200037947 /* Tests.swift in Sources */,
 				0C64A3671C8DF58B00037947 /* Internal.swift in Sources */,
+				0C64A3691C8E2ABB00037947 /* Configuration.swift in Sources */,
 				0C64A3661C8DF58B00037947 /* Adapter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -488,6 +492,7 @@
 				0C64A3621C8DF57300037947 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

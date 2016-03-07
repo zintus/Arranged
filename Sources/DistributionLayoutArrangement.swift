@@ -50,14 +50,14 @@ class DistributionLayoutArrangement: LayoutArrangement {
             let center: NSLayoutAttribute = horizontal ? .CenterX : .CenterY
             let centering = type == .EqualCentering
             if baselineRelative && !centering {
-                connectItem(previous, attribute: .LastBaseline, item: gap, attribute: leading)
-                connectItem(gap, attribute: trailing, item: current, attribute: .FirstBaseline)
+                connectItem(gap, attribute: .FirstBaseline, item: previous, attribute: .LastBaseline)
+                connectItem(gap, attribute: .LastBaseline, item: current, attribute: .FirstBaseline)
             } else {
-                connectItem(previous, attribute: (centering ? center : trailing), item: gap, attribute: leading)
+                connectItem(gap, attribute: leading, item: previous, attribute: (centering ? center : trailing))
                 connectItem(gap, attribute: trailing, item: current, attribute: (centering ? center : leading))
             }
         }
-        matchItemsSize(gaps)
+        matchItemsSize(gaps, priority: type == .EqualCentering ? 149 : nil)
     }
 
     private func updateDistributionConstraints() {
@@ -90,8 +90,8 @@ class DistributionLayoutArrangement: LayoutArrangement {
         visibleItems.forEach {
             let size = size($0)
             if size != UIViewNoIntrinsicMetric {
-                priority -= 1
                 add(constraint(item: $0, attribute: dimension, toItem: canvas, relation: .Equal, multiplier: (size / totalSize), priority: priority, identifier: "ASV-fill-proportionally"))
+                priority -= 1
             } else {
                 add(constraint(item: $0, attribute: dimension, constant: 0, identifier: "ASV-fill-proportionally"))
             }
@@ -126,9 +126,11 @@ class DistributionLayoutArrangement: LayoutArrangement {
         add(constraint(item: item1, attribute: attr1, toItem: item2, attribute: attr2, identifier: "ASV-distributing-edge"))
     }
     
-    private func matchItemsSize(items: [UIView]) {
-        items.forPair { previous, current in
-            add(constraint(item: previous, attribute: (horizontal ? .Width : .Height), toItem: current, identifier: "ASV-fill-equally"))
+    private func matchItemsSize(items: [UIView], priority: UILayoutPriority? = nil) {
+        guard items.count > 0 else { return }
+        let firstItem = items.first!
+        items.dropFirst().forEach {
+            add(constraint(item: $0, attribute: (horizontal ? .Width : .Height), toItem: firstItem, priority: priority, identifier: "ASV-fill-equally"))
         }
     }
 }

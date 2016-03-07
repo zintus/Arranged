@@ -7,30 +7,6 @@ import Arranged
 import UIKit
 
 
-struct StackTestConfiguraton {
-    // StackView Parameters
-    var axis: UILayoutConstraintAxis = .Horizontal
-    var alignment: UIStackViewAlignment = .Fill
-    var distribution: UIStackViewDistribution = .Fill
-    var baselineRelativeArrangement: Bool = false
-    var layoutMarginsRelativeArrangement: Bool = false
-    var spacing: CGFloat = 0
-}
-
-extension StackTestConfiguraton: CustomStringConvertible {
-    var description: String {
-        var desc = String()
-        desc.appendContentsOf("alignment: \(alignment.toString)\n")
-        desc.appendContentsOf("distribution: \(distribution.toString)\n")
-        desc.appendContentsOf("baselineRelativeArrangement: \(baselineRelativeArrangement)\n")
-        desc.appendContentsOf("layoutMarginsRelativeArrangement: \(layoutMarginsRelativeArrangement)\n")
-        desc.appendContentsOf("spacing: \(spacing)\n")
-        return desc
-    }
-}
-
-
-
 class Tests: XCTestCase {
     func test0() {
         printTestTitle("Test: 0 views")
@@ -65,80 +41,53 @@ class Tests: XCTestCase {
         }
     }
     
-    // MARK: Impl
+    // MARK: Tests Implementation
     
     func _test(views: (Void -> [UIView])) {
-        print("Testing views: \(views)")
         var failedCount = 0
-        let combinations = _generateConfigurations()
+        let combinations = StackTestConfiguraton.generate()
         combinations.forEach {
             if !_test(views, conf: $0) {
                 failedCount += 1
-                print("Failed combination:\n\n \($0)")
+                print("Failed configuration:\n\n \($0)")
                 print("\n================================================\n")
             }
         }
-        print("Passed: \(combinations.count - failedCount)/\(combinations.count) combinations")
+        print("Current pass: \(combinations.count - failedCount)/\(combinations.count) combinations")
     }
     
     func _test(viewsClosure: (Void -> [UIView]), conf: StackTestConfiguraton) -> Bool {
         let stack1 = UIStackView()
         let stack2 = StackView()
         
-        func constraints<T where T: UIView, T: StackViewAdapter>(view: T) -> [NSLayoutConstraint] {
+        func constraints<T where T: UIView, T: StackViewAdapter>(stack: T) -> [NSLayoutConstraint] {
             let views = viewsClosure()
             views.enumerate().forEach {
                 // This is important, tag is requried to match constraints later
-                view.tag = $0
+                $1.tag = $0
                 $1.test_isContentView = true
                 $1.accessibilityIdentifier = "content-view-\($0)"
-                view.addArrangedSubview($1)
+                stack.addArrangedSubview($1)
             }
-            view.ar_alignment = conf.alignment
-            view.ar_distribution = conf.distribution
-            view.baselineRelativeArrangement = conf.baselineRelativeArrangement
-            view.layoutMarginsRelativeArrangement = conf.layoutMarginsRelativeArrangement
+            stack.axis = conf.axis
+            stack.ar_alignment = conf.alignment
+            stack.ar_distribution = conf.distribution
+            stack.baselineRelativeArrangement = conf.baselineRelativeArrangement
+            stack.layoutMarginsRelativeArrangement = conf.layoutMarginsRelativeArrangement
+            stack.spacing = conf.spacing
             
-            view.translatesAutoresizingMaskIntoConstraints = false
-            view.updateConstraints()
-            return constraintsFor(view)
+            stack.translatesAutoresizingMaskIntoConstraints = false
+            stack.updateConstraints()
+            return constraintsFor(stack)
         }
         return assertEqualConstraints(constraints(stack1), constraints(stack2))
     }
     
     // MARK: Helpers
     
-    func _generateConfigurations() -> [StackTestConfiguraton] {
-        let alignments: [UIStackViewAlignment] = [.Fill, .Leading, .FirstBaseline, .Center, .Trailing, .LastBaseline]
-        let distributions: [UIStackViewDistribution] = [.Fill, .FillEqually, .FillProportionally, .EqualSpacing, .EqualCentering]
-        let spacing: [CGFloat] = [0.0]
-        
-        var combinations = [StackTestConfiguraton]()
-        
-        for axis in [UILayoutConstraintAxis.Horizontal, UILayoutConstraintAxis.Vertical] {
-            for alignment in alignments {
-                for distribution in distributions {
-                    for marginsRelative in [true, false] {
-                        for baselineRelative in [true, false] {
-                            var conf = StackTestConfiguraton()
-                            conf.axis = axis
-                            conf.alignment = alignment
-                            conf.distribution = distribution
-                            conf.baselineRelativeArrangement = baselineRelative
-                            conf.layoutMarginsRelativeArrangement = marginsRelative
-                            combinations.append(conf)
-                        }
-                    }
-                }
-            }
-        }
-        return combinations
-    }
-    
     func printTestTitle(string: String) {
-        print("\n=======================================")
+        print("\n\n===============================================")
         print(string)
-        print("=======================================\n")
     }
 }
 

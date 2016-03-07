@@ -105,7 +105,7 @@ public class StackView : UIView {
     
     // MARK: Hiding Views
     
-    public func setView(view: UIView, hidden: Bool) {
+    public func setArrangedView(view: UIView, hidden: Bool) {
         if hidden {
             hiddenViews.insert(view)
         } else {

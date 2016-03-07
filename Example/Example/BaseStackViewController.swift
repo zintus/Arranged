@@ -9,7 +9,7 @@
 import UIKit
 import Arranged
 
-let loggingEnabled = true
+let loggingEnabled = false
 let logAffectingViewsConstraints = false
 
 
@@ -254,7 +254,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.perform {
             self.stackView.subviews.forEach{
                 if let stack = self.stackView as? Arranged.StackView {
-                    stack.setView($0, hidden: false)
+                    stack.setArrangedView($0, hidden: false)
                 } else {
                     $0.hidden = false
                 }
@@ -265,7 +265,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
     @objc func viewTapped(sender: UITapGestureRecognizer) {
         self.perform {
             if let stack = self.stackView as? Arranged.StackView {
-                stack.setView(sender.view!, hidden: true)
+                stack.setArrangedView(sender.view!, hidden: true)
             } else {
                 sender.view?.hidden = true
             }

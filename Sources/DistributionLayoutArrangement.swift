@@ -23,6 +23,9 @@ class DistributionLayoutArrangement: LayoutArrangement {
         if hiddenItems.count > 0 {
             updateHiddenItemsConstraints()
         }
+        if type == .EqualSpacing || type == .EqualCentering {
+            addCanvasFitConstraint(attribute: (horizontal ? .Width : .Height))
+        }
     }
 
     private func updateSpacingConstraints() {
@@ -64,7 +67,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
                 let intrinsic = item.intrinsicContentSize()
                 return horizontal ? intrinsic.width : intrinsic.height
             }
-            let totalSize = visibleItems.reduce(CGFloat(0)) { total, item in
+            let totalSize = visibleItems.reduce(spacing * CGFloat(visibleItems.count - 1)) { total, item in
                 return total + size(item)
             }
             var priority: UILayoutPriority = 999

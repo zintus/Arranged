@@ -55,4 +55,8 @@ class LayoutArrangement {
     func isHidden(item: UIView) -> Bool {
         return hiddenItems.contains(item)
     }
+    
+    func addCanvasFitConstraint(attribute attribute: NSLayoutAttribute) {
+        add(constraint(item: canvas, attribute: attribute, constant: 0, priority: 49, identifier: "ASV-canvas-fit"))
+    }
 }

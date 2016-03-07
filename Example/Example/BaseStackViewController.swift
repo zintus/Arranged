@@ -9,7 +9,7 @@
 import UIKit
 import Arranged
 
-let loggingEnabled = false
+let loggingEnabled = true
 let logAffectingViewsConstraints = false
 
 
@@ -69,6 +69,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.heightConstraint = self.stackView.autoSetDimension(.Height, toSize: 100)
         self.heightConstraint.active = false
 
+        
         // Create background for stack view
 
         let background = UIView()

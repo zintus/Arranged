@@ -7,6 +7,7 @@ import UIKit
 class DistributionLayoutArrangement: LayoutArrangement {
     var type: StackViewDistribution = .Fill
     var spacing: CGFloat = 0
+    var baselineRelative = false
     private var gaps = [GapLayoutGuide]()
 
     override func updateConstraints() {
@@ -45,8 +46,13 @@ class DistributionLayoutArrangement: LayoutArrangement {
             let trailing: NSLayoutAttribute = horizontal ? .Trailing : .Bottom
             let center: NSLayoutAttribute = horizontal ? .CenterX : .CenterY
             let centering = type == .EqualCentering
-            connectItem(previous, attribute: (centering ? center : trailing), item: gap, attribute: leading)
-            connectItem(gap, attribute: trailing, item: current, attribute: (centering ? center : leading))
+            if baselineRelative && !centering {
+                connectItem(previous, attribute: .LastBaseline, item: gap, attribute: leading)
+                connectItem(gap, attribute: trailing, item: current, attribute: .FirstBaseline)
+            } else {
+                connectItem(previous, attribute: (centering ? center : trailing), item: gap, attribute: leading)
+                connectItem(gap, attribute: trailing, item: current, attribute: (centering ? center : leading))
+            }
         }
         matchItemsSize(gaps)
     }
@@ -90,7 +96,9 @@ class DistributionLayoutArrangement: LayoutArrangement {
         }
         items.forPair { previous, current in
             let spacing = spacingFor(previous: previous, current: current)
-            add(constraint(item: current, attribute: (horizontal ? .Leading : .Top), toItem: previous, attribute: (horizontal ? .Trailing : .Bottom), relation: relation, constant: spacing, identifier: "ASV-spacing"))
+            let to: NSLayoutAttribute = baselineRelative ? .FirstBaseline : (horizontal ? .Leading : .Top)
+            let from: NSLayoutAttribute = baselineRelative ? .LastBaseline : (horizontal ? .Trailing : .Bottom)
+            add(constraint(item: current, attribute: to, toItem: previous, attribute: from, relation: relation, constant: spacing, identifier: "ASV-spacing"))
         }
     }
     

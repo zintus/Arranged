@@ -68,7 +68,6 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
         self.widthConstraint.active = false
         self.heightConstraint = self.stackView.autoSetDimension(.Height, toSize: 100)
         self.heightConstraint.active = false
-        self.stackView.baselineRelativeArrangement = true
 
         // Create background for stack view
 

@@ -62,6 +62,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
         let lastItem = visibleItems.last!
         
         // Along the axis
+        // FIXME: Should probably be part of DistributionLayoutArrangement
         connectToCanvas(firstItem, attribute: horizontal ? .Leading : .Top)
         connectToCanvas(lastItem, attribute: horizontal ? .Trailing : .Bottom)
         

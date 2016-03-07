@@ -142,6 +142,7 @@ public class StackView : UIView {
             
             distributionArrangement.type = distribution
             distributionArrangement.spacing = spacing
+            distributionArrangement.baselineRelative = baselineRelativeArrangement
             
             alignmentArrangement.updateConstraints()
             distributionArrangement.updateConstraints()

@@ -81,8 +81,8 @@ class AxisPicker : ValuePicker<UILayoutConstraintAxis> {
 }
 
 class SpacingPicker : ValuePicker<CGFloat> {
-    let values: [CGFloat] = [0.0, 10.0, 20.0]
-    let items = ["0.0", "10.0", "20.0"]
+    let values: [CGFloat] = [0.0, 10.0, 20.0, 40.0]
+    let items = ["0.0", "10.0", "20.0", "40.0"]
 
     override init(value: CGFloat, presenter: UIViewController, observer: (value: CGFloat) -> Void) {
         super.init(value: value, presenter: presenter, observer: observer)

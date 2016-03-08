@@ -2,9 +2,9 @@
 //
 // Copyright (c) 2016 Alexander Grebenyuk (github.com/kean).
 
-import XCTest
 import Arranged
 import UIKit
+import XCTest
 
 var testCasesCount = 0
 var failedTestCasesCount = 0
@@ -13,7 +13,7 @@ var constraintsPrinted = 0
 let maxConstraintsPrinted = 50
 
 
-class Tests: XCTestCase {
+class LayoutTests: XCTestCase {
     func testWithoutItems() {
         printTestTitle("Test: 0 views")
         _test{ return [] }
@@ -120,7 +120,7 @@ class Tests: XCTestCase {
             let label1 = UILabel()
             label1.text = "Test"
             let label2 = UILabel()
-                        label2.text = "Test"
+            label2.text = "Test"
             return [label1, label2, UILabel()]
         }
     }
@@ -175,6 +175,16 @@ class Tests: XCTestCase {
             stack.updateConstraints()
             return constraintsFor(stack)
         }
+        
+        XCTAssertEqual(stack1.axis, stack2.axis)
+        XCTAssertEqual(stack1.axis, stack2.axis)
+        XCTAssertEqual(stack1.ar_alignment, stack2.ar_alignment)
+        XCTAssertEqual(stack1.ar_distribution, stack2.ar_distribution)
+        XCTAssertEqual(stack1.layoutMarginsRelativeArrangement, stack2.layoutMarginsRelativeArrangement)
+        XCTAssertEqual(stack1.baselineRelativeArrangement, stack2.baselineRelativeArrangement)
+        XCTAssertEqual(stack1.spacing, stack2.spacing)
+        XCTAssertEqual(stack1.arrangedSubviews.count, stack2.arrangedSubviews.count)
+        
         let constraints1 = constraints(stack1)
         let constraints2 = constraints(stack2)
         let success = assertEqualConstraints(constraints1, constraints2)

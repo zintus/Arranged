@@ -16,6 +16,9 @@
       <FileRef
          location = "group:CHANGELOG.md">
       </FileRef>
+      <FileRef
+         location = "group:Package.swift">
+      </FileRef>
    </Group>
    <FileRef
       location = "group:Arranged.xcodeproj">

@@ -8,14 +8,21 @@ class DistributionLayoutArrangement: LayoutArrangement {
     var type: StackViewDistribution = .Fill
     var spacing: CGFloat = 0
     var baselineRelative = false
-    var spacer: LayoutSpacer?
+    var spacer: LayoutSpacer
     private var gaps = [GapLayoutGuide]()
 
+    override init(canvas: StackView) {
+        spacer = LayoutSpacer()
+        spacer.accessibilityIdentifier = "ASV-alignment-spanner"
+        spacer.translatesAutoresizingMaskIntoConstraints = false
+        
+        super.init(canvas: canvas)
+    }
+    
     override func updateConstraints() {
         super.updateConstraints()
 
-        spacer?.removeFromSuperview()
-        spacer = nil
+        spacer.removeFromSuperview()
         
         gaps.forEach { $0.removeFromSuperview() }
         gaps.removeAll()
@@ -35,12 +42,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
 
     private func updateCanvasConnectingConstraints() {
         if visibleItems.count == 0 {
-            let spacer = LayoutSpacer()
-            spacer.accessibilityIdentifier = "ASV-distribution-spanner"
-            spacer.translatesAutoresizingMaskIntoConstraints = false
             canvas.addSubview(spacer)
-            self.spacer = spacer
-            
             connectToCanvas(spacer, attribute: horizontal ? .Leading : .Top)
             connectToCanvas(spacer, attribute: horizontal ? .Trailing : .Bottom)
         } else {

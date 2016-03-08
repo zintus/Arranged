@@ -51,14 +51,12 @@ class Tests: XCTestCase {
     }
     
     func testWithHiddenItems() {
-        /*
         printTestTitle("Test: 2 content views, 1st hidden")
         _test(views: {
             return [ContentView(), ContentView()]
         }, update: { stack, views in
             stack.setArrangedView(views[0], hidden: true)
         })
-*/
         
         printTestTitle("Test: 2 content views, 2nd hidden")
         _test(views: {
@@ -66,7 +64,7 @@ class Tests: XCTestCase {
         }, update: { stack, views in
             stack.setArrangedView(views[1], hidden: true)
         })
-        /*
+        
         printTestTitle("Test: 2 content views, both hidden")
         _test(views: {
             return [ContentView(), ContentView()]
@@ -74,7 +72,15 @@ class Tests: XCTestCase {
             stack.setArrangedView(views[0], hidden: true)
             stack.setArrangedView(views[1], hidden: true)
         })
-        */
+        
+        printTestTitle("Test: 3 content views, all hidden")
+        _test(views: {
+            return [ContentView(), ContentView(), ContentView()]
+        }, update: { stack, views in
+            stack.setArrangedView(views[0], hidden: true)
+            stack.setArrangedView(views[1], hidden: true)
+            stack.setArrangedView(views[2], hidden: true)
+        })
         
         /* This test is disabled because UIStackView constructs invalid spacing constraint between item 1 and 2 (10), should be 0/
         printTestTitle("Test: 3 content views, 1st and 2nd hidden")

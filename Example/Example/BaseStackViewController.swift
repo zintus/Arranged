@@ -10,7 +10,7 @@ import UIKit
 import Arranged
 
 let loggingEnabled = true
-let logAffectingViewsConstraints = false
+let logAffectingViewsConstraints = true
 
 
 // MARK: BaseStackViewController

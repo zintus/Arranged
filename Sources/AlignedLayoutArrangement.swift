@@ -6,14 +6,20 @@ import UIKit
 
 class AlignedLayoutArrangement: LayoutArrangement {
     var type: StackViewAlignment = .Fill
-    private var spacer: LayoutSpacer?
+    private var spacer: LayoutSpacer
+    
+    override init(canvas: StackView) {
+        spacer = LayoutSpacer()
+        spacer.accessibilityIdentifier = "ASV-alignment-spanner"
+        spacer.translatesAutoresizingMaskIntoConstraints = false
+        
+        super.init(canvas: canvas)
+    }
     
     override func updateConstraints() {
         super.updateConstraints()
         
-        spacer?.removeFromSuperview()
-        spacer = nil
-        createSpacerIfNecessary()
+        spacer.removeFromSuperview()
         
         updateCanvasConnectingConstraints()
         updateAlignmentConstraints()
@@ -22,7 +28,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
             addItemsAmbiguitySuppressors(items)
         }
         
-        if items.count > 0 && isAnyCanvasConnectionWeak {
+        if items.count > 0 && visibleItems.count > 0 && isAnyCanvasConnectionWeak {
             addCanvasFitConstraint(attribute: (horizontal ? .Height : .Width))
         }
     }
@@ -30,15 +36,26 @@ class AlignedLayoutArrangement: LayoutArrangement {
     private func updateCanvasConnectingConstraints() {
         guard items.count > 0 else { return }
         
-        let firstItem = items.first!
-        let spacerItem = spacer != nil ? spacer! : firstItem
+        let noVisibleItems = visibleItems.count == 0
         
-        let topLeftFacing = typeIn([.Fill, .Leading, .FirstBaseline])
-        let topItem = topLeftFacing ? firstItem : spacerItem
-        let bottomItem = topLeftFacing ? spacerItem : firstItem
+        if shouldPackItemsIntoSpacer || noVisibleItems {
+            canvas.addSubview(spacer)
+            if isAnyItemConnectionWeak {
+                add(constraint(item: spacer, attribute: (horizontal ? .Height : .Width), constant: 0, priority: 51, identifier: "ASV-spanning-fit"))
+            }
+            connectItemsToSpacer(spacer, items: visibleItems, topWeak: isTopItemConnectionWeak, bottomWeak: isBottomItemConnectionWeak)
+        }
         
-        connectToCanvas(topItem, attribute: (horizontal ? .Top : .Leading), weak: isTopCanvasConnectionWeak)
-        connectToCanvas(bottomItem, attribute: (horizontal ? .Bottom : .Trailing), weak: isBottomCanvasConnectionWeak)
+        // FIXME: Not readable
+        let firstItem = noVisibleItems ? spacer : items.first!
+        var topItem = firstItem
+        var bottomItem = shouldPackItemsIntoSpacer ? spacer : firstItem
+        if typeIn([.Center, .Trailing, .LastBaseline]) {
+            swap(&topItem, &bottomItem)
+        }
+        
+        connectToCanvas(topItem, attribute: (horizontal ? .Top : .Leading), weak: (noVisibleItems ? false : isTopCanvasConnectionWeak))
+        connectToCanvas(bottomItem, attribute: (horizontal ? .Bottom : .Trailing), weak: (noVisibleItems ? false : isBottomCanvasConnectionWeak))
         
         if type == .Center {
             connectToCanvas(firstItem, attribute: (horizontal ? .CenterY : .CenterX))
@@ -77,19 +94,6 @@ class AlignedLayoutArrangement: LayoutArrangement {
     
     private var isBottomItemConnectionWeak: Bool {
         return typeIn([.Leading, .Center, .FirstBaseline, .LastBaseline])
-    }
-    
-    private func createSpacerIfNecessary() {
-        guard shouldPackItemsIntoSpacer else { return }
-        
-        let spacer = LayoutSpacer()
-        spacer.accessibilityIdentifier = "ASV-alignment-spanner"
-        self.spacer = spacer
-        spacer.translatesAutoresizingMaskIntoConstraints = false
-        canvas.addSubview(spacer)
-        add(constraint(item: spacer, attribute: (horizontal ? .Height : .Width), constant: 0, priority: 51, identifier: "ASV-spanning-fit"))
-        
-        connectItemsToSpacer(spacer, items: visibleItems, topWeak: isTopItemConnectionWeak, bottomWeak: isBottomItemConnectionWeak)
     }
     
     private func updateAlignmentConstraints() {

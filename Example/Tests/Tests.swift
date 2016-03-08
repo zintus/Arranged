@@ -14,17 +14,20 @@ let maxConstraintsPrinted = 50
 
 
 class Tests: XCTestCase {
-    func test0() {
+    func testWithoutItems() {
         printTestTitle("Test: 0 views")
         _test{ return [] }
     }
     
-    func test1() {
-        printTestTitle("Test: 3 content views with defined content size")
+    func testWithItems() {
+        printTestTitle("Test: 1 content view")
+        _test{ return [ContentView()] }
+        
+        printTestTitle("Test: 3 content view")
         _test{ return [ContentView(), ContentView(), ContentView()] }
     }
     
-    func test2() {
+    func testWithItemSomeOfWhichHaveNoIntrinsic() {
         printTestTitle("Test: 3 content views, 1 without intrinsic")
         _test{
             return [ContentView(),

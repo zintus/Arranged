@@ -17,6 +17,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
         gaps.removeAll()
         
         if items.count > 0 {
+            updateCanvasConnectingConstraints()
             updateSpacingConstraints()
             updateDistributionConstraints()
         }
@@ -28,6 +29,12 @@ class DistributionLayoutArrangement: LayoutArrangement {
         }
     }
 
+    private func updateCanvasConnectingConstraints() {
+        guard visibleItems.count > 0 else { return }
+        connectToCanvas(visibleItems.first!, attribute: horizontal ? .Leading : .Top)
+        connectToCanvas(visibleItems.last!, attribute: horizontal ? .Trailing : .Bottom)
+    }
+    
     private func updateSpacingConstraints() {
         switch type {
         case .Fill, .FillEqually, .FillProportionally:
@@ -80,7 +87,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
         let totalSize = itemsWithIntrinsic.reduce(spacing * CGFloat(visibleItems.count - 1)) { total, item in
             return total + size(item)
         }
-        var priority: UILayoutPriority? = (itemsWithIntrinsic.count == 1 && spacing == 0.0) ? nil : 999
+        var priority: UILayoutPriority? = (itemsWithIntrinsic.count == 1 && (visibleItems.count == 1 || spacing == 0.0)) ? nil : 999
         let dimension: NSLayoutAttribute = horizontal ? .Width : .Height
         visibleItems.forEach {
             let size = size($0)

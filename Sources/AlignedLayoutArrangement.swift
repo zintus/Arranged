@@ -6,32 +6,23 @@ import UIKit
 
 class AlignedLayoutArrangement: LayoutArrangement {
     var type: StackViewAlignment = .Fill
-    private var _spacer: LayoutSpacer?
-    private var spacer: LayoutSpacer {
-        if _spacer == nil {
-            let spacer = LayoutSpacer()
-            _spacer = spacer
-            spacer.translatesAutoresizingMaskIntoConstraints = false
-            canvas.addSubview(spacer)
-            add(constraint(item: spacer, attribute: (horizontal ? .Height : .Width), constant: 0, priority: 51, identifier: "ASV-spanning-fit"))
-        }
-        return _spacer!
-    }
+    private var spacer: LayoutSpacer?
     
     override func updateConstraints() {
         super.updateConstraints()
 
-        _spacer?.removeFromSuperview()
-        _spacer = nil
+        spacer?.removeFromSuperview()
+        spacer = nil
+        createSpacerIfNecessary()
         
-        updateCanvasConnectingCostraints()
-        updateConnectingItemsToSpacerConstraints()
+        updateCanvasConnectingConstraints()
         updateAlignmentConstraints()
 
         if type != .Fill {
             addItemsAmbiguitySuppressors(items)
         }
-        if items.count > 0 && horizontal && (type == .FirstBaseline || type == .LastBaseline) {
+        
+        if items.count > 0 && ((spacer == nil && isAnyCanvasConnectionWeak) || (horizontal && (type == .FirstBaseline || type == .LastBaseline))) {
             addCanvasFitConstraint(attribute: (horizontal ? .Height : .Width))
         }
     }
@@ -54,50 +45,60 @@ class AlignedLayoutArrangement: LayoutArrangement {
         }
     }
     
-    private func updateCanvasConnectingCostraints() {
+    private func updateCanvasConnectingConstraints() {
         guard visibleItems.count > 0 else { return }
         
         let firstItem = visibleItems.first!
-        let lastItem = visibleItems.last!
+        let spacerItem = spacer != nil ? spacer! : firstItem
         
-        // Along the axis
-        // FIXME: Should probably be part of DistributionLayoutArrangement
-        connectToCanvas(firstItem, attribute: horizontal ? .Leading : .Top)
-        connectToCanvas(lastItem, attribute: horizontal ? .Trailing : .Bottom)
+        let topItem = typeIn([.Fill, .Leading, .FirstBaseline]) ? firstItem : spacerItem
+        let bottomItem = typeIn([.Leading, .FirstBaseline]) ? spacerItem : firstItem
         
-        // Perpendicular to the axis
-        let top: NSLayoutAttribute = horizontal ? .Top : .Leading
-        let bottom: NSLayoutAttribute = horizontal ? .Bottom : .Trailing
-        let center: NSLayoutAttribute = horizontal ? .CenterY : .CenterX
+        connectToCanvas(topItem, attribute: (horizontal ? .Top : .Leading), weak: isTopCanvasConnectionWeak)
+        connectToCanvas(bottomItem, attribute: (horizontal ? .Bottom : .Trailing), weak: isBottomCanvasConnectionWeak)
         
+        if type == .Center {
+            connectToCanvas(firstItem, attribute: (horizontal ? .CenterY : .CenterX))
+        }
+
+    }
+    
+    private var isAnyCanvasConnectionWeak: Bool {
+        return isTopCanvasConnectionWeak || isBottomCanvasConnectionWeak
+    }
+    
+    private var isTopCanvasConnectionWeak: Bool {
         switch type {
-        case .Fill:
-            for attribute in [top, bottom] {
-                connectToCanvas(firstItem, attribute: attribute)
-            }
-        case .Leading, .Trailing:
-            connectToCanvas((type == .Leading ? firstItem : spacer), attribute: top)
-            connectToCanvas((type == .Leading ? spacer : firstItem), attribute: bottom)
-        case .Center:
-            connectToCanvas(firstItem, attribute: center)
-            connectToCanvas(spacer, attribute: top)
-            connectToCanvas(spacer, attribute: bottom)
-        case .FirstBaseline, .LastBaseline:
-            if horizontal {
-                connectToCanvas((type == .FirstBaseline ? firstItem : spacer), attribute: top, equal: type == .LastBaseline)
-                connectToCanvas((type == .FirstBaseline ? spacer : firstItem), attribute: bottom, equal: type == .FirstBaseline)
-            } else {
-                // .FirstBaseline and .LastBaseline: alignments are not supported for vertical axis
-                connectToCanvas(spacer, attribute: top)
-                connectToCanvas(spacer, attribute: bottom)
-            }
+        case .Fill: return false
+        case .Leading: return false
+        case .Trailing: return spacer == nil
+        case .Center: return spacer == nil
+        case .FirstBaseline: return spacer == nil || horizontal // Not supported for vertical axis
+        case .LastBaseline: return spacer == nil
         }
     }
     
-    private func updateConnectingItemsToSpacerConstraints() {
-        if type != .Fill {
-            connectItemsToSpacer(visibleItems, topEqual: type == .Leading, bottomEqual: type == .Trailing)
+    private var isBottomCanvasConnectionWeak: Bool {
+        switch type {
+        case .Fill: return false
+        case .Leading: return spacer == nil
+        case .Trailing: return false
+        case .Center: return spacer == nil
+        case .FirstBaseline: return spacer == nil
+        case .LastBaseline: return spacer == nil || horizontal  // Not supported for vertical axis
         }
+    }
+    
+    private func createSpacerIfNecessary() {
+        guard visibleItems.count > 1 && type != .Fill else { return }
+        
+        let spacer = LayoutSpacer()
+        self.spacer = spacer
+        spacer.translatesAutoresizingMaskIntoConstraints = false
+        canvas.addSubview(spacer)
+        add(constraint(item: spacer, attribute: (horizontal ? .Height : .Width), constant: 0, priority: 51, identifier: "ASV-spanning-fit"))
+        
+        connectItemsToSpacer(spacer, items: visibleItems, topWeak: type != .Leading, bottomWeak: type != .Trailing)
     }
     
     // MARK: Helpers
@@ -110,33 +111,27 @@ class AlignedLayoutArrangement: LayoutArrangement {
         }
     }
     
-    private func connectItemsToSpacer(items: [UIView], topEqual: Bool, bottomEqual: Bool) {
-        func connectToSpacer(item: UIView, attribute attr: NSLayoutAttribute, equal: Bool) {
-            let relation = connectionRelation(attr, equal: equal)
-            let priority: UILayoutPriority? = equal ? 999.5 : nil
+    private func connectItemsToSpacer(spacer: LayoutSpacer, items: [UIView], topWeak: Bool, bottomWeak: Bool) {
+        func connectToSpacer(item: UIView, attribute attr: NSLayoutAttribute, weak: Bool) {
+            let relation = connectionRelation(attr, weak: weak)
+            let priority: UILayoutPriority? = weak ? nil : 999.5
             add(constraint(item: spacer, attribute: attr, toItem: item, relation: relation, priority: priority, identifier: "ASV-spanning-boundary"))
         }
         let top: NSLayoutAttribute = horizontal ? .Top : .Leading
         let bottom: NSLayoutAttribute = horizontal ? .Bottom : .Trailing
         items.forEach {
-            connectToSpacer($0, attribute: top, equal: topEqual)
-            connectToSpacer($0, attribute: bottom, equal: bottomEqual)
+            connectToSpacer($0, attribute: top, weak: topWeak)
+            connectToSpacer($0, attribute: bottom, weak: bottomWeak)
         }
     }
     
-    private func connectToCanvas(item: UIView, attribute attr: NSLayoutAttribute, equal: Bool = true) {
-        let relation = connectionRelation(attr, equal: equal)
-        add(constraint(item: canvas, attribute: (marginsEnabled ? attr.toMargin : attr), toItem: item, attribute: attr, relation: relation, identifier: "ASV-canvas-connection"))
-    }
-    
-    private func connectionRelation(attr: NSLayoutAttribute, equal: Bool) -> NSLayoutRelation {
-        if equal { return .Equal }
-        return (attr == .Top || attr == .Left || attr == .Leading) ? .LessThanOrEqual : .GreaterThanOrEqual
-    }
-        
     private func addItemsAmbiguitySuppressors(items: [UIView]) {
         items.forEach {
             add(constraint(item: $0, attribute: (horizontal ? .Height : .Width), constant: 0, priority: 25, identifier: "ASV-ambiguity-suppression"))
         }
+    }
+    
+    private func typeIn(types: [StackViewAlignment]) -> Bool {
+        return types.contains(type)
     }
 }

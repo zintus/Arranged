@@ -59,4 +59,14 @@ class LayoutArrangement {
     func addCanvasFitConstraint(attribute attribute: NSLayoutAttribute) {
         add(constraint(item: canvas, attribute: attribute, constant: 0, priority: 49, identifier: "ASV-canvas-fit"))
     }
+    
+    func connectToCanvas(item: UIView, attribute attr: NSLayoutAttribute, weak: Bool = false) {
+        let relation = connectionRelation(attr, weak: weak)
+        add(constraint(item: canvas, attribute: (marginsEnabled ? attr.toMargin : attr), toItem: item, attribute: attr, relation: relation, identifier: "ASV-canvas-connection"))
+    }
+    
+    func connectionRelation(attr: NSLayoutAttribute, weak: Bool) -> NSLayoutRelation {
+        if !weak { return .Equal }
+        return (attr == .Top || attr == .Left || attr == .Leading) ? .LessThanOrEqual : .GreaterThanOrEqual
+    }
 }

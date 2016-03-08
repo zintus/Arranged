@@ -50,13 +50,54 @@ class Tests: XCTestCase {
         }
     }
     
-    // MARK: Tests Implementation
+    func testWithHiddenItems() {
+        /*
+        printTestTitle("Test: 2 content views, 1st hidden")
+        _test(views: {
+            return [ContentView(), ContentView()]
+        }, update: { stack, views in
+            stack.setArrangedView(views[0], hidden: true)
+        })
+*/
+        
+        printTestTitle("Test: 2 content views, 2nd hidden")
+        _test(views: {
+            return [ContentView(), ContentView()]
+        }, update: { stack, views in
+            stack.setArrangedView(views[1], hidden: true)
+        })
+        /*
+        printTestTitle("Test: 2 content views, both hidden")
+        _test(views: {
+            return [ContentView(), ContentView()]
+        }, update: { stack, views in
+            stack.setArrangedView(views[0], hidden: true)
+            stack.setArrangedView(views[1], hidden: true)
+        })
+        */
+        
+        /* This test is disabled because UIStackView constructs invalid spacing constraint between item 1 and 2 (10), should be 0/
+        printTestTitle("Test: 3 content views, 1st and 2nd hidden")
+        _test(views: {
+            return [ContentView(), ContentView(), ContentView()]
+        }, update: { stack, views in
+            stack.setArrangedView(views[0], hidden: true)
+            stack.setArrangedView(views[1], hidden: true)
+        })
+        */
+    }
     
+    // MARK: Tests Implementation
+
     func _test(views: (Void -> [UIView])) {
+        _test(views: views, update: nil)
+    }
+    
+    func _test(views views: (Void -> [UIView]), update: ((StackViewAdapter, [UIView]) -> Void)?) {
         var failedCount = 0
         let combinations = StackTestConfiguraton.generate()
         combinations.forEach {
-            if !_test(views, conf: $0) {
+            if !_test(views, update: update, conf: $0) {
                 failedCount += 1
             }
         }
@@ -68,7 +109,7 @@ class Tests: XCTestCase {
         print("Total passes: \(testCasesCount - failedTestCasesCount)/\(testCasesCount) combinations")
     }
     
-    func _test(viewsClosure: (Void -> [UIView]), conf: StackTestConfiguraton) -> Bool {
+    func _test(viewsClosure: (Void -> [UIView]), update: ((StackViewAdapter, [UIView]) -> Void)?, conf: StackTestConfiguraton) -> Bool {
         let stack1 = UIStackView()
         let stack2 = StackView()
         
@@ -87,6 +128,10 @@ class Tests: XCTestCase {
             stack.baselineRelativeArrangement = conf.baselineRelativeArrangement
             stack.layoutMarginsRelativeArrangement = conf.layoutMarginsRelativeArrangement
             stack.spacing = conf.spacing
+            
+            if let update = update {
+                update(stack, views)
+            }
             
             stack.translatesAutoresizingMaskIntoConstraints = false
             stack.updateConstraints()

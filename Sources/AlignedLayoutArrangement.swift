@@ -10,21 +10,86 @@ class AlignedLayoutArrangement: LayoutArrangement {
     
     override func updateConstraints() {
         super.updateConstraints()
-
+        
         spacer?.removeFromSuperview()
         spacer = nil
         createSpacerIfNecessary()
         
         updateCanvasConnectingConstraints()
         updateAlignmentConstraints()
-
-        if type != .Fill {
+        
+        if isAnyItemConnectionWeak {
             addItemsAmbiguitySuppressors(items)
         }
         
-        if items.count > 0 && ((spacer == nil && isAnyCanvasConnectionWeak) || (horizontal && (type == .FirstBaseline || type == .LastBaseline))) {
+        if items.count > 0 && isAnyCanvasConnectionWeak {
             addCanvasFitConstraint(attribute: (horizontal ? .Height : .Width))
         }
+    }
+    
+    private func updateCanvasConnectingConstraints() {
+        guard items.count > 0 else { return }
+        
+        let firstItem = items.first!
+        let spacerItem = spacer != nil ? spacer! : firstItem
+        
+        let topLeftFacing = typeIn([.Fill, .Leading, .FirstBaseline])
+        let topItem = topLeftFacing ? firstItem : spacerItem
+        let bottomItem = topLeftFacing ? spacerItem : firstItem
+        
+        connectToCanvas(topItem, attribute: (horizontal ? .Top : .Leading), weak: isTopCanvasConnectionWeak)
+        connectToCanvas(bottomItem, attribute: (horizontal ? .Bottom : .Trailing), weak: isBottomCanvasConnectionWeak)
+        
+        if type == .Center {
+            connectToCanvas(firstItem, attribute: (horizontal ? .CenterY : .CenterX))
+        }
+    }
+    
+    private var isAnyCanvasConnectionWeak: Bool {
+        return isTopCanvasConnectionWeak || isBottomCanvasConnectionWeak
+    }
+    
+    private var isTopCanvasConnectionWeak: Bool {
+        if shouldPackItemsIntoSpacer {
+            return type == .FirstBaseline && horizontal // FIXME: Why? Not supported for vertical axis? Just implementation detail?
+        }
+        return isTopItemConnectionWeak
+    }
+    
+    private var isBottomCanvasConnectionWeak: Bool {
+        if shouldPackItemsIntoSpacer {
+            return type == .LastBaseline && horizontal // FIXME: Why? Not supported for vertical axis? Just implementation detail?
+        }
+        return isBottomItemConnectionWeak
+    }
+    
+    private var shouldPackItemsIntoSpacer: Bool {
+        return items.count > 1 && isAnyItemConnectionWeak
+    }
+    
+    private var isAnyItemConnectionWeak: Bool {
+        return isTopItemConnectionWeak || isBottomItemConnectionWeak
+    }
+    
+    private var isTopItemConnectionWeak: Bool {
+        return typeIn([.Trailing, .Center, .FirstBaseline, .LastBaseline])
+    }
+    
+    private var isBottomItemConnectionWeak: Bool {
+        return typeIn([.Leading, .Center, .FirstBaseline, .LastBaseline])
+    }
+    
+    private func createSpacerIfNecessary() {
+        guard shouldPackItemsIntoSpacer else { return }
+        
+        let spacer = LayoutSpacer()
+        spacer.accessibilityIdentifier = "ASV-alignment-spanner"
+        self.spacer = spacer
+        spacer.translatesAutoresizingMaskIntoConstraints = false
+        canvas.addSubview(spacer)
+        add(constraint(item: spacer, attribute: (horizontal ? .Height : .Width), constant: 0, priority: 51, identifier: "ASV-spanning-fit"))
+        
+        connectItemsToSpacer(spacer, items: visibleItems, topWeak: isTopItemConnectionWeak, bottomWeak: isBottomItemConnectionWeak)
     }
     
     private func updateAlignmentConstraints() {
@@ -43,62 +108,6 @@ class AlignedLayoutArrangement: LayoutArrangement {
         for attribute in attributes() {
             alignItems(items, attribute: attribute)
         }
-    }
-    
-    private func updateCanvasConnectingConstraints() {
-        guard visibleItems.count > 0 else { return }
-        
-        let firstItem = visibleItems.first!
-        let spacerItem = spacer != nil ? spacer! : firstItem
-        
-        let topItem = typeIn([.Fill, .Leading, .FirstBaseline]) ? firstItem : spacerItem
-        let bottomItem = typeIn([.Leading, .FirstBaseline]) ? spacerItem : firstItem
-        
-        connectToCanvas(topItem, attribute: (horizontal ? .Top : .Leading), weak: isTopCanvasConnectionWeak)
-        connectToCanvas(bottomItem, attribute: (horizontal ? .Bottom : .Trailing), weak: isBottomCanvasConnectionWeak)
-        
-        if type == .Center {
-            connectToCanvas(firstItem, attribute: (horizontal ? .CenterY : .CenterX))
-        }
-
-    }
-    
-    private var isAnyCanvasConnectionWeak: Bool {
-        return isTopCanvasConnectionWeak || isBottomCanvasConnectionWeak
-    }
-    
-    private var isTopCanvasConnectionWeak: Bool {
-        switch type {
-        case .Fill: return false
-        case .Leading: return false
-        case .Trailing: return spacer == nil
-        case .Center: return spacer == nil
-        case .FirstBaseline: return spacer == nil || horizontal // Not supported for vertical axis
-        case .LastBaseline: return spacer == nil
-        }
-    }
-    
-    private var isBottomCanvasConnectionWeak: Bool {
-        switch type {
-        case .Fill: return false
-        case .Leading: return spacer == nil
-        case .Trailing: return false
-        case .Center: return spacer == nil
-        case .FirstBaseline: return spacer == nil
-        case .LastBaseline: return spacer == nil || horizontal  // Not supported for vertical axis
-        }
-    }
-    
-    private func createSpacerIfNecessary() {
-        guard visibleItems.count > 1 && type != .Fill else { return }
-        
-        let spacer = LayoutSpacer()
-        self.spacer = spacer
-        spacer.translatesAutoresizingMaskIntoConstraints = false
-        canvas.addSubview(spacer)
-        add(constraint(item: spacer, attribute: (horizontal ? .Height : .Width), constant: 0, priority: 51, identifier: "ASV-spanning-fit"))
-        
-        connectItemsToSpacer(spacer, items: visibleItems, topWeak: type != .Leading, bottomWeak: type != .Trailing)
     }
     
     // MARK: Helpers

@@ -17,6 +17,8 @@ protocol StackViewAdapter: class {
     
     var ar_distribution: UIStackViewDistribution { get set }
     var ar_alignment: UIStackViewAlignment { get set }
+    
+    func setArrangedView(view: UIView, hidden: Bool)
 }
 
 extension StackView: StackViewAdapter {
@@ -38,6 +40,9 @@ extension UIStackView: StackViewAdapter {
     var ar_alignment: UIStackViewAlignment {
         get { return self.alignment }
         set { self.alignment = newValue }
+    }
+    func setArrangedView(view: UIView, hidden: Bool) {
+        view.hidden = hidden
     }
 }
 

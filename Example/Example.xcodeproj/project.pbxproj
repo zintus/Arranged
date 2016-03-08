@@ -13,7 +13,7 @@
 		0C2AAAFF1C87443E008752CC /* Adapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2AAAFE1C87443E008752CC /* Adapter.swift */; };
 		0C35A6021C86E50E00C7D800 /* Picker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C35A6011C86E50E00C7D800 /* Picker.swift */; };
 		0C35A6081C871BFC00C7D800 /* BaseStackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C35A6071C871BFC00C7D800 /* BaseStackViewController.swift */; };
-		0C64A35D1C8DF57200037947 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C64A35C1C8DF57200037947 /* Tests.swift */; };
+		0C64A35D1C8DF57200037947 /* LayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C64A35C1C8DF57200037947 /* LayoutTests.swift */; };
 		0C64A3661C8DF58B00037947 /* Adapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C64A3641C8DF58B00037947 /* Adapter.swift */; };
 		0C64A3671C8DF58B00037947 /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C64A3651C8DF58B00037947 /* Internal.swift */; };
 		0C64A3691C8E2ABB00037947 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C64A3681C8E2ABB00037947 /* Configuration.swift */; };
@@ -42,7 +42,7 @@
 		0C35A6011C86E50E00C7D800 /* Picker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Picker.swift; sourceTree = "<group>"; };
 		0C35A6071C871BFC00C7D800 /* BaseStackViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseStackViewController.swift; sourceTree = "<group>"; };
 		0C64A35A1C8DF57200037947 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		0C64A35C1C8DF57200037947 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
+		0C64A35C1C8DF57200037947 /* LayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutTests.swift; sourceTree = "<group>"; };
 		0C64A35E1C8DF57200037947 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C64A3641C8DF58B00037947 /* Adapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Adapter.swift; sourceTree = "<group>"; };
 		0C64A3651C8DF58B00037947 /* Internal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
@@ -112,7 +112,7 @@
 		0C64A35B1C8DF57200037947 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				0C64A35C1C8DF57200037947 /* Tests.swift */,
+				0C64A35C1C8DF57200037947 /* LayoutTests.swift */,
 				0C64A3641C8DF58B00037947 /* Adapter.swift */,
 				0C64A3651C8DF58B00037947 /* Internal.swift */,
 				0C64A3681C8E2ABB00037947 /* Configuration.swift */,
@@ -302,7 +302,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C64A35D1C8DF57200037947 /* Tests.swift in Sources */,
+				0C64A35D1C8DF57200037947 /* LayoutTests.swift in Sources */,
 				0C64A3671C8DF58B00037947 /* Internal.swift in Sources */,
 				0C64A3691C8E2ABB00037947 /* Configuration.swift in Sources */,
 				0C64A3661C8DF58B00037947 /* Adapter.swift in Sources */,

@@ -8,11 +8,15 @@ class DistributionLayoutArrangement: LayoutArrangement {
     var type: StackViewDistribution = .Fill
     var spacing: CGFloat = 0
     var baselineRelative = false
+    var spacer: LayoutSpacer?
     private var gaps = [GapLayoutGuide]()
 
     override func updateConstraints() {
         super.updateConstraints()
 
+        spacer?.removeFromSuperview()
+        spacer = nil
+        
         gaps.forEach { $0.removeFromSuperview() }
         gaps.removeAll()
         
@@ -30,9 +34,19 @@ class DistributionLayoutArrangement: LayoutArrangement {
     }
 
     private func updateCanvasConnectingConstraints() {
-        guard visibleItems.count > 0 else { return }
-        connectToCanvas(visibleItems.first!, attribute: horizontal ? .Leading : .Top)
-        connectToCanvas(visibleItems.last!, attribute: horizontal ? .Trailing : .Bottom)
+        if visibleItems.count == 0 {
+            let spacer = LayoutSpacer()
+            spacer.accessibilityIdentifier = "ASV-distribution-spanner"
+            spacer.translatesAutoresizingMaskIntoConstraints = false
+            canvas.addSubview(spacer)
+            self.spacer = spacer
+            
+            connectToCanvas(spacer, attribute: horizontal ? .Leading : .Top)
+            connectToCanvas(spacer, attribute: horizontal ? .Trailing : .Bottom)
+        } else {
+            connectToCanvas(visibleItems.first!, attribute: horizontal ? .Leading : .Top)
+            connectToCanvas(visibleItems.last!, attribute: horizontal ? .Trailing : .Bottom)
+        }
     }
     
     private func updateSpacingConstraints() {
@@ -46,7 +60,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
     }
 
     private func updateGapLayoutGuides() {
-        items.forPair { previous, current in
+        visibleItems.forPair { previous, current in
             let gap = GapLayoutGuide()
             gap.translatesAutoresizingMaskIntoConstraints = false
             canvas.addSubview(gap)

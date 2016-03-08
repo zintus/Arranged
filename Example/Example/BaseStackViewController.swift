@@ -30,7 +30,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
     var animated = true
     var contentType: ContentType = .View {
         didSet {
-            if oldValue != self.contentType {
+            if oldValue != contentType {
                 refreshContent()
             }
         }
@@ -53,31 +53,39 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
 
         // Creat stack view
 
-        self.stackView = self.createStackView()
+        stackView = createStackView()
 
-        self.refreshContent()
+        refreshContent()
 
-        self.stackView.layoutMargins = UIEdgeInsetsMake(8, 8, 8, 8)
+        stackView.layoutMargins = UIEdgeInsetsMake(8, 8, 8, 8)
 
-        self.view.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
-        self.view.addSubview(self.stackView)
-        self.stackView.autoPinToTopLayoutGuideOfViewController(self, withInset: 16)
-        self.stackView.autoPinEdgeToSuperviewMargin(.Leading)
-        self.stackView.autoPinEdgeToSuperviewMargin(.Trailing, relation: .GreaterThanOrEqual)
-        self.widthConstraint = self.stackView.autoSetDimension(.Width, toSize: 100)
-        self.widthConstraint.active = false
-        self.heightConstraint = self.stackView.autoSetDimension(.Height, toSize: 100)
-        self.heightConstraint.active = false
+        view.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+        view.addSubview(stackView)
+        stackView.autoPinToTopLayoutGuideOfViewController(self, withInset: 16)
+        stackView.autoPinEdgeToSuperviewMargin(.Leading)
+        stackView.autoPinEdgeToSuperviewMargin(.Trailing, relation: .GreaterThanOrEqual)
+        widthConstraint = stackView.autoSetDimension(.Width, toSize: 100)
+        widthConstraint.active = false
+        heightConstraint = stackView.autoSetDimension(.Height, toSize: 100)
+        heightConstraint.active = false
+        
+        // Disambiguate stack view size
+        stackView.addConstraint(NSLayoutConstraint(item: stackView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 0).then {
+            $0.priority = 100
+        })
+        stackView.addConstraint(NSLayoutConstraint(item: stackView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 0).then {
+            $0.priority = 100
+        })
         
         // Create background for stack view
 
         let background = UIView()
         background.backgroundColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1.0)
-        self.view.insertSubview(background, belowSubview: self.stackView)
-        background.autoMatchDimension(.Width, toDimension: .Width, ofView: self.stackView)
-        background.autoMatchDimension(.Height, toDimension: .Height, ofView: self.stackView)
-        background.autoAlignAxis(.Horizontal, toSameAxisOfView: self.stackView)
-        background.autoAlignAxis(.Vertical, toSameAxisOfView: self.stackView)
+        view.insertSubview(background, belowSubview: stackView)
+        background.autoMatchDimension(.Width, toDimension: .Width, ofView: stackView)
+        background.autoMatchDimension(.Height, toDimension: .Height, ofView: stackView)
+        background.autoAlignAxis(.Horizontal, toSameAxisOfView: stackView)
+        background.autoAlignAxis(.Vertical, toSameAxisOfView: stackView)
 
 
         // Create controls
@@ -152,56 +160,56 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
             self.heightConstraint.constant = ratio * bound
         }.view)
 
-        self.view.addSubview(controls)
-        self.view.addSubview(controls2)
+        view.addSubview(controls)
+        view.addSubview(controls2)
         controls.autoPinToBottomLayoutGuideOfViewController(self, withInset: 16)
         controls2.autoPinEdge(.Top, toEdge: .Top, ofView: controls)
         controls.autoPinEdgeToSuperviewMargin(.Leading)
         controls2.autoPinEdgeToSuperviewMargin(.Trailing)
-        controls.autoPinEdge(.Top, toEdge: .Bottom, ofView: self.stackView, withOffset: 16, relation: .GreaterThanOrEqual)
+        controls.autoPinEdge(.Top, toEdge: .Bottom, ofView: stackView, withOffset: 16, relation: .GreaterThanOrEqual)
     }
 
     func refreshContent() {
 
-        self.views.forEach {
-            self.stackView.removeArrangedSubview($0)
+        views.forEach {
+            stackView.removeArrangedSubview($0)
             $0.removeFromSuperview()
         }
-        self.views.removeAll()
+        views.removeAll()
 
         switch self.contentType {
         case .View:
-            self.views.append(ContentView().then {
+            views.append(ContentView().then {
                 $0.contentSize = CGSize(width: 40, height: 40)
                 $0.backgroundColor = UIColor.redColor()
             })
 
-            self.views.append(ContentView().then {
+            views.append(ContentView().then {
                 $0.contentSize = CGSize(width: 20, height: 100)
                 $0.backgroundColor = UIColor.blueColor()
             })
 
-            self.views.append(ContentView().then {
+            views.append(ContentView().then {
                 $0.contentSize = CGSize(width: 80, height: 60)
                 $0.backgroundColor = UIColor.greenColor()
             })
 
         case .Label:
-            self.views.append(UILabel().then {
+            views.append(UILabel().then {
                 $0.text = "Sed ut perspiciatis unde omnis iste natus"
                 $0.font = UIFont.systemFontOfSize(26)
                 $0.numberOfLines = 0
                 $0.backgroundColor = UIColor.redColor()
             })
 
-            self.views.append(UILabel().then {
+            views.append(UILabel().then {
                 $0.text = "Neque porro quisquam est, qui dolorem ipsum"
                 $0.font = UIFont.systemFontOfSize(20)
                 $0.numberOfLines = 0
                 $0.backgroundColor = UIColor.blueColor()
             })
 
-            self.views.append(UILabel().then {
+            views.append(UILabel().then {
                 $0.text = "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
                 $0.font = UIFont.systemFontOfSize(14)
                 $0.numberOfLines = 0
@@ -209,10 +217,15 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
             })
         }
 
-        for (index, view) in self.views.enumerate() {
+        for (index, view) in views.enumerate() {
             view.accessibilityIdentifier = "content-view-\(index + 1)"
             view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "viewTapped:"))
-            self.stackView.addArrangedSubview(view)
+            stackView.addArrangedSubview(view)
+        }
+        
+        if views.first is UILabel {
+            // Disambiguate stack view size
+            stackView.ar_distribution = .FillEqually
         }
     }
 
@@ -249,7 +262,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
     }
     
     @objc func buttonShowAllTapped(sender: UIButton) {
-        self.perform {
+        perform {
             self.stackView.subviews.forEach{
                 if let stack = self.stackView as? Arranged.StackView {
                     stack.setArrangedView($0, hidden: false)
@@ -261,7 +274,7 @@ class BaseStackViewController<T where T: UIView, T: StackViewAdapter>: UIViewCon
     }
 
     @objc func viewTapped(sender: UITapGestureRecognizer) {
-        self.perform {
+        perform {
             if let stack = self.stackView as? Arranged.StackView {
                 stack.setArrangedView(sender.view!, hidden: true)
             } else {
@@ -319,7 +332,7 @@ class ContentView: UIView {
     }
 
     override func intrinsicContentSize() -> CGSize {
-        return self.contentSize
+        return contentSize
     }
 }
 

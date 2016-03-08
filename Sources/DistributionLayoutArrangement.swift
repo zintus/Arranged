@@ -80,7 +80,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
         let totalSize = itemsWithIntrinsic.reduce(spacing * CGFloat(itemsWithIntrinsic.count - 1)) { total, item in
             return total + size(item)
         }
-        var priority: UILayoutPriority = 999
+        var priority: UILayoutPriority? = itemsWithIntrinsic.count > 1 ? 999 : nil
         let dimension: NSLayoutAttribute = horizontal ? .Width : .Height
         visibleItems.forEach {
             let size = size($0)
@@ -89,7 +89,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
             } else {
                 add(constraint(item: $0, attribute: dimension, constant: 0, identifier: "ASV-fill-proportionally"))
             }
-            priority -= 1
+            priority? -= 1
         }
     }
     

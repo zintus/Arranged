@@ -77,10 +77,10 @@ class DistributionLayoutArrangement: LayoutArrangement {
             matchItemsSize(visibleItems)
             return
         }
-        let totalSize = itemsWithIntrinsic.reduce(spacing * CGFloat(itemsWithIntrinsic.count - 1)) { total, item in
+        let totalSize = itemsWithIntrinsic.reduce(spacing * CGFloat(visibleItems.count - 1)) { total, item in
             return total + size(item)
         }
-        var priority: UILayoutPriority? = itemsWithIntrinsic.count > 1 ? 999 : nil
+        var priority: UILayoutPriority? = (itemsWithIntrinsic.count == 1 && spacing == 0.0) ? nil : 999
         let dimension: NSLayoutAttribute = horizontal ? .Width : .Height
         visibleItems.forEach {
             let size = size($0)

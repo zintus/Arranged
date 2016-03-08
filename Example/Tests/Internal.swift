@@ -77,7 +77,7 @@ func isEqual(lhs: NSLayoutConstraint, _ rhs: NSLayoutConstraint) -> Bool {
     guard isEqual(lhs.firstItem, rhs.firstItem) &&
         isEqual(lhs.secondItem, rhs.secondItem) else {
             return false
-    }
+    }    
     return lhs.firstAttribute == rhs.firstAttribute &&
         lhs.secondAttribute == rhs.secondAttribute &&
         lhs.relation == rhs.relation &&

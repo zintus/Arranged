@@ -15,27 +15,26 @@ struct StackTestConfiguraton {
     static func generate() -> [StackTestConfiguraton] {
         let alignments: [UIStackViewAlignment] = [.Fill, .Leading, .FirstBaseline, .Center, .Trailing, .LastBaseline]
         let distributions: [UIStackViewDistribution] = [.Fill, .FillEqually, .FillProportionally, .EqualSpacing, .EqualCentering]
-        let spacing: [CGFloat] = [0.0]
+        let spacings: [CGFloat] = [0.0, 20.0]
         
         var combinations = [StackTestConfiguraton]()
         // FIXME: Is there a better way to write this?
         for axis in [UILayoutConstraintAxis.Horizontal, UILayoutConstraintAxis.Vertical] {
-            for alignment in alignments {
-                for distribution in distributions {
-                    for marginsRelative in [false] {
-                        for baselineRelative in [true, false] {
-                            var conf = StackTestConfiguraton()
-                            conf.axis = axis
-                            conf.alignment = alignment
-                            conf.distribution = distribution
-                            conf.baselineRelativeArrangement = baselineRelative
-                            conf.layoutMarginsRelativeArrangement = marginsRelative
-                            combinations.append(conf)
-                        }
-                    }
-                }
-            }
-        }
+        for alignment in alignments {
+        for distribution in distributions {
+        for baselineRelative in [true, false] {
+        for spacing in spacings {
+            var conf = StackTestConfiguraton()
+            conf.axis = axis
+            conf.alignment = alignment
+            conf.distribution = distribution
+            conf.baselineRelativeArrangement = baselineRelative
+            // We don't test marginsRelative because UIStackView
+            // pins to UIViewLayoutMarginsGuide (iOS 9+)
+            conf.layoutMarginsRelativeArrangement = false
+            conf.spacing = spacing
+            combinations.append(conf)
+        }}}}}
         return combinations
     }
 }

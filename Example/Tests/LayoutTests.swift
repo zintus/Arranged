@@ -114,8 +114,6 @@ class Tests: XCTestCase {
         _test {
             return [UILabel(), UILabel()]
         }
-
-        return
         
         printTestTitle("Test: 2 text based views (one not empty)")
         _test {

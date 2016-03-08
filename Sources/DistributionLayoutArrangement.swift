@@ -101,7 +101,8 @@ class DistributionLayoutArrangement: LayoutArrangement {
             matchItemsSize(visibleItems)
             return
         }
-        let totalSize = itemsWithIntrinsic.reduce(spacing * CGFloat(visibleItems.count - 1)) { total, item in
+        let totalSpacing = spacing * CGFloat(visibleItems.count - 1)
+        let totalSize = itemsWithIntrinsic.reduce(totalSpacing) { total, item in
             return total + size(item)
         }
         var priority: UILayoutPriority? = (itemsWithIntrinsic.count == 1 && (visibleItems.count == 1 || spacing == 0.0)) ? nil : 999

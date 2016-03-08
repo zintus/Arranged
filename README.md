@@ -51,6 +51,28 @@
 <'ASV-ambiguity-suppression' V:[content-view-2(0@25)] priority:25>
 ```
 
+## Usage
+
+`Arranged.StackView` usage is used in the same way `UIStackView` is.
+
+```swift
+let stackView = StackView(arrangedSubviews: [view1, view2, view3])
+stackView.alignment = .Leading
+stackView.distribution = .FillEqually
+stackView.spacing = 20
+stackView.axis = .Vertical
+stackView.layoutMarginsRelativeArrangement = true
+```
+
+The only difference is in hiding items:
+
+```swift
+UIView.animateWithDuration(0.33) {
+    stackView.setArrangedView(view, hidden: true)
+    stackView.layoutIfNeeded()
+}
+```
+
 ## Requirements
 
 - iOS 8.0+

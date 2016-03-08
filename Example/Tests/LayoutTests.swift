@@ -100,6 +100,33 @@ class Tests: XCTestCase {
         */
     }
     
+    func testRemovingItems() {
+        printTestTitle("Test: 2 content views, 1st removed")
+        _test(views: {
+            return [ContentView(), ContentView()]
+        }, update: { stack, views in
+            stack.removeArrangedSubview(views[1])
+        })
+    }
+    
+    func testTextBasedViews() {
+        printTestTitle("Test: 2 text based views (empty)")
+        _test {
+            return [UILabel(), UILabel()]
+        }
+
+        return
+        
+        printTestTitle("Test: 2 text based views (one not empty)")
+        _test {
+            let label1 = UILabel()
+            label1.text = "Test"
+            let label2 = UILabel()
+                        label2.text = "Test"
+            return [label1, label2, UILabel()]
+        }
+    }
+    
     // MARK: Tests Implementation
 
     func _test(views: (Void -> [UIView])) {

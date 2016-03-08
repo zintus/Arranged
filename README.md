@@ -6,11 +6,12 @@
 <a href="http://cocoadocs.org/docsets/Arranged"><img src="https://img.shields.io/cocoapods/p/Arranged.svg?style=flat)"></a>
 </p>
 
-[UIStackView](https://developer.apple.com/library/prerelease/ios/documentation/UIKit/Reference/UIStackView_Class_Reference/) port for iOS 8.
+[UIStackView](https://developer.apple.com/library/prerelease/ios/documentation/UIKit/Reference/UIStackView_Class_Reference/) port for iOS 8 (100% layouts supported).
 
 <img src="https://cloud.githubusercontent.com/assets/1567433/13573981/364b2946-e493-11e5-9d02-893a5dc11a8c.png" width="50%"/>
 
 - Supports all `alignments` and `distributions`, `spacing`, `baselineRelativeArrangement`, `layoutMarginsRelativeArrangement`, `axis`
+- Unit tested, 3360 layouts tested
 - Manages arranged views the same way `UIStackView` does
 - Supports animations
 - Generates exactly the same sets of constraints as `UIStackView`:

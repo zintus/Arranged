@@ -55,7 +55,6 @@ func isEqual(lhs: NSLayoutConstraint, _ rhs: NSLayoutConstraint) -> Bool {
         return false
     }
         
-    // FIXME: Fix comparison
     func isEqual(item1: AnyObject?, _ item2: AnyObject?) -> Bool {
         // True if both nil
         if item1 == nil && item2 == nil {

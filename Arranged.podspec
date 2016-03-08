@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
     s.name             = "Arranged"
-    s.version          = "0.1"
-    s.summary          = "UIStackView port for iOS 8+"
+    s.version          = "1.0"
+    s.summary          = "UIStackView port for iOS 8"
 
     s.homepage         = "https://github.com/kean/Arranged"
     s.license          = "MIT"

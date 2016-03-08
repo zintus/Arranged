@@ -224,14 +224,14 @@ public class StackView : UIView {
                 arrangement.hiddenItems = hiddenViews
             }
             
-            alignmentArrangement.type = alignment
-            
             distributionArrangement.type = distribution
             distributionArrangement.spacing = spacing
             distributionArrangement.baselineRelative = baselineRelativeArrangement && axis == .Vertical
             
-            alignmentArrangement.updateConstraints()
+            alignmentArrangement.type = alignment
+            
             distributionArrangement.updateConstraints()
+            alignmentArrangement.updateConstraints()
         }
         super.updateConstraints()
     }

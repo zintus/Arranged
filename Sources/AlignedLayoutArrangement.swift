@@ -101,7 +101,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
         let bottom: NSLayoutAttribute = horizontal ? .Bottom : .Trailing
         func attributes() -> [NSLayoutAttribute] {
             switch type {
-            case .Fill: return [top, bottom]
+            case .Fill: return [bottom, top]
             case .Leading: return [top]
             case .Trailing: return [bottom]
             case .Center: return [horizontal ? .CenterY : .CenterX]

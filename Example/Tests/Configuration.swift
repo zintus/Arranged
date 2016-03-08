@@ -15,7 +15,7 @@ struct StackTestConfiguraton {
     static func generate() -> [StackTestConfiguraton] {
         let alignments: [UIStackViewAlignment] = [.Fill, .Leading, .FirstBaseline, .Center, .Trailing, .LastBaseline]
         let distributions: [UIStackViewDistribution] = [.Fill, .FillEqually, .FillProportionally, .EqualSpacing, .EqualCentering]
-        let spacings: [CGFloat] = [0.0, 20.0]
+        let spacings: [CGFloat] = [0.0, 20.0, -20.0]
         
         var combinations = [StackTestConfiguraton]()
         // FIXME: Is there a better way to write this?

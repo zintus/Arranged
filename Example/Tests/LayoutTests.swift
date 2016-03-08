@@ -51,6 +51,13 @@ class Tests: XCTestCase {
     }
     
     func testWithHiddenItems() {
+        printTestTitle("Test: 1 content view, hidden")
+        _test(views: {
+            return [ContentView()]
+        }, update: { stack, views in
+            stack.setArrangedView(views[0], hidden: true)
+        })
+        
         printTestTitle("Test: 2 content views, 1st hidden")
         _test(views: {
             return [ContentView(), ContentView()]

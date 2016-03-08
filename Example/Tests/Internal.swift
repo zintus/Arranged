@@ -18,7 +18,7 @@ func assertEqualConstraints(constraints1: [NSLayoutConstraint], _ constraints2: 
 
 func _assertEqualConstraints(constraints1: [NSLayoutConstraint], _ constraints2: [NSLayoutConstraint]) -> Bool {
     guard constraints1.count == constraints2.count else {
-        XCTFail("Constraints count doesnt match")
+        XCTFail("Constraints count doesn't match")
         return false
     }
     

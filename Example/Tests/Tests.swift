@@ -6,8 +6,11 @@ import XCTest
 import Arranged
 import UIKit
 
+var testCasesCount = 0
+var failedTestCasesCount = 0
+
 var constraintsPrinted = 0
-let maxConstraintsPrinted = 10
+let maxConstraintsPrinted = 50
 
 
 class Tests: XCTestCase {
@@ -55,6 +58,11 @@ class Tests: XCTestCase {
             }
         }
         print("Current pass: \(combinations.count - failedCount)/\(combinations.count) combinations")
+        
+        testCasesCount += combinations.count
+        failedTestCasesCount += failedCount
+        
+        print("Total passes: \(testCasesCount - failedTestCasesCount)/\(testCasesCount) combinations")
     }
     
     func _test(viewsClosure: (Void -> [UIView]), conf: StackTestConfiguraton) -> Bool {
@@ -85,7 +93,7 @@ class Tests: XCTestCase {
         let constraints2 = constraints(stack2)
         let success = assertEqualConstraints(constraints1, constraints2)
         if !success {
-            print("Failed configuration:\n\n \(conf)")
+            print("\nFailed configuration:\n\n\(conf)")
             
             print("UIStackView constraints (count: \(constraints1.count)):\n")
             _print(constraints1)

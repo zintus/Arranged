@@ -43,6 +43,8 @@ struct StackTestConfiguraton {
 extension StackTestConfiguraton: CustomStringConvertible {
     var description: String {
         var desc = String()
+        let axis = self.axis == .Horizontal ? ".Horizontal" : ".Vertical"
+        desc.appendContentsOf("axis: \(axis)\n")
         desc.appendContentsOf("alignment: \(alignment.toString)\n")
         desc.appendContentsOf("distribution: \(distribution.toString)\n")
         desc.appendContentsOf("baselineRelativeArrangement: \(baselineRelativeArrangement)\n")

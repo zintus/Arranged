@@ -31,7 +31,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
         if type != .Fill {
             addItemsAmbiguitySuppressors(items)
         }
-        if items.count > 0 && (type == .FirstBaseline || type == .LastBaseline) {
+        if items.count > 0 && horizontal && (type == .FirstBaseline || type == .LastBaseline) {
             addCanvasFitConstraint(attribute: (horizontal ? .Height : .Width))
         }
     }
@@ -83,8 +83,14 @@ class AlignedLayoutArrangement: LayoutArrangement {
             connectToCanvas(spacer, attribute: top)
             connectToCanvas(spacer, attribute: bottom)
         case .FirstBaseline, .LastBaseline:
-            connectToCanvas((type == .FirstBaseline ? firstItem : spacer), attribute: top, equal: type == .LastBaseline)
-            connectToCanvas((type == .FirstBaseline ? spacer : firstItem), attribute: bottom, equal: type == .FirstBaseline)
+            if horizontal {
+                connectToCanvas((type == .FirstBaseline ? firstItem : spacer), attribute: top, equal: type == .LastBaseline)
+                connectToCanvas((type == .FirstBaseline ? spacer : firstItem), attribute: bottom, equal: type == .FirstBaseline)
+            } else {
+                // .FirstBaseline and .LastBaseline: alignments are not supported for vertical axis
+                connectToCanvas(spacer, attribute: top)
+                connectToCanvas(spacer, attribute: bottom)
+            }
         }
     }
     

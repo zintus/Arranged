@@ -11,7 +11,6 @@ class LayoutArrangement {
     var visibleItems = Array<UIView>()
     
     var axis: UILayoutConstraintAxis = .Horizontal
-    var horizontal: Bool { return axis == .Horizontal }
     var marginsEnabled: Bool = false
 
     private var constraints = [NSLayoutConstraint]()

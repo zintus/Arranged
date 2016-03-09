@@ -4,6 +4,8 @@
 
 import UIKit
 
+/** Manages alignment: constraints perpendicular to the axis.
+ */
 class AlignedLayoutArrangement: LayoutArrangement {
     var type: StackViewAlignment = .Fill
     private var spacer: LayoutSpacer
@@ -29,7 +31,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
         }
         
         if items.count > 0 && visibleItems.count > 0 && isAnyCanvasConnectionWeak {
-            addCanvasFitConstraint(attribute: (horizontal ? .Height : .Width))
+            addCanvasFitConstraint(attribute: height)
         }
     }
     
@@ -41,7 +43,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
         if shouldPackItemsIntoSpacer || noVisibleItems {
             canvas.addSubview(spacer)
             if isAnyItemConnectionWeak {
-                add(constraint(item: spacer, attribute: (horizontal ? .Height : .Width), constant: 0, priority: 51, identifier: "ASV-spanning-fit"))
+                add(constraint(item: spacer, attribute: height, constant: 0, priority: 51, identifier: "ASV-spanning-fit"))
             }
             connectItemsToSpacer(spacer, items: visibleItems, topWeak: isTopItemConnectionWeak, bottomWeak: isBottomItemConnectionWeak)
         }
@@ -54,11 +56,11 @@ class AlignedLayoutArrangement: LayoutArrangement {
             swap(&topItem, &bottomItem)
         }
         
-        connectToCanvas(topItem, attribute: (horizontal ? .Top : .Leading), weak: (noVisibleItems ? false : isTopCanvasConnectionWeak))
-        connectToCanvas(bottomItem, attribute: (horizontal ? .Bottom : .Trailing), weak: (noVisibleItems ? false : isBottomCanvasConnectionWeak))
+        connectToCanvas(topItem, attribute: top, weak: (noVisibleItems ? false : isTopCanvasConnectionWeak))
+        connectToCanvas(bottomItem, attribute: bottom, weak: (noVisibleItems ? false : isBottomCanvasConnectionWeak))
         
         if type == .Center {
-            connectToCanvas(firstItem, attribute: (horizontal ? .CenterY : .CenterX))
+            connectToCanvas(firstItem, attribute: center)
         }
     }
     
@@ -68,14 +70,14 @@ class AlignedLayoutArrangement: LayoutArrangement {
     
     private var isTopCanvasConnectionWeak: Bool {
         if shouldPackItemsIntoSpacer {
-            return type == .FirstBaseline && horizontal // FIXME: Why? Not supported for vertical axis? Just implementation detail?
+            return type == .FirstBaseline && axis == .Horizontal // FIXME: Why? Not supported for vertical axis? Just implementation detail?
         }
         return isTopItemConnectionWeak
     }
     
     private var isBottomCanvasConnectionWeak: Bool {
         if shouldPackItemsIntoSpacer {
-            return type == .LastBaseline && horizontal // FIXME: Why? Not supported for vertical axis? Just implementation detail?
+            return type == .LastBaseline && axis == .Horizontal // FIXME: Why? Not supported for vertical axis? Just implementation detail?
         }
         return isBottomItemConnectionWeak
     }
@@ -97,21 +99,37 @@ class AlignedLayoutArrangement: LayoutArrangement {
     }
     
     private func updateAlignmentConstraints() {
-        let top: NSLayoutAttribute = horizontal ? .Top : .Leading
-        let bottom: NSLayoutAttribute = horizontal ? .Bottom : .Trailing
         func attributes() -> [NSLayoutAttribute] {
             switch type {
             case .Fill: return [bottom, top]
             case .Leading: return [top]
             case .Trailing: return [bottom]
-            case .Center: return [horizontal ? .CenterY : .CenterX]
-            case .FirstBaseline: return horizontal ? [.FirstBaseline] : []
-            case .LastBaseline: return horizontal ? [.LastBaseline] : []
+            case .Center: return [center]
+            case .FirstBaseline: return axis == .Horizontal ? [.FirstBaseline] : []
+            case .LastBaseline: return axis == .Horizontal ? [.LastBaseline] : []
             }
         }
         for attribute in attributes() {
             alignItems(items, attribute: attribute)
         }
+    }
+
+    // MARK: Managed Attributes
+
+    private var height: NSLayoutAttribute {
+        return axis == .Horizontal ? .Height : .Width
+    }
+
+    private var top: NSLayoutAttribute {
+        return axis == .Horizontal ? .Top : .Leading
+    }
+
+    private var bottom: NSLayoutAttribute {
+        return axis == .Horizontal ? .Bottom : .Trailing
+    }
+
+    private var center: NSLayoutAttribute {
+        return axis == .Horizontal ? .CenterY : .CenterX
     }
     
     // MARK: Helpers
@@ -130,8 +148,6 @@ class AlignedLayoutArrangement: LayoutArrangement {
             let priority: UILayoutPriority? = weak ? nil : 999.5
             add(constraint(item: spacer, attribute: attr, toItem: item, relation: relation, priority: priority, identifier: "ASV-spanning-boundary"))
         }
-        let top: NSLayoutAttribute = horizontal ? .Top : .Leading
-        let bottom: NSLayoutAttribute = horizontal ? .Bottom : .Trailing
         items.forEach {
             connectToSpacer($0, attribute: top, weak: topWeak)
             connectToSpacer($0, attribute: bottom, weak: bottomWeak)
@@ -140,7 +156,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
     
     private func addItemsAmbiguitySuppressors(items: [UIView]) {
         items.forEach {
-            add(constraint(item: $0, attribute: (horizontal ? .Height : .Width), constant: 0, priority: 25, identifier: "ASV-ambiguity-suppression"))
+            add(constraint(item: $0, attribute: height, constant: 0, priority: 25, identifier: "ASV-ambiguity-suppression"))
         }
     }
     

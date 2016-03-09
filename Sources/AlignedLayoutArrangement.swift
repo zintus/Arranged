@@ -22,25 +22,21 @@ class AlignedLayoutArrangement: LayoutArrangement {
         super.updateConstraints()
         
         spacer.removeFromSuperview()
-        
-        updateCanvasConnectingConstraints()
-        updateAlignmentConstraints()
-        
+
+        if items.count > 0 {
+            updateCanvasConnectingConstraints()
+            updateAlignmentConstraints()
+        }
         if isAnyItemConnectionWeak {
             addItemsAmbiguitySuppressors(items)
         }
-        
-        if items.count > 0 && visibleItems.count > 0 && isAnyCanvasConnectionWeak {
+        if isAnyCanvasConnectionWeak {
             addCanvasFitConstraint(attribute: height)
         }
     }
     
     private func updateCanvasConnectingConstraints() {
-        guard items.count > 0 else { return }
-        
-        let noVisibleItems = visibleItems.count == 0
-        
-        if shouldPackItemsIntoSpacer || noVisibleItems {
+        if shouldCreateSpacer {
             canvas.addSubview(spacer)
             if isAnyItemConnectionWeak {
                 add(constraint(item: spacer, attribute: height, constant: 0, priority: 51, identifier: "ASV-spanning-fit"))
@@ -48,16 +44,16 @@ class AlignedLayoutArrangement: LayoutArrangement {
             connectItemsToSpacer(spacer, items: visibleItems, topWeak: isTopItemConnectionWeak, bottomWeak: isBottomItemConnectionWeak)
         }
         
-        // FIXME: Not readable
-        let firstItem = noVisibleItems ? spacer : items.first!
+        // FIXME: Make more readable
+        let firstItem = visibleItems.count == 0 ? spacer : items.first!
         var topItem = firstItem
-        var bottomItem = shouldPackItemsIntoSpacer ? spacer : firstItem
+        var bottomItem = shouldCreateSpacer ? spacer : firstItem
         if typeIn([.Center, .Trailing, .LastBaseline]) {
             swap(&topItem, &bottomItem)
         }
         
-        connectToCanvas(topItem, attribute: top, weak: (noVisibleItems ? false : isTopCanvasConnectionWeak))
-        connectToCanvas(bottomItem, attribute: bottom, weak: (noVisibleItems ? false : isBottomCanvasConnectionWeak))
+        connectToCanvas(topItem, attribute: top, weak: isTopCanvasConnectionWeak)
+        connectToCanvas(bottomItem, attribute: bottom, weak: isBottomCanvasConnectionWeak)
         
         if type == .Center {
             connectToCanvas(firstItem, attribute: center)
@@ -69,21 +65,21 @@ class AlignedLayoutArrangement: LayoutArrangement {
     }
     
     private var isTopCanvasConnectionWeak: Bool {
-        if shouldPackItemsIntoSpacer {
-            return type == .FirstBaseline && axis == .Horizontal // FIXME: Why? Not supported for vertical axis? Just implementation detail?
+        if shouldCreateSpacer {
+            return type == .FirstBaseline && visibleItems.count > 0 && axis == .Horizontal // .FirstBaseline specific
         }
         return isTopItemConnectionWeak
     }
     
     private var isBottomCanvasConnectionWeak: Bool {
-        if shouldPackItemsIntoSpacer {
-            return type == .LastBaseline && axis == .Horizontal // FIXME: Why? Not supported for vertical axis? Just implementation detail?
+        if shouldCreateSpacer {
+            return type == .LastBaseline && visibleItems.count > 0 && axis == .Horizontal // .LastBaseline specific
         }
         return isBottomItemConnectionWeak
     }
     
-    private var shouldPackItemsIntoSpacer: Bool {
-        return items.count > 1 && isAnyItemConnectionWeak
+    private var shouldCreateSpacer: Bool {
+        return visibleItems.count == 0 || (items.count > 1 && isAnyItemConnectionWeak)
     }
     
     private var isAnyItemConnectionWeak: Bool {
@@ -109,8 +105,8 @@ class AlignedLayoutArrangement: LayoutArrangement {
             case .LastBaseline: return axis == .Horizontal ? [.LastBaseline] : []
             }
         }
-        for attribute in attributes() {
-            alignItems(items, attribute: attribute)
+        attributes().forEach {
+            alignItems(items, attribute: $0)
         }
     }
 
@@ -135,7 +131,6 @@ class AlignedLayoutArrangement: LayoutArrangement {
     // MARK: Helpers
     
     private func alignItems(items: [UIView], attribute: NSLayoutAttribute) {
-        guard items.count > 0 else { return }
         let firstItem = items.first!
         items.dropFirst().forEach {
             add(constraint(item: firstItem, attribute: attribute, toItem: $0, attribute: nil, identifier: "ASV-alignment"))

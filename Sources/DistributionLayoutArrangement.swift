@@ -37,7 +37,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
         if hiddenItems.count > 0 {
             updateHiddenItemsConstraints()
         }
-        if items.count > 0 && (type == .EqualSpacing || type == .EqualCentering) { // If spacing are weak
+        if items.count > 0 && (type == .EqualSpacing || type == .EqualCentering) { // If spacings are weak
             addCanvasFitConstraint(attribute: width)
         }
     }

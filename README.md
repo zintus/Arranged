@@ -11,7 +11,7 @@ Open source replacement of [UIStackView](https://developer.apple.com/library/pre
 <img src="https://cloud.githubusercontent.com/assets/1567433/13573981/364b2946-e493-11e5-9d02-893a5dc11a8c.png" width="50%"/>
 
 - Supports all `alignments` and `distributions`, `spacing`, `baselineRelativeArrangement`, `layoutMarginsRelativeArrangement`, `axis`
-- 3360 layouts unit tested
+- Unit tested, thousands of layouts covered
 - Supports animations
 - Generates exactly the same sets of constraints as `UIStackView`:
 

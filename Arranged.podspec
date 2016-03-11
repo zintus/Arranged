@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = "Arranged"
-    s.version          = "1.0.1"
+    s.version          = "1.0.2"
     s.summary          = "Open source replacement of UIStackView for iOS 8 (100% layouts supported)"
 
     s.homepage         = "https://github.com/kean/Arranged"

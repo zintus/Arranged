@@ -212,7 +212,8 @@ public class StackView : UIView {
             setNeedsUpdateConstraints()
         }
     }
-    
+
+    /// Updates alignment and distribution constraints.
     public override func updateConstraints() {
         if invalidated {
             invalidated = false
@@ -239,16 +240,18 @@ public class StackView : UIView {
     // MARK: Baseline Alignment
     
     // FIXME: Signal UIView when viewForFirst(Last)BaselineLayout changes.
-    
+
+    /// Returns first arranged view for vertical axis and self for horizontal axis.
     public override func viewForBaselineLayout() -> UIView {
         return _viewForFirstBaselineLayout
     }
-    
+
+    /// Returns first arranged view for vertical axis and self for horizontal axis.
     public override var viewForFirstBaselineLayout: UIView {
         return _viewForFirstBaselineLayout
     }
     
-    public var _viewForFirstBaselineLayout: UIView {
+    private var _viewForFirstBaselineLayout: UIView {
         switch axis {
         case .Vertical:
             if let first = arrangedSubviews.first {
@@ -264,7 +267,8 @@ public class StackView : UIView {
         case .Horizontal: return self
         }
     }
-    
+
+    /// Returns last arranged view for vertical axis and self for horizontal axis.
     public override var viewForLastBaselineLayout: UIView {
         switch axis {
         case .Vertical:
@@ -282,11 +286,13 @@ public class StackView : UIView {
     }
     
     // MARK: Misc
-    
+
+    /// Returns CATransformLayer class.
     public override class func layerClass() -> AnyClass {
         return CATransformLayer.self
     }
-    
+
+    /// Changing background color has no effect.
     public override var backgroundColor: UIColor? {
         get { return nil }
         set { return }

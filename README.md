@@ -53,7 +53,7 @@ Open source replacement of [UIStackView](https://developer.apple.com/library/pre
 
 ## Usage
 
-`Arranged.StackView` usage is used in the same way `UIStackView` is.
+`Arranged.StackView` is used the same way `UIStackView` is:
 
 ```swift
 let stackView = StackView(arrangedSubviews: [view1, view2, view3])
@@ -64,7 +64,7 @@ stackView.axis = .Vertical
 stackView.layoutMarginsRelativeArrangement = true
 ```
 
-The only difference is in hiding items:
+The only difference is hiding items:
 
 ```swift
 UIView.animateWithDuration(0.33) {
@@ -85,10 +85,10 @@ UIView.animateWithDuration(0.33) {
 
 ## Differences
 
-- `UIStackView` observes `hidden` property of arranged views, delays its effect if called inside animation block, and updates constraints accordingly. I find this behavior confusing and impractical to implement. `Arranged.StackView` provides a straightforward method `setArrangedView(_:hidden:)` which updates constraints exactly the same way as `UIStackView` does, but it doesn't affect `hidden` property.
-- Animations require you to call `view.layoutIfNeeded()` method, just like with any regular layout
-- `StackViewDistribution.FillProportionally` doesn't update its constrains when `intrinsicContentSize` of arranged views changes, due to the fact that `UIStackView` uses private API (`_intrinsicContentSizeInvalidatedForChildView`) to do that
-- `UISV-text-width-disambiguation` constraints are not implemented because they are confusing and not documented
+- `UIStackView` observes `hidden` property of arranged views, delays its effect if called inside animation block, and updates constraints accordingly. I believe this behavior is confusing and impractical to implement. `Arranged.StackView` provides a straightforward method `setArrangedView(_:hidden:)` which updates constraints exactly the same way as `UIStackView` does, but it doesn't affect `hidden` property.
+- Animations require you to call `view.layoutIfNeeded()` - just like with any regular layout
+- `StackViewDistribution.FillProportionally` doesn't update its constrains when `intrinsicContentSize` of arranged views changes due to the fact that `UIStackView` uses private API (`_intrinsicContentSizeInvalidatedForChildView`) to achieve that
+- `UISV-text-width-disambiguation` constraints are not implemented because they are not documented (and you probably should disambiguate text views the way that fits your app anyway)
 
 ## Installation<a name="installation"></a>
 

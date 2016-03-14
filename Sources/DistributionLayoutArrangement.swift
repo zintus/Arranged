@@ -110,9 +110,9 @@ class DistributionLayoutArrangement: LayoutArrangement {
         visibleItems.forEach {
             let size = size($0)
             if size != UIViewNoIntrinsicMetric && size > 0 {
-                add(constraint(item: $0, attribute: width, toItem: canvas, relation: .Equal, multiplier: (size / totalSize), priority: priority, identifier: "ASV-fill-proportionally"))
+                constraint(item: $0, attribute: width, toItem: canvas, relation: .Equal, multiplier: (size / totalSize), priority: priority, identifier: "ASV-fill-proportionally")
             } else {
-                add(constraint(item: $0, attribute: width, constant: 0, identifier: "ASV-fill-proportionally"))
+                constraint(item: $0, attribute: width, constant: 0, identifier: "ASV-fill-proportionally")
             }
             priority? -= 1
         }
@@ -120,7 +120,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
     
     private func updateHiddenItemsConstraints() {
         hiddenItems.forEach {
-            add(constraint(item: $0, attribute: width, constant: 0, identifier: "ASV-hiding"))
+            constraint(item: $0, attribute: width, constant: 0, identifier: "ASV-hiding")
         }
     }
 
@@ -157,19 +157,19 @@ class DistributionLayoutArrangement: LayoutArrangement {
             let spacing = spacingFor(previous: previous, current: current)
             let toAttr: NSLayoutAttribute = baselineRelative ? .FirstBaseline : leading
             let fromAttr: NSLayoutAttribute = baselineRelative ? .LastBaseline : trailing
-            add(constraint(item: current, attribute: toAttr, toItem: previous, attribute: fromAttr, relation: relation, constant: spacing, identifier: "ASV-spacing"))
+            constraint(item: current, attribute: toAttr, toItem: previous, attribute: fromAttr, relation: relation, constant: spacing, identifier: "ASV-spacing")
         }
     }
     
     private func connectItem(item1: UIView, attribute attr1: NSLayoutAttribute, item item2: UIView, attribute attr2: NSLayoutAttribute) {
-        add(constraint(item: item1, attribute: attr1, toItem: item2, attribute: attr2, identifier: "ASV-distributing-edge"))
+        constraint(item: item1, attribute: attr1, toItem: item2, attribute: attr2, identifier: "ASV-distributing-edge")
     }
     
     private func matchItemsSize(items: [UIView], priority: UILayoutPriority? = nil) {
         guard items.count > 0 else { return }
         let firstItem = items.first!
         items.dropFirst().forEach {
-            add(constraint(item: $0, attribute: width, toItem: firstItem, priority: priority, identifier: "ASV-fill-equally"))
+            constraint(item: $0, attribute: width, toItem: firstItem, priority: priority, identifier: "ASV-fill-equally")
         }
     }
 }

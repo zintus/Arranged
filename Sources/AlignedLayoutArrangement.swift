@@ -39,7 +39,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
         if shouldCreateSpacer {
             canvas.addSubview(spacer)
             if isAnyItemConnectionWeak {
-                add(constraint(item: spacer, attribute: height, constant: 0, priority: 51, identifier: "ASV-spanning-fit"))
+                constraint(item: spacer, attribute: height, constant: 0, priority: 51, identifier: "ASV-spanning-fit")
             }
             connectItemsToSpacer(spacer, items: visibleItems, topWeak: isTopItemConnectionWeak, bottomWeak: isBottomItemConnectionWeak)
         }
@@ -133,7 +133,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
     private func alignItems(items: [UIView], attribute: NSLayoutAttribute) {
         let firstItem = items.first!
         items.dropFirst().forEach {
-            add(constraint(item: firstItem, attribute: attribute, toItem: $0, attribute: nil, identifier: "ASV-alignment"))
+            constraint(item: firstItem, attribute: attribute, toItem: $0, attribute: nil, identifier: "ASV-alignment")
         }
     }
     
@@ -141,7 +141,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
         func connectToSpacer(item: UIView, attribute attr: NSLayoutAttribute, weak: Bool) {
             let relation = connectionRelation(attr, weak: weak)
             let priority: UILayoutPriority? = weak ? nil : 999.5
-            add(constraint(item: spacer, attribute: attr, toItem: item, relation: relation, priority: priority, identifier: "ASV-spanning-boundary"))
+            constraint(item: spacer, attribute: attr, toItem: item, relation: relation, priority: priority, identifier: "ASV-spanning-boundary")
         }
         items.forEach {
             connectToSpacer($0, attribute: top, weak: topWeak)
@@ -151,7 +151,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
     
     private func addItemsAmbiguitySuppressors(items: [UIView]) {
         items.forEach {
-            add(constraint(item: $0, attribute: height, constant: 0, priority: 25, identifier: "ASV-ambiguity-suppression"))
+            constraint(item: $0, attribute: height, constant: 0, priority: 25, identifier: "ASV-ambiguity-suppression")
         }
     }
     

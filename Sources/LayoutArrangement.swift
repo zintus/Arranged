@@ -41,11 +41,8 @@ class LayoutArrangement {
         }
         constraint.identifier = identifier
         (item2 != nil ? canvas : item1).addConstraint(constraint)
-        return constraint
-    }
-    
-    func add(constraint: NSLayoutConstraint) {
         constraints.append(constraint)
+        return constraint
     }
     
     // MARK: Helpers
@@ -55,12 +52,12 @@ class LayoutArrangement {
     }
     
     func addCanvasFitConstraint(attribute attribute: NSLayoutAttribute) {
-        add(constraint(item: canvas, attribute: attribute, constant: 0, priority: 49, identifier: "ASV-canvas-fit"))
+        constraint(item: canvas, attribute: attribute, constant: 0, priority: 49, identifier: "ASV-canvas-fit")
     }
     
     func connectToCanvas(item: UIView, attribute attr: NSLayoutAttribute, weak: Bool = false) {
         let relation = connectionRelation(attr, weak: weak)
-        add(constraint(item: canvas, attribute: (marginsEnabled ? attr.toMargin : attr), toItem: item, attribute: attr, relation: relation, identifier: "ASV-canvas-connection"))
+        constraint(item: canvas, attribute: (marginsEnabled ? attr.toMargin : attr), toItem: item, attribute: attr, relation: relation, identifier: "ASV-canvas-connection")
     }
     
     func connectionRelation(attr: NSLayoutAttribute, weak: Bool) -> NSLayoutRelation {

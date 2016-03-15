@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0C7D028A1C98756C00DAB3ED"
-               BuildableName = "Arranged tvOS.framework"
+               BuildableName = "Arranged.framework"
                BlueprintName = "Arranged tvOS"
                ReferencedContainer = "container:Arranged.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0C7D028A1C98756C00DAB3ED"
-            BuildableName = "Arranged tvOS.framework"
+            BuildableName = "Arranged.framework"
             BlueprintName = "Arranged tvOS"
             ReferencedContainer = "container:Arranged.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0C7D028A1C98756C00DAB3ED"
-            BuildableName = "Arranged tvOS.framework"
+            BuildableName = "Arranged.framework"
             BlueprintName = "Arranged tvOS"
             ReferencedContainer = "container:Arranged.xcodeproj">
          </BuildableReference>

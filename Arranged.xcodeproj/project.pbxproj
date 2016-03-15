@@ -400,6 +400,7 @@
 				0C7D02921C98756C00DAB3ED /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0CE361121C86077B00EA70CF /* Build configuration list for PBXProject "Arranged" */ = {
 			isa = XCConfigurationList;

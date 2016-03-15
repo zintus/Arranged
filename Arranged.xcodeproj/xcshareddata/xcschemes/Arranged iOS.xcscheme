@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0CE361171C86077B00EA70CF"
-               BuildableName = "Arranged iOS.framework"
+               BuildableName = "Arranged.framework"
                BlueprintName = "Arranged iOS"
                ReferencedContainer = "container:Arranged.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0CE361171C86077B00EA70CF"
-            BuildableName = "Arranged iOS.framework"
+            BuildableName = "Arranged.framework"
             BlueprintName = "Arranged iOS"
             ReferencedContainer = "container:Arranged.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0CE361171C86077B00EA70CF"
-            BuildableName = "Arranged iOS.framework"
+            BuildableName = "Arranged.framework"
             BlueprintName = "Arranged iOS"
             ReferencedContainer = "container:Arranged.xcodeproj">
          </BuildableReference>

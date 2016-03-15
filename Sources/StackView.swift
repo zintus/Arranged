@@ -172,16 +172,17 @@ public class StackView : UIView {
      The stack view also ensures that the arrangedSubviews array is always a subset of its subviews array. This method automatically adds the provided view as a subview of the stack view, if it is not already. When adding subviews, the stack view appends the view to the end of its subviews array. The index only affects the order of views in the arrangedSubviews array. It does not affect the ordering of views in the subviews array.
      */
     public func insertArrangedSubview(view: UIView, atIndex stackIndex: Int) {
-        if !arrangedSubviews.contains(view) {
-            view.translatesAutoresizingMaskIntoConstraints = false
-            arrangedSubviews.insert(view, atIndex: stackIndex)
-            if view.superview != self {
-                addSubview(view)
-            }
-            invalidateLayout()
+        if let idx = arrangedSubviews.indexOf(view) {
+            arrangedSubviews.removeAtIndex(idx)
         }
+        view.translatesAutoresizingMaskIntoConstraints = false
+        arrangedSubviews.insert(view, atIndex: stackIndex)
+        if view.superview != self {
+            addSubview(view)
+        }
+        invalidateLayout()
     }
-    
+
     /// Removes subview from arranged subviews.
     public override func willRemoveSubview(subview: UIView) {
         removeArrangedSubview(subview)

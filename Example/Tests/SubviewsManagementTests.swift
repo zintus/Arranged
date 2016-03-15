@@ -72,4 +72,20 @@ class SubviewsManagementTests: XCTestCase {
         XCTAssertFalse(stack.arrangedSubviews.contains(view))
         XCTAssertTrue(stack.subviews.contains(view))
     }
+
+    func testThatInsertArrangedSubivewAtIndexMethodUpdatesIndexOfExistingSubview() {
+        let stack = StackView()
+        let view1 = UIView()
+        let view2 = UIView()
+        stack.addArrangedSubview(view1)
+        stack.addArrangedSubview(view2)
+        XCTAssertEqual(stack.arrangedSubviews.count, 2)
+        XCTAssertTrue(stack.arrangedSubviews[0] === view1)
+        XCTAssertTrue(stack.arrangedSubviews[1] === view2)
+
+        stack.insertArrangedSubview(view2, atIndex: 0)
+        XCTAssertEqual(stack.arrangedSubviews.count, 2)
+        XCTAssertTrue(stack.arrangedSubviews[0] === view2)
+        XCTAssertTrue(stack.arrangedSubviews[1] === view1)
+    }
 }

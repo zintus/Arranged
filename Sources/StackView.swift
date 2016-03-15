@@ -243,6 +243,7 @@ public class StackView : UIView {
     // FIXME: Signal UIView when viewForFirst(Last)BaselineLayout changes.
 
     /// Returns first arranged view for vertical axis and self for horizontal axis.
+    #if !os(tvOS)
     public override func viewForBaselineLayout() -> UIView {
         return _viewForFirstBaselineLayout
     }
@@ -285,7 +286,8 @@ public class StackView : UIView {
         case .Horizontal: return self
         }
     }
-    
+    #endif
+
     // MARK: Misc
 
     /// Returns CATransformLayer class.

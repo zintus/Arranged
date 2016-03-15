@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C7D02931C9875A200DAB3ED /* StackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE361271C8607DE00EA70CF /* StackView.swift */; };
+		0C7D02941C9875A200DAB3ED /* LayoutArrangement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C81ABB41C889BE50036DFD4 /* LayoutArrangement.swift */; };
+		0C7D02951C9875A200DAB3ED /* AlignedLayoutArrangement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C81ABBA1C889C830036DFD4 /* AlignedLayoutArrangement.swift */; };
+		0C7D02961C9875A200DAB3ED /* DistributionLayoutArrangement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C81ABB81C889C6D0036DFD4 /* DistributionLayoutArrangement.swift */; };
+		0C7D02971C9875A200DAB3ED /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C81ABB61C889C100036DFD4 /* Internal.swift */; };
 		0C81ABB51C889BE50036DFD4 /* LayoutArrangement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C81ABB41C889BE50036DFD4 /* LayoutArrangement.swift */; };
 		0C81ABB71C889C100036DFD4 /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C81ABB61C889C100036DFD4 /* Internal.swift */; };
 		0C81ABB91C889C6D0036DFD4 /* DistributionLayoutArrangement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C81ABB81C889C6D0036DFD4 /* DistributionLayoutArrangement.swift */; };
@@ -15,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0C7D028B1C98756C00DAB3ED /* Arranged.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Arranged.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C81ABB41C889BE50036DFD4 /* LayoutArrangement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayoutArrangement.swift; sourceTree = "<group>"; };
 		0C81ABB61C889C100036DFD4 /* Internal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
 		0C81ABB81C889C6D0036DFD4 /* DistributionLayoutArrangement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DistributionLayoutArrangement.swift; sourceTree = "<group>"; };
@@ -25,6 +31,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0C7D02871C98756C00DAB3ED /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0CE361141C86077B00EA70CF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -48,6 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				0CE361181C86077B00EA70CF /* Arranged.framework */,
+				0C7D028B1C98756C00DAB3ED /* Arranged.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,6 +89,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		0C7D02881C98756C00DAB3ED /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0CE361151C86077B00EA70CF /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -85,9 +106,27 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		0CE361171C86077B00EA70CF /* Arranged */ = {
+		0C7D028A1C98756C00DAB3ED /* Arranged tvOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0CE361201C86077B00EA70CF /* Build configuration list for PBXNativeTarget "Arranged" */;
+			buildConfigurationList = 0C7D02901C98756C00DAB3ED /* Build configuration list for PBXNativeTarget "Arranged tvOS" */;
+			buildPhases = (
+				0C7D02861C98756C00DAB3ED /* Sources */,
+				0C7D02871C98756C00DAB3ED /* Frameworks */,
+				0C7D02881C98756C00DAB3ED /* Headers */,
+				0C7D02891C98756C00DAB3ED /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Arranged tvOS";
+			productName = "Arranged tvOS";
+			productReference = 0C7D028B1C98756C00DAB3ED /* Arranged.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		0CE361171C86077B00EA70CF /* Arranged iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0CE361201C86077B00EA70CF /* Build configuration list for PBXNativeTarget "Arranged iOS" */;
 			buildPhases = (
 				0CE361131C86077B00EA70CF /* Sources */,
 				0CE361141C86077B00EA70CF /* Frameworks */,
@@ -98,7 +137,7 @@
 			);
 			dependencies = (
 			);
-			name = Arranged;
+			name = "Arranged iOS";
 			productName = Stack;
 			productReference = 0CE361181C86077B00EA70CF /* Arranged.framework */;
 			productType = "com.apple.product-type.framework";
@@ -112,6 +151,9 @@
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "Alexander Grebenyuk";
 				TargetAttributes = {
+					0C7D028A1C98756C00DAB3ED = {
+						CreatedOnToolsVersion = 7.2.1;
+					};
 					0CE361171C86077B00EA70CF = {
 						CreatedOnToolsVersion = 7.2.1;
 					};
@@ -129,12 +171,20 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0CE361171C86077B00EA70CF /* Arranged */,
+				0CE361171C86077B00EA70CF /* Arranged iOS */,
+				0C7D028A1C98756C00DAB3ED /* Arranged tvOS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		0C7D02891C98756C00DAB3ED /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0CE361161C86077B00EA70CF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -145,6 +195,18 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0C7D02861C98756C00DAB3ED /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C7D02961C9875A200DAB3ED /* DistributionLayoutArrangement.swift in Sources */,
+				0C7D02951C9875A200DAB3ED /* AlignedLayoutArrangement.swift in Sources */,
+				0C7D02941C9875A200DAB3ED /* LayoutArrangement.swift in Sources */,
+				0C7D02971C9875A200DAB3ED /* Internal.swift in Sources */,
+				0C7D02931C9875A200DAB3ED /* StackView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0CE361131C86077B00EA70CF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -160,6 +222,46 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		0C7D02911C98756C00DAB3ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Supporting/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.Arranged;
+				PRODUCT_NAME = Arranged;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Debug;
+		};
+		0C7D02921C98756C00DAB3ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = Supporting/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.Arranged;
+				PRODUCT_NAME = Arranged;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Release;
+		};
 		0CE3611E1C86077B00EA70CF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -263,7 +365,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.Arranged;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Arranged;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -283,7 +385,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.Arranged;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Arranged;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -291,6 +393,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0C7D02901C98756C00DAB3ED /* Build configuration list for PBXNativeTarget "Arranged tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C7D02911C98756C00DAB3ED /* Debug */,
+				0C7D02921C98756C00DAB3ED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		0CE361121C86077B00EA70CF /* Build configuration list for PBXProject "Arranged" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -300,7 +410,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0CE361201C86077B00EA70CF /* Build configuration list for PBXNativeTarget "Arranged" */ = {
+		0CE361201C86077B00EA70CF /* Build configuration list for PBXNativeTarget "Arranged iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0CE361211C86077B00EA70CF /* Debug */,

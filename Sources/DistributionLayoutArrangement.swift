@@ -16,7 +16,6 @@ class DistributionLayoutArrangement: LayoutArrangement {
     override init(canvas: StackView) {
         spacer = LayoutSpacer()
         spacer.accessibilityIdentifier = "ASV-alignment-spanner"
-        spacer.translatesAutoresizingMaskIntoConstraints = false
 
         super.init(canvas: canvas)
     }
@@ -66,7 +65,6 @@ class DistributionLayoutArrangement: LayoutArrangement {
     private func updateGapLayoutGuides() {
         visibleItems.forPair { previous, current in
             let gap = GapLayoutGuide()
-            gap.translatesAutoresizingMaskIntoConstraints = false
             canvas.addSubview(gap)
             gaps.append(gap)
 

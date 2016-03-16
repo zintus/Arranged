@@ -10,6 +10,7 @@ class LayoutGuide: UIView {
         super.init(frame: frame)
         // Make sure that layout guides don't interfere with touches
         self.hidden = true
+        self.translatesAutoresizingMaskIntoConstraints = false
     }
 
     required init?(coder aDecoder: NSCoder) {

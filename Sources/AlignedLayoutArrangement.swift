@@ -13,7 +13,6 @@ class AlignedLayoutArrangement: LayoutArrangement {
     override init(canvas: StackView) {
         spacer = LayoutSpacer()
         spacer.accessibilityIdentifier = "ASV-alignment-spanner"
-        spacer.translatesAutoresizingMaskIntoConstraints = false
         
         super.init(canvas: canvas)
     }

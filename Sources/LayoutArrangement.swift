@@ -40,7 +40,7 @@ class LayoutArrangement {
             constraint.priority = priority
         }
         constraint.identifier = identifier
-        (item2 != nil ? canvas : item1).addConstraint(constraint)
+        constraint.active = true
         constraints.append(constraint)
         return constraint
     }

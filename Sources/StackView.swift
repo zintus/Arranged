@@ -300,4 +300,9 @@ public class StackView : UIView {
         get { return nil }
         set { return }
     }
+
+    /// Returns true.
+    public override class func requiresConstraintBasedLayout() -> Bool {
+        return true
+    }
 }

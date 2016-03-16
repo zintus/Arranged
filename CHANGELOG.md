@@ -1,5 +1,12 @@
 [Changelog](https://github.com/kean/Arranged/releases) for all versions
 
+## Arranged 1.0.4
+
+- Activate constraints using `activate` property instead of manually adding them to the view
+- `StackView` now returns true in `requiresConstraintBasedLayout`
+- `LayoutGuides` are now hidden by default
+- `LayoutGuides` now have `translatesAutoresizingMaskIntoConstraints` set to false be default
+
 ## Arranged 1.0.3
  
 - `insertArrangedSubview(_:atIndex:)` method now updates the stack index (but not the subview index) of the arranged subview if it's already in the `arrangedSubviews` list.

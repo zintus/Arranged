@@ -6,6 +6,16 @@ import UIKit
 
 
 class LayoutGuide: UIView {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        // Make sure that layout guides don't interfere with touches
+        self.hidden = true
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override class func layerClass() -> AnyClass {
         return CATransformLayer.self
     }

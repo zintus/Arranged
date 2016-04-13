@@ -20,8 +20,8 @@ class LayoutArrangement {
     }
 
     func updateConstraints() {
-        visibleItems = items.filter { return !isHidden($0) }
-        NSLayoutConstraint.deactivateConstraints(constraints.filter { return $0.active })
+        visibleItems = items.filter { !isHidden($0) }
+        NSLayoutConstraint.deactivateConstraints(constraints.filter { $0.active })
         constraints.removeAll()
     }
     

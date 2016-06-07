@@ -1,5 +1,7 @@
 source 'https://github.com/CocoaPods/Specs.git'
 use_frameworks!
 
-pod "Arranged", :path => "../"
-pod "PureLayout"
+target 'Example' do
+	pod "Arranged", :path => "../"
+	pod "PureLayout"
+end

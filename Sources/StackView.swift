@@ -9,23 +9,23 @@ import UIKit
 public enum StackViewDistribution {
     /** A layout where the stack view resizes its arranged views so that they fill the available space along the stack view’s axis.
      */
-    case Fill
+    case fill
     
     /** A layout where the stack view resizes its arranged views so that they fill the available space along the stack view’s axis. The views are resized so that they are all the same size along the stack view’s axis.
      */
-    case FillEqually
+    case fillEqually
     
     /** A layout where the stack view resizes its arranged views so that they fill the available space along the stack view’s axis. Views are resized proportionally based on their intrinsic content size along the stack view’s axis.
      */
-    case FillProportionally
+    case fillProportionally
     
     /** A layout where the stack view positions its arranged views so that they fill the available space along the stack view’s axis. When the arranged views do not fill the stack view, it pads the spacing between the views evenly.
      */
-    case EqualSpacing
+    case equalSpacing
     
     /** A layout that attempts to position the arranged views so that they have an equal center-to-center spacing along the stack view’s axis, while maintaining the spacing property’s distance between views.
      */
-    case EqualCentering
+    case equalCentering
 }
 
 
@@ -34,39 +34,39 @@ public enum StackViewDistribution {
 public enum StackViewAlignment {
     /** A layout where the stack view resizes its arranged views so that they fill the available space perpendicular to the stack view’s axis.
      */
-    case Fill
+    case fill
     
     /** A layout for vertical stacks where the stack view aligns the leading edge of its arranged views along its leading edge. This is equivalent to the `StackViewAlignment.Top` alignment for horizontal stacks.
      */
-    case Leading
+    case leading
     
     /** A layout for horizontal stacks where the stack view aligns the top edge of its arranged views along its top edge. This is equivalent to the `StackViewAlignment.Leading` alignment for vertical stacks.
      */
     public static var Top: StackViewAlignment {
-        return .Leading
+        return .leading
     }
     
     /** A layout where the stack view aligns its arranged views based on their first baseline. This alignment is only valid for horizontal stacks.
      */
-    case FirstBaseline
+    case firstBaseline
     
     /** A layout where the stack view aligns the center of its arranged views with its center along its axis.
      */
-    case Center
+    case center
     
     /** A layout for vertical stacks where the stack view aligns the trailing edge of its arranged views along its trailing edge. This is equivalent to the `StackViewAlignment.Bottom` alignment for horizontal stacks.
      */
-    case Trailing
+    case trailing
     
     /** A layout for horizontal stacks where the stack view aligns the bottom edge of its arranged views along its bottom edge. This is equivalent to the `StackViewAlignment.Trailing` alignment for vertical stacks.
      */
     public static var Bottom: StackViewAlignment {
-        return .Trailing
+        return .trailing
     }
     
     /** A layout where the stack view aligns its arranged views based on their last baseline. This alignment is only valid for horizontal stacks.
      */
-    case LastBaseline
+    case lastBaseline
 }
 
 /**
@@ -77,17 +77,17 @@ The StackView class provides a streamlined interface for laying out a collection
 public class StackView : UIView {
     
     /// The axis along which the arranged views are laid out.
-    public var axis: UILayoutConstraintAxis = .Horizontal {
+    public var axis: UILayoutConstraintAxis = .horizontal {
         didSet { if axis != oldValue { invalidateLayout() } }
     }
     
     /// The distribution of the arranged views along the stack view’s axis.
-    public var distribution: StackViewDistribution = .Fill {
+    public var distribution: StackViewDistribution = .fill {
         didSet { if distribution != oldValue { invalidateLayout() } }
     }
     
     /// The alignment of the arranged subviews perpendicular to the stack view’s axis.
-    public var alignment: StackViewAlignment = .Fill {
+    public var alignment: StackViewAlignment = .fill {
         didSet { if alignment != oldValue { invalidateLayout() } }
     }
     
@@ -102,7 +102,7 @@ public class StackView : UIView {
     }
     
     /// A Boolean value that determines whether the stack view lays out its arranged views relative to its layout margins.
-    public var layoutMarginsRelativeArrangement = false {
+    open var layoutMarginsRelativeArrangement = false {
         didSet { if layoutMarginsRelativeArrangement != oldValue { invalidateLayout() } }
     }
 
@@ -116,7 +116,7 @@ public class StackView : UIView {
     
     /// Returns a new stack view object that manages the provided views.
     public init(arrangedSubviews views: [UIView]) {
-        super.init(frame: CGRectZero)
+        super.init(frame: CGRect.zero)
         commonInit(views: views)
     }
 
@@ -131,7 +131,7 @@ public class StackView : UIView {
         commonInit(views: [])
     }
     
-    private func commonInit(views views: [UIView]) {
+    private func commonInit(views: [UIView]) {
         layoutMargins = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         alignmentArrangement = AlignedLayoutArrangement(canvas: self)
         distributionArrangement = DistributionLayoutArrangement(canvas: self)
@@ -147,7 +147,7 @@ public class StackView : UIView {
     
     The stack view ensures that the arrangedSubviews array is always a subset of its subviews array. This method automatically adds the provided view as a subview of the stack view, if it is not already. If the view is already a subview, this operation does not alter the subview ordering.
     */
-    public func addArrangedSubview(view: UIView) {
+    public func addArrangedSubview(_ view: UIView) {
         insertArrangedSubview(view, atIndex: arrangedSubviews.count)
     }
     
@@ -156,9 +156,9 @@ public class StackView : UIView {
      
      This method removes the provided view from the stack’s arrangedSubviews array. The view’s position and size will no longer be managed by the stack view. However, this method does not remove the provided view from the stack’s subviews array; therefore, the view is still displayed as part of the view hierarchy.
      */
-    public func removeArrangedSubview(view: UIView) {
-        if let index = arrangedSubviews.indexOf(view) {
-            arrangedSubviews.removeAtIndex(index)
+    public func removeArrangedSubview(_ view: UIView) {
+        if let index = arrangedSubviews.index(of: view) {
+            arrangedSubviews.remove(at: index)
             hiddenViews.remove(view)
             invalidateLayout()
         }
@@ -171,12 +171,12 @@ public class StackView : UIView {
      
      The stack view also ensures that the arrangedSubviews array is always a subset of its subviews array. This method automatically adds the provided view as a subview of the stack view, if it is not already. When adding subviews, the stack view appends the view to the end of its subviews array. The index only affects the order of views in the arrangedSubviews array. It does not affect the ordering of views in the subviews array.
      */
-    public func insertArrangedSubview(view: UIView, atIndex stackIndex: Int) {
-        if let idx = arrangedSubviews.indexOf(view) {
-            arrangedSubviews.removeAtIndex(idx)
+    public func insertArrangedSubview(_ view: UIView, atIndex stackIndex: Int) {
+        if let idx = arrangedSubviews.index(of: view) {
+            arrangedSubviews.remove(at: idx)
         }
         view.translatesAutoresizingMaskIntoConstraints = false
-        arrangedSubviews.insert(view, atIndex: stackIndex)
+        arrangedSubviews.insert(view, at: stackIndex)
         if view.superview != self {
             addSubview(view)
         }
@@ -184,14 +184,14 @@ public class StackView : UIView {
     }
 
     /// Removes subview from arranged subviews.
-    public override func willRemoveSubview(subview: UIView) {
+    public override func willRemoveSubview(_ subview: UIView) {
         removeArrangedSubview(subview)
     }
     
     // MARK: Hiding Views
     
     /// Updates stack view's layout to hide/show a given view. The view remains a subview of the stack view, but it's width (or height for vertical stack view) is reduced to 0. This method doesn't change view's `hidden` property.
-    public func setArrangedView(view: UIView, hidden: Bool) {
+    public func setArrangedView(_ view: UIView, hidden: Bool) {
         if hidden {
             hiddenViews.insert(view)
         } else {
@@ -219,7 +219,7 @@ public class StackView : UIView {
         if invalidated {
             invalidated = false
             
-            for arrangement in [alignmentArrangement, distributionArrangement] {
+            for arrangement in [alignmentArrangement, distributionArrangement] as [LayoutArrangement] {
                 arrangement.items = arrangedSubviews
                 arrangement.axis = axis
                 arrangement.marginsEnabled = layoutMarginsRelativeArrangement
@@ -228,7 +228,7 @@ public class StackView : UIView {
             
             distributionArrangement.type = distribution
             distributionArrangement.spacing = spacing
-            distributionArrangement.baselineRelative = baselineRelativeArrangement && axis == .Vertical
+            distributionArrangement.baselineRelative = baselineRelativeArrangement && axis == .vertical
             
             alignmentArrangement.type = alignment
             
@@ -244,46 +244,46 @@ public class StackView : UIView {
 
     /// Returns first arranged view for vertical axis and self for horizontal axis.
     #if !os(tvOS)
-    public override func viewForBaselineLayout() -> UIView {
+    public override func forBaselineLayout() -> UIView {
         return _viewForFirstBaselineLayout
     }
 
     /// Returns first arranged view for vertical axis and self for horizontal axis.
-    public override var viewForFirstBaselineLayout: UIView {
+    public override var forFirstBaselineLayout: UIView {
         return _viewForFirstBaselineLayout
     }
     
     private var _viewForFirstBaselineLayout: UIView {
         switch axis {
-        case .Vertical:
+        case .vertical:
             if let first = arrangedSubviews.first {
                 if #available(iOS 9.0, *) {
-                    return first.viewForFirstBaselineLayout
+                    return first.forFirstBaselineLayout
                 } else {
-                    return first.viewForBaselineLayout()
+                    return first.forBaselineLayout()
                 }
             } else {
                 return self
             }
             // FIXME: UIStackView: A horizontal stack view returns its tallest view (whatever that means)
-        case .Horizontal: return self
+        case .horizontal: return self
         }
     }
 
     /// Returns last arranged view for vertical axis and self for horizontal axis.
-    public override var viewForLastBaselineLayout: UIView {
+    public override var forLastBaselineLayout: UIView {
         switch axis {
-        case .Vertical:
+        case .vertical:
             if let last = arrangedSubviews.last {
                 if #available(iOS 9.0, *) {
-                    return last.viewForLastBaselineLayout
+                    return last.forLastBaselineLayout
                 } else {
                     return last
                 }
             } else {
                 return self
             }
-        case .Horizontal: return self
+        case .horizontal: return self
         }
     }
     #endif
@@ -291,7 +291,7 @@ public class StackView : UIView {
     // MARK: Misc
 
     /// Returns CATransformLayer class.
-    public override class func layerClass() -> AnyClass {
+    public override class var layerClass: Swift.AnyClass {
         return CATransformLayer.self
     }
 
@@ -302,7 +302,7 @@ public class StackView : UIView {
     }
 
     /// Returns true.
-    public override class func requiresConstraintBasedLayout() -> Bool {
+    public override class var requiresConstraintBasedLayout: Bool {
         return true
     }
 }

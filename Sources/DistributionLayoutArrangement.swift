@@ -7,7 +7,7 @@ import UIKit
 /** Manages distribution: constraints along the axis.
  */
 class DistributionLayoutArrangement: LayoutArrangement {
-    var type: StackViewDistribution = .Fill
+    var type: StackViewDistribution = .fill
     var spacing: CGFloat = 0
     var baselineRelative = false
     var spacer: LayoutSpacer
@@ -36,7 +36,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
         if hiddenItems.count > 0 {
             updateHiddenItemsConstraints()
         }
-        if items.count > 0 && (type == .EqualSpacing || type == .EqualCentering) { // If spacings are weak
+        if items.count > 0 && (type == .equalSpacing || type == .equalCentering) { // If spacings are weak
             addCanvasFitConstraint(attribute: width)
         }
     }
@@ -54,10 +54,10 @@ class DistributionLayoutArrangement: LayoutArrangement {
     
     private func updateSpacingConstraints() {
         switch type {
-        case .Fill, .FillEqually, .FillProportionally:
+        case .fill, .fillEqually, .fillProportionally:
             addSpacings()
-        case .EqualSpacing, .EqualCentering:
-            addSpacings(.GreaterThanOrEqual)
+        case .equalSpacing, .equalCentering:
+            addSpacings(.greaterThanOrEqual)
             updateGapLayoutGuides()
         }
     }
@@ -68,32 +68,32 @@ class DistributionLayoutArrangement: LayoutArrangement {
             canvas.addSubview(gap)
             gaps.append(gap)
 
-            let toAttr: NSLayoutAttribute = baselineRelative ? .FirstBaseline : leading
-            let fromAttr: NSLayoutAttribute = baselineRelative ? .LastBaseline : trailing
+            let toAttr: NSLayoutAttribute = baselineRelative ? .firstBaseline : leading
+            let fromAttr: NSLayoutAttribute = baselineRelative ? .lastBaseline : trailing
             
-            connectItem(gap, attribute: toAttr, item: previous, attribute: (type == .EqualCentering ? center : fromAttr))
-            connectItem(gap, attribute: fromAttr, item: current, attribute: (type == .EqualCentering ? center : toAttr))
+            connectItem(gap, attribute: toAttr, item: previous, attribute: (type == .equalCentering ? center : fromAttr))
+            connectItem(gap, attribute: fromAttr, item: current, attribute: (type == .equalCentering ? center : toAttr))
         }
-        matchItemsSize(gaps, priority: type == .EqualCentering ? 149 : nil)
+        matchItemsSize(gaps, priority: type == .equalCentering ? 149 : nil)
     }
 
     private func updateDistributionConstraints() {
         switch type {
-        case .FillProportionally:
+        case .fillProportionally:
             fillItemsProportionally()
-        case .FillEqually:
+        case .fillEqually:
             matchItemsSize(visibleItems)
         default: break
         }
     }
         
     private func fillItemsProportionally() {
-        func size(item: UIView) -> CGFloat {
-            let intrinsic = item.intrinsicContentSize()
-            return axis == .Horizontal ? intrinsic.width : intrinsic.height
+        func sizeFor(_ item: UIView) -> CGFloat {
+            let intrinsic = item.intrinsicContentSize
+            return axis == .horizontal ? intrinsic.width : intrinsic.height
         }
         let itemsWithIntrinsic: [UIView] = visibleItems.filter {
-            let size = size($0)
+            let size = sizeFor($0)
             return size != UIViewNoIntrinsicMetric && size > 0
         }
         guard itemsWithIntrinsic.count > 0 else {
@@ -102,13 +102,13 @@ class DistributionLayoutArrangement: LayoutArrangement {
         }
         let totalSpacing = spacing * CGFloat(visibleItems.count - 1)
         let totalSize = itemsWithIntrinsic.reduce(totalSpacing) { total, item in
-            return total + size(item)
+            return total + sizeFor(item)
         }
         var priority: UILayoutPriority? = (itemsWithIntrinsic.count == 1 && (visibleItems.count == 1 || spacing == 0.0)) ? nil : 999
         visibleItems.forEach {
-            let size = size($0)
+            let size = sizeFor($0)
             if size != UIViewNoIntrinsicMetric && size > 0 {
-                constraint(item: $0, attribute: width, toItem: canvas, relation: .Equal, multiplier: (size / totalSize), priority: priority, identifier: "ASV-fill-proportionally")
+                constraint(item: $0, attribute: width, toItem: canvas, relation: .equal, multiplier: (size / totalSize), priority: priority, identifier: "ASV-fill-proportionally")
             } else {
                 constraint(item: $0, attribute: width, constant: 0, identifier: "ASV-fill-proportionally")
             }
@@ -125,26 +125,26 @@ class DistributionLayoutArrangement: LayoutArrangement {
     // MARK: Managed Attributes
 
     private var width: NSLayoutAttribute {
-        return axis == .Horizontal ? .Width : .Height
+        return axis == .horizontal ? .width : .height
     }
 
     private var leading: NSLayoutAttribute {
-        return axis == .Horizontal ? .Leading : .Top
+        return axis == .horizontal ? .leading : .top
     }
 
     private var trailing: NSLayoutAttribute {
-        return axis == .Horizontal ? .Trailing : .Bottom
+        return axis == .horizontal ? .trailing : .bottom
     }
 
     private var center: NSLayoutAttribute {
-        return axis == .Horizontal ? .CenterX : .CenterY
+        return axis == .horizontal ? .centerX : .centerY
     }
 
     
     // MARK: Helpers
     
-    private func addSpacings(relation: NSLayoutRelation = .Equal) {
-        func spacingFor(previous previous: UIView, current: UIView) -> CGFloat {
+    private func addSpacings(_ relation: NSLayoutRelation = .equal) {
+        func spacingFor(previous: UIView, current: UIView) -> CGFloat {
             if current === visibleItems.first || previous === visibleItems.last {
                 return 0.0
             } else {
@@ -153,17 +153,17 @@ class DistributionLayoutArrangement: LayoutArrangement {
         }
         items.forPair { previous, current in
             let spacing = spacingFor(previous: previous, current: current)
-            let toAttr: NSLayoutAttribute = baselineRelative ? .FirstBaseline : leading
-            let fromAttr: NSLayoutAttribute = baselineRelative ? .LastBaseline : trailing
+            let toAttr: NSLayoutAttribute = baselineRelative ? .firstBaseline : leading
+            let fromAttr: NSLayoutAttribute = baselineRelative ? .lastBaseline : trailing
             constraint(item: current, attribute: toAttr, toItem: previous, attribute: fromAttr, relation: relation, constant: spacing, identifier: "ASV-spacing")
         }
     }
     
-    private func connectItem(item1: UIView, attribute attr1: NSLayoutAttribute, item item2: UIView, attribute attr2: NSLayoutAttribute) {
+    private func connectItem(_ item1: UIView, attribute attr1: NSLayoutAttribute, item item2: UIView, attribute attr2: NSLayoutAttribute) {
         constraint(item: item1, attribute: attr1, toItem: item2, attribute: attr2, identifier: "ASV-distributing-edge")
     }
     
-    private func matchItemsSize(items: [UIView], priority: UILayoutPriority? = nil) {
+    private func matchItemsSize(_ items: [UIView], priority: UILayoutPriority? = nil) {
         guard items.count > 0 else { return }
         let firstItem = items.first!
         items.dropFirst().forEach {

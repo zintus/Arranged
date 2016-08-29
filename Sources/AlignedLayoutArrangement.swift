@@ -7,7 +7,7 @@ import UIKit
 /** Manages alignment: constraints perpendicular to the axis.
  */
 class AlignedLayoutArrangement: LayoutArrangement {
-    var type: StackViewAlignment = .Fill
+    var type: StackViewAlignment = .fill
     private var spacer: LayoutSpacer
     
     override init(canvas: StackView) {
@@ -47,14 +47,14 @@ class AlignedLayoutArrangement: LayoutArrangement {
         let firstItem = visibleItems.count == 0 ? spacer : items.first!
         var topItem = firstItem
         var bottomItem = shouldCreateSpacer ? spacer : firstItem
-        if typeIn([.Center, .Trailing, .LastBaseline]) {
+        if typeIn([.center, .trailing, .lastBaseline]) {
             swap(&topItem, &bottomItem)
         }
         
         connectToCanvas(topItem, attribute: top, weak: isTopCanvasConnectionWeak)
         connectToCanvas(bottomItem, attribute: bottom, weak: isBottomCanvasConnectionWeak)
         
-        if type == .Center {
+        if type == .center {
             connectToCanvas(firstItem, attribute: center)
         }
     }
@@ -65,14 +65,14 @@ class AlignedLayoutArrangement: LayoutArrangement {
     
     private var isTopCanvasConnectionWeak: Bool {
         if shouldCreateSpacer {
-            return type == .FirstBaseline && visibleItems.count > 0 && axis == .Horizontal // .FirstBaseline specific
+            return type == .firstBaseline && visibleItems.count > 0 && axis == .horizontal // .FirstBaseline specific
         }
         return isTopItemConnectionWeak
     }
     
     private var isBottomCanvasConnectionWeak: Bool {
         if shouldCreateSpacer {
-            return type == .LastBaseline && visibleItems.count > 0 && axis == .Horizontal // .LastBaseline specific
+            return type == .lastBaseline && visibleItems.count > 0 && axis == .horizontal // .LastBaseline specific
         }
         return isBottomItemConnectionWeak
     }
@@ -86,22 +86,22 @@ class AlignedLayoutArrangement: LayoutArrangement {
     }
     
     private var isTopItemConnectionWeak: Bool {
-        return typeIn([.Trailing, .Center, .FirstBaseline, .LastBaseline])
+        return typeIn([.trailing, .center, .firstBaseline, .lastBaseline])
     }
     
     private var isBottomItemConnectionWeak: Bool {
-        return typeIn([.Leading, .Center, .FirstBaseline, .LastBaseline])
+        return typeIn([.leading, .center, .firstBaseline, .lastBaseline])
     }
     
     private func updateAlignmentConstraints() {
         func attributes() -> [NSLayoutAttribute] {
             switch type {
-            case .Fill: return [bottom, top]
-            case .Leading: return [top]
-            case .Trailing: return [bottom]
-            case .Center: return [center]
-            case .FirstBaseline: return axis == .Horizontal ? [.FirstBaseline] : []
-            case .LastBaseline: return axis == .Horizontal ? [.LastBaseline] : []
+            case .fill: return [bottom, top]
+            case .leading: return [top]
+            case .trailing: return [bottom]
+            case .center: return [center]
+            case .firstBaseline: return axis == .horizontal ? [.firstBaseline] : []
+            case .lastBaseline: return axis == .horizontal ? [.lastBaseline] : []
             }
         }
         attributes().forEach {
@@ -112,32 +112,32 @@ class AlignedLayoutArrangement: LayoutArrangement {
     // MARK: Managed Attributes
 
     private var height: NSLayoutAttribute {
-        return axis == .Horizontal ? .Height : .Width
+        return axis == .horizontal ? .height : .width
     }
 
     private var top: NSLayoutAttribute {
-        return axis == .Horizontal ? .Top : .Leading
+        return axis == .horizontal ? .top : .leading
     }
 
     private var bottom: NSLayoutAttribute {
-        return axis == .Horizontal ? .Bottom : .Trailing
+        return axis == .horizontal ? .bottom : .trailing
     }
 
     private var center: NSLayoutAttribute {
-        return axis == .Horizontal ? .CenterY : .CenterX
+        return axis == .horizontal ? .centerY : .centerX
     }
     
     // MARK: Helpers
     
-    private func alignItems(items: [UIView], attribute: NSLayoutAttribute) {
+    private func alignItems(_ items: [UIView], attribute: NSLayoutAttribute) {
         let firstItem = items.first!
         items.dropFirst().forEach {
             constraint(item: firstItem, attribute: attribute, toItem: $0, attribute: nil, identifier: "ASV-alignment")
         }
     }
     
-    private func connectItemsToSpacer(spacer: LayoutSpacer, items: [UIView], topWeak: Bool, bottomWeak: Bool) {
-        func connectToSpacer(item: UIView, attribute attr: NSLayoutAttribute, weak: Bool) {
+    private func connectItemsToSpacer(_ spacer: LayoutSpacer, items: [UIView], topWeak: Bool, bottomWeak: Bool) {
+        func connectToSpacer(_ item: UIView, attribute attr: NSLayoutAttribute, weak: Bool) {
             let relation = connectionRelation(attr, weak: weak)
             let priority: UILayoutPriority? = weak ? nil : 999.5
             constraint(item: spacer, attribute: attr, toItem: item, relation: relation, priority: priority, identifier: "ASV-spanning-boundary")
@@ -148,13 +148,13 @@ class AlignedLayoutArrangement: LayoutArrangement {
         }
     }
     
-    private func addItemsAmbiguitySuppressors(items: [UIView]) {
+    private func addItemsAmbiguitySuppressors(_ items: [UIView]) {
         items.forEach {
             constraint(item: $0, attribute: height, constant: 0, priority: 25, identifier: "ASV-ambiguity-suppression")
         }
     }
     
-    private func typeIn(types: [StackViewAlignment]) -> Bool {
+    private func typeIn(_ types: [StackViewAlignment]) -> Bool {
         return types.contains(type)
     }
 }

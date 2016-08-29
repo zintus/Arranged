@@ -127,11 +127,11 @@ class LayoutTests: XCTestCase {
     
     // MARK: Tests Implementation
 
-    func _test(views: (Void -> [UIView])) {
+    func _test(_ views: ((Void) -> [UIView])) {
         _test(views: views, update: nil)
     }
     
-    func _test(views views: (Void -> [UIView]), update: ((StackViewAdapter, [UIView]) -> Void)?) {
+    func _test(views: ((Void) -> [UIView]), update: ((StackViewAdapter, [UIView]) -> Void)?) {
         var failedCount = 0
         let combinations = StackTestConfiguraton.generate()
         combinations.forEach {
@@ -147,13 +147,13 @@ class LayoutTests: XCTestCase {
         print("Total passes: \(testCasesCount - failedTestCasesCount)/\(testCasesCount) combinations")
     }
     
-    func _test(viewsClosure: (Void -> [UIView]), update: ((StackViewAdapter, [UIView]) -> Void)?, conf: StackTestConfiguraton) -> Bool {
+    func _test(_ viewsClosure: ((Void) -> [UIView]), update: ((StackViewAdapter, [UIView]) -> Void)?, conf: StackTestConfiguraton) -> Bool {
         let stack1 = UIStackView()
         let stack2 = StackView()
         
-        func constraints<T where T: UIView, T: StackViewAdapter>(stack: T) -> [NSLayoutConstraint] {
+        func constraints<T>(_ stack: T) -> [NSLayoutConstraint] where T: UIView, T: StackViewAdapter {
             let views = viewsClosure()
-            views.enumerate().forEach {
+            views.enumerated().forEach {
                 // This is important, tag is requried to match constraints later
                 $1.tag = $0
                 $1.test_isContentView = true
@@ -163,8 +163,8 @@ class LayoutTests: XCTestCase {
             stack.axis = conf.axis
             stack.ar_alignment = conf.alignment
             stack.ar_distribution = conf.distribution
-            stack.baselineRelativeArrangement = conf.baselineRelativeArrangement
-            stack.layoutMarginsRelativeArrangement = conf.layoutMarginsRelativeArrangement
+            stack.isBaselineRelativeArrangement = conf.isBaselineRelativeArrangement
+            stack.isLayoutMarginsRelativeArrangement = conf.isLayoutMarginsRelativeArrangement
             stack.spacing = conf.spacing
             
             if let update = update {
@@ -180,8 +180,8 @@ class LayoutTests: XCTestCase {
         XCTAssertEqual(stack1.axis, stack2.axis)
         XCTAssertEqual(stack1.ar_alignment, stack2.ar_alignment)
         XCTAssertEqual(stack1.ar_distribution, stack2.ar_distribution)
-        XCTAssertEqual(stack1.layoutMarginsRelativeArrangement, stack2.layoutMarginsRelativeArrangement)
-        XCTAssertEqual(stack1.baselineRelativeArrangement, stack2.baselineRelativeArrangement)
+        XCTAssertEqual(stack1.isLayoutMarginsRelativeArrangement, stack2.isLayoutMarginsRelativeArrangement)
+        XCTAssertEqual(stack1.isBaselineRelativeArrangement, stack2.isBaselineRelativeArrangement)
         XCTAssertEqual(stack1.spacing, stack2.spacing)
         XCTAssertEqual(stack1.arrangedSubviews.count, stack2.arrangedSubviews.count)
         
@@ -204,13 +204,13 @@ class LayoutTests: XCTestCase {
     
     // MARK: Helpers
     
-    func printTestTitle(string: String) {
+    func printTestTitle(_ string: String) {
         print("\n\n===============================================")
         print(string)
     }
     
-    func _print(constraints: [NSLayoutConstraint]) {
-        constraintsPrinted++
+    func _print(_ constraints: [NSLayoutConstraint]) {
+        constraintsPrinted += 1
         guard constraintsPrinted < maxConstraintsPrinted else {
             return
         }
@@ -224,7 +224,7 @@ class LayoutTests: XCTestCase {
 class ContentView: UIView {
     var contentSize: CGSize = CGSize(width: 44, height: 44)
     convenience init(contentSize: CGSize) {
-        self.init(frame: CGRectZero)
+        self.init(frame: CGRect.zero)
         self.contentSize = contentSize
     }
     
@@ -236,7 +236,7 @@ class ContentView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func intrinsicContentSize() -> CGSize {
+    override var intrinsicContentSize: CGSize {
         return self.contentSize
     }
 }

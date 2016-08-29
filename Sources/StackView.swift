@@ -97,13 +97,13 @@ public class StackView : UIView {
     }
     
     /// A Boolean value that determines whether the vertical spacing between views is measured from their baselines.
-    public var baselineRelativeArrangement = false {
-        didSet { if baselineRelativeArrangement != oldValue { invalidateLayout() } }
+    public var isBaselineRelativeArrangement = false {
+        didSet { if isBaselineRelativeArrangement != oldValue { invalidateLayout() } }
     }
     
     /// A Boolean value that determines whether the stack view lays out its arranged views relative to its layout margins.
-    open var layoutMarginsRelativeArrangement = false {
-        didSet { if layoutMarginsRelativeArrangement != oldValue { invalidateLayout() } }
+    open var isLayoutMarginsRelativeArrangement = false {
+        didSet { if isLayoutMarginsRelativeArrangement != oldValue { invalidateLayout() } }
     }
 
     /// The list of views arranged by the stack view.
@@ -222,13 +222,13 @@ public class StackView : UIView {
             for arrangement in [alignmentArrangement, distributionArrangement] as [LayoutArrangement] {
                 arrangement.items = arrangedSubviews
                 arrangement.axis = axis
-                arrangement.marginsEnabled = layoutMarginsRelativeArrangement
+                arrangement.marginsEnabled = isLayoutMarginsRelativeArrangement
                 arrangement.hiddenItems = hiddenViews
             }
             
             distributionArrangement.type = distribution
             distributionArrangement.spacing = spacing
-            distributionArrangement.baselineRelative = baselineRelativeArrangement && axis == .vertical
+            distributionArrangement.isBaselineRelative = isBaselineRelativeArrangement && axis == .vertical
             
             alignmentArrangement.type = alignment
             

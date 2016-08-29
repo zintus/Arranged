@@ -9,7 +9,7 @@ import UIKit
 class DistributionLayoutArrangement: LayoutArrangement {
     var type: StackViewDistribution = .fill
     var spacing: CGFloat = 0
-    var baselineRelative = false
+    var isBaselineRelative = false
     var spacer: LayoutSpacer
     private var gaps = [GapLayoutGuide]()
 
@@ -68,8 +68,8 @@ class DistributionLayoutArrangement: LayoutArrangement {
             canvas.addSubview(gap)
             gaps.append(gap)
 
-            let toAttr: NSLayoutAttribute = baselineRelative ? .firstBaseline : leading
-            let fromAttr: NSLayoutAttribute = baselineRelative ? .lastBaseline : trailing
+            let toAttr: NSLayoutAttribute = isBaselineRelative ? .firstBaseline : leading
+            let fromAttr: NSLayoutAttribute = isBaselineRelative ? .lastBaseline : trailing
             
             connectItem(gap, attribute: toAttr, item: previous, attribute: (type == .equalCentering ? center : fromAttr))
             connectItem(gap, attribute: fromAttr, item: current, attribute: (type == .equalCentering ? center : toAttr))
@@ -153,8 +153,8 @@ class DistributionLayoutArrangement: LayoutArrangement {
         }
         items.forPair { previous, current in
             let spacing = spacingFor(previous: previous, current: current)
-            let toAttr: NSLayoutAttribute = baselineRelative ? .firstBaseline : leading
-            let fromAttr: NSLayoutAttribute = baselineRelative ? .lastBaseline : trailing
+            let toAttr: NSLayoutAttribute = isBaselineRelative ? .firstBaseline : leading
+            let fromAttr: NSLayoutAttribute = isBaselineRelative ? .lastBaseline : trailing
             constraint(item: current, attribute: toAttr, toItem: previous, attribute: fromAttr, relation: relation, constant: spacing, identifier: "ASV-spacing")
         }
     }

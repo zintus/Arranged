@@ -12,12 +12,12 @@ import Arranged
 
 protocol StackViewAdapter: class {
     // Those members are the same for both classes
-    func addArrangedSubview(view: UIView)
-    func removeArrangedSubview(view: UIView)
+    func addArrangedSubview(_ view: UIView)
+    func removeArrangedSubview(_ view: UIView)
     var axis: UILayoutConstraintAxis { get set }
     var spacing: CGFloat { get set }
-    var baselineRelativeArrangement: Bool { get set }
-    var layoutMarginsRelativeArrangement: Bool { get set }
+    var isBaselineRelativeArrangement: Bool { get set }
+    var isLayoutMarginsRelativeArrangement: Bool { get set }
 
     var ar_distribution: UIStackViewDistribution { get set }
     var ar_alignment: UIStackViewAlignment { get set }
@@ -48,21 +48,21 @@ extension UIStackView: StackViewAdapter {
 extension StackViewDistribution {
     func toStackViewDistrubition() -> UIStackViewDistribution {
         switch self {
-        case .Fill: return .Fill
-        case .FillEqually: return .FillEqually
-        case .FillProportionally: return .FillProportionally
-        case .EqualSpacing: return .EqualSpacing
-        case .EqualCentering: return .EqualCentering
+        case .fill: return .fill
+        case .fillEqually: return .fillEqually
+        case .fillProportionally: return .fillProportionally
+        case .equalSpacing: return .equalSpacing
+        case .equalCentering: return .equalCentering
         }
     }
 
-    static func fromStackViewDistrubition(distribution: UIStackViewDistribution) -> StackViewDistribution {
+    static func fromStackViewDistrubition(_ distribution: UIStackViewDistribution) -> StackViewDistribution {
         switch distribution {
-        case .Fill: return .Fill
-        case .FillEqually: return .FillEqually
-        case .FillProportionally: return .FillProportionally
-        case .EqualSpacing: return .EqualSpacing
-        case .EqualCentering: return .EqualCentering
+        case .fill: return .fill
+        case .fillEqually: return .fillEqually
+        case .fillProportionally: return .fillProportionally
+        case .equalSpacing: return .equalSpacing
+        case .equalCentering: return .equalCentering
         }
     }
 }
@@ -70,23 +70,23 @@ extension StackViewDistribution {
 extension StackViewAlignment {
     func toStackViewAlignment() -> UIStackViewAlignment {
         switch self {
-        case .Fill: return .Fill
-        case .Leading: return .Leading
-        case .FirstBaseline: return .FirstBaseline
-        case .Center: return .Center
-        case .Trailing: return .Trailing
-        case .LastBaseline: return .LastBaseline
+        case .fill: return .fill
+        case .leading: return .leading
+        case .firstBaseline: return .firstBaseline
+        case .center: return .center
+        case .trailing: return .trailing
+        case .lastBaseline: return .lastBaseline
         }
     }
 
-    static func fromStackViewAlignment(alignment: UIStackViewAlignment) -> StackViewAlignment {
+    static func fromStackViewAlignment(_ alignment: UIStackViewAlignment) -> StackViewAlignment {
         switch alignment {
-        case .Fill: return .Fill
-        case .Leading: return .Leading
-        case .FirstBaseline: return .FirstBaseline
-        case .Center: return .Center
-        case .Trailing: return .Trailing
-        case .LastBaseline: return .LastBaseline
+        case .fill: return .fill
+        case .leading: return .leading
+        case .firstBaseline: return .firstBaseline
+        case .center: return .center
+        case .trailing: return .trailing
+        case .lastBaseline: return .lastBaseline
         }
     }
 }

@@ -16,9 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     let controller1 = ArrangedViewController()
     let controller2 = StackViewController()
 
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        window?.backgroundColor = UIColor.whiteColor()
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.backgroundColor = UIColor.white
         controller1.tabBarItem = UITabBarItem(title: "Arranged.StackView", image: UIImage(named: "tabBarIcon"), tag: 0)
         controller2.tabBarItem = UITabBarItem(title: "UIStackView", image: UIImage(named: "tabBarIcon"), tag: 0)
         tabBarController.viewControllers = [controller1, controller2]

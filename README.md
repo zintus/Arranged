@@ -1,7 +1,7 @@
 <p align="left"><img src="https://cloud.githubusercontent.com/assets/1567433/13573789/5bb83738-e492-11e5-930d-3c51341a8ac3.png" height="150"/>
 
 <p align="left">
-<a href="https://cocoapods.org"><img src="https://img.shields.io/cocoapods/v/Arranged.svg"></a>
+<img src="https://img.shields.io/cocoapods/v/Arranged.svg?label=version">
 <a href="https://github.com/Carthage/Carthage"><img src="https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat"></a>
 <a href="http://cocoadocs.org/docsets/Arranged"><img src="https://img.shields.io/cocoapods/p/Arranged.svg?style=flat)"></a>
 </p>
@@ -75,8 +75,9 @@ UIView.animateWithDuration(0.33) {
 
 ## Requirements
 
-- iOS 8.0+, tvOS 9.0+
-- Xcode 7.1+, Swift 2.0+
+- iOS 8.0, tvOS 9.0
+- Xcode 8 
+- Swift 3
 
 ## Getting Started
 

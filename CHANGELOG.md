@@ -1,5 +1,9 @@
 [Changelog](https://github.com/kean/Arranged/releases) for all versions
 
+## Arranged 2.0
+ 
+- Updated to Swift 3
+
 ## Arranged 1.0.4
 
 - Activate constraints using `activate` property instead of manually adding them to the view

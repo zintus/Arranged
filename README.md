@@ -57,11 +57,11 @@ Open source replacement of [UIStackView](https://developer.apple.com/library/pre
 
 ```swift
 let stackView = StackView(arrangedSubviews: [view1, view2, view3])
-stackView.alignment = .Leading
-stackView.distribution = .FillEqually
+stackView.alignment = .leading
+stackView.distribution = .fillEqually
 stackView.spacing = 20
-stackView.axis = .Vertical
-stackView.layoutMarginsRelativeArrangement = true
+stackView.axis = .vertical
+stackView.isLayoutMarginsRelativeArrangement = true
 ```
 
 The only difference is hiding items:

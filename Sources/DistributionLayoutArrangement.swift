@@ -74,7 +74,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
             connectItem(gap, attribute: toAttr, item: previous, attribute: (type == .equalCentering ? center : fromAttr))
             connectItem(gap, attribute: fromAttr, item: current, attribute: (type == .equalCentering ? center : toAttr))
         }
-        matchItemsSize(gaps, priority: type == .equalCentering ? 149 : nil)
+        matchItemsSize(gaps, priority: type == .equalCentering ? UILayoutPriority(rawValue: 149) : nil)
     }
 
     private func updateDistributionConstraints() {
@@ -104,7 +104,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
         let totalSize = itemsWithIntrinsic.reduce(totalSpacing) { total, item in
             return total + sizeFor(item)
         }
-        var priority: UILayoutPriority? = (itemsWithIntrinsic.count == 1 && (visibleItems.count == 1 || spacing == 0.0)) ? nil : 999
+        var priority: UILayoutPriority? = (itemsWithIntrinsic.count == 1 && (visibleItems.count == 1 || spacing == 0.0)) ? nil : UILayoutPriority(rawValue: 999)
         visibleItems.forEach {
             let size = sizeFor($0)
             if size != UIViewNoIntrinsicMetric && size > 0 {
@@ -112,7 +112,9 @@ class DistributionLayoutArrangement: LayoutArrangement {
             } else {
                 constraint(item: $0, attribute: width, constant: 0, identifier: "ASV-fill-proportionally")
             }
-            priority? -= 1
+            if let unwrappedPriority = priority {
+                priority = UILayoutPriority(rawValue: unwrappedPriority.rawValue - 1)
+            }
         }
     }
     

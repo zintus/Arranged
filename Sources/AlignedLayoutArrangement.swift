@@ -38,7 +38,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
         if shouldCreateSpacer {
             canvas.addSubview(spacer)
             if isAnyItemConnectionWeak {
-                constraint(item: spacer, attribute: height, constant: 0, priority: 51, identifier: "ASV-spanning-fit")
+                constraint(item: spacer, attribute: height, constant: 0, priority: UILayoutPriority(rawValue: 51), identifier: "ASV-spanning-fit")
             }
             connectItemsToSpacer(spacer, items: visibleItems, topWeak: isTopItemConnectionWeak, bottomWeak: isBottomItemConnectionWeak)
         }
@@ -139,7 +139,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
     private func connectItemsToSpacer(_ spacer: LayoutSpacer, items: [UIView], topWeak: Bool, bottomWeak: Bool) {
         func connectToSpacer(_ item: UIView, attribute attr: NSLayoutAttribute, weak: Bool) {
             let relation = connectionRelation(attr, weak: weak)
-            let priority: UILayoutPriority? = weak ? nil : 999.5
+            let priority: UILayoutPriority? = weak ? nil : UILayoutPriority(rawValue: 999.5)
             constraint(item: spacer, attribute: attr, toItem: item, relation: relation, priority: priority, identifier: "ASV-spanning-boundary")
         }
         items.forEach {
@@ -150,7 +150,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
     
     private func addItemsAmbiguitySuppressors(_ items: [UIView]) {
         items.forEach {
-            constraint(item: $0, attribute: height, constant: 0, priority: 25, identifier: "ASV-ambiguity-suppression")
+            constraint(item: $0, attribute: height, constant: 0, priority: UILayoutPriority(rawValue: 25), identifier: "ASV-ambiguity-suppression")
         }
     }
     

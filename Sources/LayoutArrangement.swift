@@ -52,7 +52,7 @@ class LayoutArrangement {
     }
     
     func addCanvasFitConstraint(attribute: NSLayoutAttribute) {
-        constraint(item: canvas, attribute: attribute, constant: 0, priority: 49, identifier: "ASV-canvas-fit")
+        constraint(item: canvas, attribute: attribute, constant: 0, priority: UILayoutPriority(rawValue: 49), identifier: "ASV-canvas-fit")
     }
     
     func connectToCanvas(_ item: UIView, attribute attr: NSLayoutAttribute, weak: Bool = false) {

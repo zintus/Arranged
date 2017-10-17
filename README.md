@@ -76,8 +76,8 @@ UIView.animateWithDuration(0.33) {
 ## Requirements
 
 - iOS 8.0, tvOS 9.0
-- Xcode 8 
-- Swift 3
+- Xcode 9
+- Swift 4
 
 ## Getting Started
 

@@ -9,7 +9,7 @@
 import UIKit
 import Arranged
 
-let loggingEnabled = false
+let loggingEnabled = true
 let logAffectingViewsConstraints = false
 
 
@@ -240,7 +240,7 @@ class BaseStackViewController<T>: UIViewController where T: UIView, T: StackView
             print("\n\n")
             print("===========================")
             print("constraints:")
-            printConstraints(constraintsForView(stackView))
+            printConstraints(constraints(for: stackView))
 
             if logAffectingViewsConstraints {
                 print("")
@@ -302,16 +302,14 @@ class BaseStackViewController<T>: UIViewController where T: UIView, T: StackView
     }
     
     func printConstraints(_ constraints: [NSLayoutConstraint]) {
-        for constraint in constraints {
-            print(constraint)
-        }
+        constraints.forEach { print($0) }
     }
     
-    func constraintsForView(_ item: UIView) -> [NSLayoutConstraint] {
+    func constraints(for item: UIView) -> [NSLayoutConstraint] {
         var constraints = [NSLayoutConstraint]()
         constraints.append(contentsOf: item.constraints)
         for subview in item.subviews {
-                constraints.append(contentsOf: subview.constraints)
+            constraints.append(contentsOf: subview.constraints)
         }
         return constraints
     }

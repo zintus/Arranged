@@ -1,5 +1,9 @@
 [Changelog](https://github.com/kean/Arranged/releases) for all versions
 
+## Arranged 2.1
+
+- Updated to Swift 4
+
 ## Arranged 2.0
  
 - Updated to Swift 3

@@ -74,30 +74,30 @@ The StackView class provides a streamlined interface for laying out a collection
  
  See UIStackView documentation for more info.
 */
-public class StackView : UIView {
+open class StackView : UIView {
     
     /// The axis along which the arranged views are laid out.
-    public var axis: UILayoutConstraintAxis = .horizontal {
+    open var axis: UILayoutConstraintAxis = .horizontal {
         didSet { if axis != oldValue { invalidateLayout() } }
     }
     
     /// The distribution of the arranged views along the stack view’s axis.
-    public var distribution: StackViewDistribution = .fill {
+    open var distribution: StackViewDistribution = .fill {
         didSet { if distribution != oldValue { invalidateLayout() } }
     }
     
     /// The alignment of the arranged subviews perpendicular to the stack view’s axis.
-    public var alignment: StackViewAlignment = .fill {
+    open var alignment: StackViewAlignment = .fill {
         didSet { if alignment != oldValue { invalidateLayout() } }
     }
     
     /// The distance in points between the adjacent edges of the stack view’s arranged views.
-    public var spacing: CGFloat = 0.0 {
+    open var spacing: CGFloat = 0.0 {
         didSet { if spacing != oldValue { invalidateLayout() } }
     }
     
     /// A Boolean value that determines whether the vertical spacing between views is measured from their baselines.
-    public var isBaselineRelativeArrangement = false {
+    open var isBaselineRelativeArrangement = false {
         didSet { if isBaselineRelativeArrangement != oldValue { invalidateLayout() } }
     }
     
@@ -115,18 +115,18 @@ public class StackView : UIView {
     private var hiddenViews = Set<UIView>()
     
     /// Returns a new stack view object that manages the provided views.
-    public init(arrangedSubviews views: [UIView]) {
+    open init(arrangedSubviews views: [UIView]) {
         super.init(frame: CGRect.zero)
         commonInit(views: views)
     }
 
     /// Returns a new stack view object.
-    public convenience init() {
+    open convenience init() {
         self.init(arrangedSubviews: [])
     }
     
     /// Returns a new stack view object.
-    public required init?(coder aDecoder: NSCoder) {
+    open required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         commonInit(views: [])
     }
@@ -147,7 +147,7 @@ public class StackView : UIView {
     
     The stack view ensures that the arrangedSubviews array is always a subset of its subviews array. This method automatically adds the provided view as a subview of the stack view, if it is not already. If the view is already a subview, this operation does not alter the subview ordering.
     */
-    public func addArrangedSubview(_ view: UIView) {
+    open func addArrangedSubview(_ view: UIView) {
         insertArrangedSubview(view, atIndex: arrangedSubviews.count)
     }
     
@@ -156,7 +156,7 @@ public class StackView : UIView {
      
      This method removes the provided view from the stack’s arrangedSubviews array. The view’s position and size will no longer be managed by the stack view. However, this method does not remove the provided view from the stack’s subviews array; therefore, the view is still displayed as part of the view hierarchy.
      */
-    public func removeArrangedSubview(_ view: UIView) {
+    open func removeArrangedSubview(_ view: UIView) {
         if let index = arrangedSubviews.index(of: view) {
             arrangedSubviews.remove(at: index)
             hiddenViews.remove(view)
@@ -171,7 +171,7 @@ public class StackView : UIView {
      
      The stack view also ensures that the arrangedSubviews array is always a subset of its subviews array. This method automatically adds the provided view as a subview of the stack view, if it is not already. When adding subviews, the stack view appends the view to the end of its subviews array. The index only affects the order of views in the arrangedSubviews array. It does not affect the ordering of views in the subviews array.
      */
-    public func insertArrangedSubview(_ view: UIView, atIndex stackIndex: Int) {
+    open func insertArrangedSubview(_ view: UIView, atIndex stackIndex: Int) {
         if let idx = arrangedSubviews.index(of: view) {
             arrangedSubviews.remove(at: idx)
         }
@@ -184,14 +184,14 @@ public class StackView : UIView {
     }
 
     /// Removes subview from arranged subviews.
-    public override func willRemoveSubview(_ subview: UIView) {
+    open override func willRemoveSubview(_ subview: UIView) {
         removeArrangedSubview(subview)
     }
     
     // MARK: Hiding Views
     
     /// Updates stack view's layout to hide/show a given view. The view remains a subview of the stack view, but it's width (or height for vertical stack view) is reduced to 0. This method doesn't change view's `hidden` property.
-    public func setArrangedView(_ view: UIView, hidden: Bool) {
+    open func setArrangedView(_ view: UIView, hidden: Bool) {
         if hidden {
             hiddenViews.insert(view)
         } else {
@@ -207,7 +207,7 @@ public class StackView : UIView {
     
     In general, you never need to call this method manually. The only reason to call it is when stack view's `distribution` is set to `.FillProportionally` and `intrinsicContentSize` of one of the arranged view changes.
     */
-    public func invalidateLayout() {
+    open func invalidateLayout() {
         if !invalidated {
             invalidated = true
             setNeedsUpdateConstraints()
@@ -215,7 +215,7 @@ public class StackView : UIView {
     }
 
     /// Updates alignment and distribution constraints.
-    public override func updateConstraints() {
+    open override func updateConstraints() {
         if invalidated {
             invalidated = false
             
@@ -244,12 +244,12 @@ public class StackView : UIView {
 
     /// Returns first arranged view for vertical axis and self for horizontal axis.
     #if !os(tvOS)
-    public override func forBaselineLayout() -> UIView {
+    open override func forBaselineLayout() -> UIView {
         return _viewForFirstBaselineLayout
     }
 
     /// Returns first arranged view for vertical axis and self for horizontal axis.
-    public override var forFirstBaselineLayout: UIView {
+    open override var forFirstBaselineLayout: UIView {
         return _viewForFirstBaselineLayout
     }
     
@@ -271,7 +271,7 @@ public class StackView : UIView {
     }
 
     /// Returns last arranged view for vertical axis and self for horizontal axis.
-    public override var forLastBaselineLayout: UIView {
+    open override var forLastBaselineLayout: UIView {
         switch axis {
         case .vertical:
             if let last = arrangedSubviews.last {
@@ -291,18 +291,18 @@ public class StackView : UIView {
     // MARK: Misc
 
     /// Returns CATransformLayer class.
-    public override class var layerClass: Swift.AnyClass {
+    open override class var layerClass: Swift.AnyClass {
         return CATransformLayer.self
     }
 
     /// Changing background color has no effect.
-    public override var backgroundColor: UIColor? {
+    open override var backgroundColor: UIColor? {
         get { return nil }
         set { return }
     }
 
     /// Returns true.
-    public override class var requiresConstraintBasedLayout: Bool {
+    open override class var requiresConstraintBasedLayout: Bool {
         return true
     }
 }

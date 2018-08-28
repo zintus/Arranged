@@ -15,7 +15,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
 
     override init(canvas: StackView) {
         spacer = LayoutSpacer()
-        spacer.accessibilityIdentifier = "ASV-alignment-spanner"
+        spacer.accessibilityIdentifier = "ASV-ordering-spanner"
 
         super.init(canvas: canvas)
     }
@@ -50,8 +50,13 @@ class DistributionLayoutArrangement: LayoutArrangement {
             connectToCanvas(visibleItems.first!, attribute: leading)
             connectToCanvas(visibleItems.last!, attribute: trailing)
         }
+        updateSpanningFitConstraint()
     }
-    
+
+    private func updateSpanningFitConstraint() {
+        constraint(item: spacer, attribute: width, priority: spanningFitPriority, identifier: "ASV-spanning-fit")
+    }
+
     private func updateSpacingConstraints() {
         switch type {
         case .fill, .fillEqually, .fillProportionally:
@@ -120,7 +125,7 @@ class DistributionLayoutArrangement: LayoutArrangement {
     
     private func updateHiddenItemsConstraints() {
         hiddenItems.forEach {
-            constraint(item: $0, attribute: width, constant: 0, identifier: "ASV-hiding")
+            constraint(item: $0, attribute: width, constant: 0, priority: UILayoutPriority(rawValue: 999.999), identifier: "ASV-hiding")
         }
     }
 
@@ -153,11 +158,58 @@ class DistributionLayoutArrangement: LayoutArrangement {
                 return spacing - (spacing / 2.0) * CGFloat([previous, current].filter{ isHidden($0) }.count)
             }
         }
-        items.forPair { previous, current in
-            let spacing = spacingFor(previous: previous, current: current)
-            let toAttr: NSLayoutAttribute = isBaselineRelative ? .firstBaseline : leading
-            let fromAttr: NSLayoutAttribute = isBaselineRelative ? .lastBaseline : trailing
-            constraint(item: current, attribute: toAttr, toItem: previous, attribute: fromAttr, relation: relation, constant: spacing, identifier: "ASV-spacing")
+
+        if visibleItems.isEmpty {
+            for item in items {
+                let toAttr: NSLayoutAttribute = leading
+                let fromAttr: NSLayoutAttribute = trailing
+
+                constraint(item: item, attribute: toAttr, toItem: spacer, attribute: fromAttr, priority: UILayoutPriority(rawValue: 50), identifier: "ASV-spacing-hidden")
+            }
+        } else {
+            guard items.count > 1 else {
+                return
+            }
+            func establishSpacing(from: UIView, to: UIView) {
+                let spacing = spacingFor(previous: from, current: to)
+                let toAttr: NSLayoutAttribute = isBaselineRelative && !isHidden(to) ? .firstBaseline : leading
+                let fromAttr: NSLayoutAttribute = isBaselineRelative && !isHidden(from) ? .lastBaseline : trailing
+
+                if isHidden(to) || isHidden(from) {
+                    constraint(item: to, attribute: toAttr, toItem: from, attribute: fromAttr, relation: relation, constant: spacing, priority: UILayoutPriority(rawValue: 50), identifier: "ASV-spacing-hidden")
+                } else {
+                    constraint(item: to, attribute: toAttr, toItem: from, attribute: fromAttr, relation: relation, constant: spacing, identifier: "ASV-spacing")
+                }
+            }
+
+            var index = items.startIndex
+            while index < items.endIndex {
+                let item = items[index]
+                let isVisible = !isHidden(item)
+
+                if isVisible {
+                    var nextIndex = items.index(after: index)
+                    while nextIndex < items.endIndex {
+                        let nextItem = items[nextIndex]
+                        let nextIsVisible = !isHidden(nextItem)
+                        establishSpacing(from: item, to: nextItem)
+                        if nextIsVisible {
+                            break
+                        } else {
+                            nextIndex = items.index(after: nextIndex)
+                        }
+                    }
+                    index = nextIndex
+                } else {
+                    if let visibleItemAfter = (items[(index + 1)..<items.endIndex].first { !isHidden($0) }) {
+                        establishSpacing(from: item, to: visibleItemAfter)
+                    } else {
+                        assertionFailure("There must be at least one visible view")
+                    }
+
+                    index = items.index(after: index)
+                }
+            }
         }
     }
     
@@ -171,5 +223,9 @@ class DistributionLayoutArrangement: LayoutArrangement {
         items.dropFirst().forEach {
             constraint(item: $0, attribute: width, toItem: firstItem, priority: priority, identifier: "ASV-fill-equally")
         }
+    }
+
+    private var spanningFitPriority: UILayoutPriority {
+        return UILayoutPriority(rawValue: 0.001)
     }
 }

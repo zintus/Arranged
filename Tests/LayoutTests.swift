@@ -88,8 +88,7 @@ class LayoutTests: XCTestCase {
             stack.setArrangedView(views[1], hidden: true)
             stack.setArrangedView(views[2], hidden: true)
         })
-        
-        /* This test is disabled because UIStackView constructs invalid spacing constraint between item 1 and 2 (10), should be 0/
+
         printTestTitle("Test: 3 content views, 1st and 2nd hidden")
         _test(views: {
             return [ContentView(), ContentView(), ContentView()]
@@ -97,7 +96,14 @@ class LayoutTests: XCTestCase {
             stack.setArrangedView(views[0], hidden: true)
             stack.setArrangedView(views[1], hidden: true)
         })
-        */
+
+        printTestTitle("Test: 3 content views, 2nd and 3rd hidden")
+        _test(views: {
+            return [ContentView(), ContentView(), ContentView()]
+        }, update: { stack, views in
+            stack.setArrangedView(views[1], hidden: true)
+            stack.setArrangedView(views[2], hidden: true)
+        })
     }
     
     func testRemovingItems() {
@@ -127,11 +133,11 @@ class LayoutTests: XCTestCase {
     
     // MARK: Tests Implementation
 
-    func _test(_ views: @escaping ((Void) -> [UIView])) {
+    func _test(_ views: @escaping (() -> [UIView])) {
         _test(views: views, update: nil)
     }
     
-    func _test(views: @escaping ((Void) -> [UIView]), update: ((StackViewAdapter, [UIView]) -> Void)?) {
+    func _test(views: @escaping (() -> [UIView]), update: ((StackViewAdapter, [UIView]) -> Void)?) {
         var failedCount = 0
         let combinations = StackTestConfiguraton.generate()
         combinations.forEach {
@@ -147,7 +153,7 @@ class LayoutTests: XCTestCase {
         print("Total passes: \(testCasesCount - failedTestCasesCount)/\(testCasesCount) combinations")
     }
     
-    func _test(_ viewsClosure: @escaping ((Void) -> [UIView]), update: ((StackViewAdapter, [UIView]) -> Void)?, conf: StackTestConfiguraton) -> Bool {
+    func _test(_ viewsClosure: @escaping (() -> [UIView]), update: ((StackViewAdapter, [UIView]) -> Void)?, conf: StackTestConfiguraton) -> Bool {
         let stack1 = UIStackView()
         let stack2 = StackView()
         

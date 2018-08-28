@@ -37,9 +37,7 @@ class AlignedLayoutArrangement: LayoutArrangement {
     private func updateCanvasConnectingConstraints() {
         if shouldCreateSpacer {
             canvas.addSubview(spacer)
-            if isAnyItemConnectionWeak {
-                constraint(item: spacer, attribute: height, constant: 0, priority: UILayoutPriority(rawValue: 51), identifier: "ASV-spanning-fit")
-            }
+            constraint(item: spacer, attribute: height, constant: 0, priority: spanningAlignmentPriority, identifier: "ASV-spanning-fit")
             connectItemsToSpacer(spacer, items: visibleItems, topWeak: isTopItemConnectionWeak, bottomWeak: isBottomItemConnectionWeak)
         }
         
@@ -156,5 +154,9 @@ class AlignedLayoutArrangement: LayoutArrangement {
     
     private func typeIn(_ types: [StackViewAlignment]) -> Bool {
         return types.contains(type)
+    }
+
+    private var spanningAlignmentPriority: UILayoutPriority {
+        return UILayoutPriority(rawValue: !visibleItems.isEmpty ? 51 : 0.001)
     }
 }

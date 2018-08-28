@@ -115,18 +115,18 @@ open class StackView : UIView {
     private var hiddenViews = Set<UIView>()
     
     /// Returns a new stack view object that manages the provided views.
-    open init(arrangedSubviews views: [UIView]) {
+    public init(arrangedSubviews views: [UIView]) {
         super.init(frame: CGRect.zero)
         commonInit(views: views)
     }
 
     /// Returns a new stack view object.
-    open convenience init() {
+    public convenience init() {
         self.init(arrangedSubviews: [])
     }
     
     /// Returns a new stack view object.
-    open required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         commonInit(views: [])
     }

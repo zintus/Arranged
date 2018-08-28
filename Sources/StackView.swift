@@ -107,7 +107,7 @@ open class StackView : UIView {
     }
 
     /// The list of views arranged by the stack view.
-    public private(set) var arrangedSubviews = [UIView]()
+    open private(set) var arrangedSubviews = [UIView]()
     
     private var alignmentArrangement: AlignedLayoutArrangement!
     private var distributionArrangement: DistributionLayoutArrangement!
